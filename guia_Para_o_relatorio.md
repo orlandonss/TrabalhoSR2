@@ -28,6 +28,9 @@ E aí! Aqui está a estrutura completa e detalhada para o nosso relatório, agor
 
 ## 🏗️ Capítulo 2: Arquitetura e Implementação
 
+so para teres alguma referencia:
+Componentes instaladas linux cliente: sudo apt install -y realmd sssd-ad sssd-tools adcli libnss-sss libpam-sss krb5-user samba-common-bin dnsutils smbclient cifs-utils winbind libpam-winbind libnss-winbind
+
 *Aqui é onde entramos nos detalhes técnicos ("a carne do projeto").*
 
 * **Contexto e Arquitetura:** Apresentar o contexto do problema e a arquitetura completa do trabalho prático. Como é que as máquinas virtuais vão comunicar entre si?
@@ -45,7 +48,7 @@ E aí! Aqui está a estrutura completa e detalhada para o nosso relatório, agor
 *A prova de que o que fizemos realmente funciona.*
 
 * Mostrar as experiências realizadas e analisar os resultados de cada uma.
-* **Screenshots:** Encher este capítulo de *screenshots* bem explicados.
+* **Screenshots:** Encher este capítulo com alguns vestigios importantes de *screenshots* bem explicados.
   * Mostrar logins com sucesso de utilizadores do AD nas máquinas Linux.
   * **Essencial:** Mostrar o comando `klist` no terminal do Linux para provar que o utilizador recebeu um bilhete Kerberos válido a partir do Windows Server!
 
