@@ -1,0 +1,47 @@
+Before this message I did **no web searches**. The commands and configs in the guide and the slides came from my own knowledge and from your project files, so there is no list of searched links to give you.
+
+To give you sources you can cite, I just checked official documentation for each thing we used. These are real references that cover what you implemented, not a record of where each step came from. ✅ means I opened the page today and it loaded. ⚠️ means ubuntu.com returned an error (503), so check those yourself before citing them.
+
+## Project files (internal sources)
+- The workshop brief: `Ficheiros/SR2-2627-Workshop-Temas-10.pdf` (section 7.8, base and advanced components)
+- `regras_de_entrega_workshop_sr2.md` (delivery and naming rules)
+- `guias_workshop/project-oriented/RELATORIO_Pedro_Resumo_configuracao_realizada.pdf` (your colleague's earlier configuration report)
+- Your group's guides in `guias_workshop/project-oriented/` and `workshop_oriented/`
+
+## Windows Server / Active Directory
+- ✅ Install Active Directory Domain Services on Windows Server (Microsoft Learn): https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/install-active-directory-domain-services--level-100-
+
+## Kerberos and time
+- ✅ krb5.conf, MIT Kerberos Documentation: https://web.mit.edu/kerberos/krb5-latest/doc/admin/conf_files/krb5_conf.html
+- ✅ chrony documentation: https://chrony-project.org/documentation.html
+
+## Samba client (SRII) and CB5 (automatic mount)
+- ✅ smbclient man page (Samba): https://www.samba.org/samba/docs/current/man-html/smbclient.1.html
+- ✅ mount.cifs(8), Ubuntu Manpages: https://manpages.ubuntu.com/manpages/noble/man8/mount.cifs.8.html
+- ✅ pam_mount.conf(5), Ubuntu Manpages: https://manpages.ubuntu.com/manpages/noble/man5/pam_mount.conf.5.html
+
+## Joining the domain, SSSD and PAM (CB1/CB2)
+- ✅ realmd documentation: https://www.freedesktop.org/software/realmd/docs/
+- ✅ realm(8), including `--client-software=sssd|winbind`: https://manpages.ubuntu.com/manpages/noble/man8/realm.8.html
+- ✅ sssd-ad(5), including `ad_gpo_access_control` (the "su: System error" fix): https://manpages.ubuntu.com/manpages/noble/man5/sssd-ad.5.html
+- ✅ pam_mkhomedir(8): https://manpages.ubuntu.com/manpages/noble/man8/pam_mkhomedir.8.html
+- ⚠️ Ubuntu Server docs, SSSD with Active Directory: https://ubuntu.com/server/docs/how-to/sssd/with-active-directory/
+
+## CB3: Winbind
+- ✅ Setting up Samba as a Domain Member (SambaWiki): https://wiki.samba.org/index.php/Setting_up_Samba_as_a_Domain_Member
+- ⚠️ Ubuntu Server docs, Samba member of an AD domain: https://ubuntu.com/server/docs/how-to/samba/member-server-in-an-ad-domain/
+
+## CB4: ADsys
+- ✅ ubuntu/adsys on GitHub ("Active Directory bridging tool suite"): https://github.com/ubuntu/adsys
+
+## CA1/CA2: authd + Entra ID
+- ✅ ubuntu/authd on GitHub: https://github.com/ubuntu/authd
+- ⚠️ authd official documentation: https://ubuntu.com/docs/authd/stable-docs/
+- ✅ What is Microsoft Entra? (Microsoft Learn): https://learn.microsoft.com/en-us/entra/fundamentals/what-is-entra
+
+## CA3: FreeIPA
+- ✅ FreeIPA Quick Start Guide: https://www.freeipa.org/page/Quick_Start_Guide
+
+Two things to describe in the report as your own testing rather than as cited facts:
+- The fix "kinit inside the user's session". The documentation does not explain why the SSSD login ticket gave "KDC unreachable" with SMB in your lab.
+- The choice of `sec=ntlmssp` for the automatic mount. It came from that same troubleshooting.
