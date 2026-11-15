@@ -1,0 +1,9 @@
+%% 1.1 Windows Server: nome, rede e IP estático
+\begin{tikzpicture}
+  \draw[caixa] (-4.60,-1.45) rectangle (1.60,1.55);
+  \node[caixatit] at (-4.48,1.47) {Windows Server - \texttt{SR2-SRV}};
+  \node[svc, text width=3.8cm] (nic) at (-1.5,0.5) {Adaptador de rede\\IP \ph{IP\_DC}/24};
+  \node[svc, text width=3.8cm] (dns) at (-1.5,-0.7) {DNS preferido = \ph{IP\_DC}\\(o próprio servidor)};
+  \node[net, text width=2.6cm] (gw) at (4.4,0.5) {Gateway\\\texttt{192.168.X.1}};
+  \draw[seta] (nic.east) -- (gw.west) node[midway, above, rot] {ping (ICMP)};
+\end{tikzpicture}

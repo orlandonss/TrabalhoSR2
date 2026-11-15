@@ -1,0 +1,28 @@
+% 1.6
+% Ficheiro incluído por main.tex
+
+\section[Firewall do Windows: permitir ping do Ubuntu]{Firewall do Windows: permitir ping do Ubuntu}
+
+\esquema{1-6-firewall}{Regra de firewall para o ping do Ubuntu}
+
+\textbf{Objetivo:} permitir que o Ubuntu faça ping ao DC (por defeito o Windows bloqueia).
+
+\passo{Passo 1 - Nova regra de entrada}
+
+\emph{Iniciar} → escrever \textbf{Windows Defender Firewall with Advanced Security} e abrir. Painel esquerdo: \textbf{Inbound Rules}; painel direito: \textbf{New Rule...}
+
+\passo{Passo 2 - Tipo de regra e protocolo}
+
+\textbf{Custom} → Next → \textbf{All programs} → Next → \textbf{Protocol type: ICMPv4} → Next.
+
+\passo{Passo 3 - IP de origem}
+
+Em \emph{Which remote IP addresses does this rule apply to?} → \textbf{These IP addresses} → \textbf{Add...} → \texttt{\textless{}IP\_CLIENTE\textgreater{}} → OK → Next.
+
+\passo{Passo 4 - Permitir e dar nome}
+
+\textbf{Allow the connection} → Next → Next → Nome: \textbf{\texttt{SR2 Allow Ping Ubuntu}} → \textbf{Finish}.
+
+\emph{Verificação esperada:} a regra aparece ativa (visto verde) em \emph{Inbound Rules}. O teste de ping faz-se a partir do Ubuntu (2.1.1, Passo 11).
+
+\problemas{\hyperref[ec-a]{Erros Comuns - Parte A}}

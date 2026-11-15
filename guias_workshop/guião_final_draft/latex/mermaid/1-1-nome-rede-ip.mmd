@@ -1,0 +1,14 @@
+%% 1.1 Windows Server: nome, rede e IP estático
+flowchart LR
+    subgraph DC["Windows Server - SR2-SRV"]
+        NIC["Adaptador de rede<br/>IP #lt;IP_DC#gt;/24"]:::svc
+        DNSC["Cliente DNS<br/>DNS preferido = #lt;IP_DC#gt;"]:::svc
+    end
+    GW["Gateway<br/>192.168.X.1"]:::net
+    NIC -->|"ping - ICMP"| GW
+    DNSC -.->|"aponta para si próprio"| NIC
+    class DC vm
+    classDef vm fill:#e8eef7,stroke:#1f497d,stroke-width:2px,color:#000
+    classDef svc fill:#ffffff,stroke:#1f497d,stroke-width:1px,color:#000
+    classDef net fill:#f3f3f3,stroke:#777,stroke-dasharray:4 3,color:#000
+    classDef ext fill:#fff4e5,stroke:#c77700,color:#000

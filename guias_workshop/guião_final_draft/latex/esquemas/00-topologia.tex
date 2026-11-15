@@ -1,0 +1,13 @@
+%% Topologia geral do laboratório
+\begin{tikzpicture}
+  \node[ext] (int) at (0,3.3) {Internet};
+  \node[net, text width=3.6cm] (gw) at (0,2.05) {Default gateway da VLAN X\\\texttt{192.168.X.1}};
+  \draw[caixa] (-7.00,-1.90) rectangle (7.00,1.15);
+  \node[caixatit] at (-6.88,1.07) {VLAN X - \texttt{192.168.X.0/24} (bridge \ph{BRIDGE} no Proxmox)};
+  \node[vm, text width=5.0cm] (dc) at (-3.9,-0.45) {\textbf{Windows Server}\\\texttt{SR2-SRV.isec.local}\\IP: \ph{IP\_DC}\\AD DS - DNS - KDC - Partilha SRII};
+  \node[vm, text width=5.0cm] (cl) at (3.9,-0.45) {\textbf{Ubuntu Client}\\\texttt{ubuclient}\\IP: \ph{IP\_CLIENTE}\\Kerberos - Samba - SSSD - PAM};
+  \draw[linha] (int) -- (gw);
+  \draw[linha] (gw.south) -- (0,1.45) -| (dc.north);
+  \draw[linha] (gw.south) -- (0,1.45) -| (cl.north);
+  \draw[duplo] (dc.east) -- (cl.west) node[midway, above, rot, text width=2.0cm] {DNS 53\\Kerberos 88\\LDAP 389\\SMB 445\\NTP 123};
+\end{tikzpicture}

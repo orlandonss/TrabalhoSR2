@@ -1,0 +1,20 @@
+%% 2.1.1 Ubuntu: IP estático e DNS do Windows
+flowchart LR
+    subgraph CL["Ubuntu Client - ubuclient"]
+        NM["NetworkManager<br/>perfil labX - ens18<br/>IP #lt;IP_CLIENTE#gt;/24"]:::svc
+        NSS["nsswitch.conf<br/>hosts: files dns"]:::svc
+        RES["systemd-resolved<br/>DNS = #lt;IP_DC#gt;"]:::svc
+    end
+    subgraph DC["Windows Server - SR2-SRV"]
+        DNS["DNS isec.local<br/>A + SRV _ldap / _kerberos"]:::svc
+    end
+    GW["Gateway 192.168.X.1"]:::net
+    NM --- GW
+    NSS --> RES
+    RES -->|"consultas DNS - UDP/TCP 53"| DNS
+    NM -->|"ping - ICMP"| DC
+    class CL,DC vm
+    classDef vm fill:#e8eef7,stroke:#1f497d,stroke-width:2px,color:#000
+    classDef svc fill:#ffffff,stroke:#1f497d,stroke-width:1px,color:#000
+    classDef net fill:#f3f3f3,stroke:#777,stroke-dasharray:4 3,color:#000
+    classDef ext fill:#fff4e5,stroke:#c77700,color:#000

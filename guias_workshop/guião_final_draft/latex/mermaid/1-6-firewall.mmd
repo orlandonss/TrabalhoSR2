@@ -1,0 +1,15 @@
+%% 1.6 Firewall do Windows: permitir ping do Ubuntu
+flowchart LR
+    CL["Ubuntu Client<br/>#lt;IP_CLIENTE#gt;"]:::vm
+    subgraph DC["Windows Server - SR2-SRV"]
+        FW["Windows Defender Firewall<br/>Inbound Rule: SR2 Allow Ping Ubuntu<br/>ICMPv4 - origem #lt;IP_CLIENTE#gt;"]:::svc
+        OS["Sistema"]:::svc
+    end
+    CL -->|"ICMP echo request"| FW
+    FW -->|"permitido"| OS
+    OS -->|"ICMP echo reply"| CL
+    class DC vm
+    classDef vm fill:#e8eef7,stroke:#1f497d,stroke-width:2px,color:#000
+    classDef svc fill:#ffffff,stroke:#1f497d,stroke-width:1px,color:#000
+    classDef net fill:#f3f3f3,stroke:#777,stroke-dasharray:4 3,color:#000
+    classDef ext fill:#fff4e5,stroke:#c77700,color:#000

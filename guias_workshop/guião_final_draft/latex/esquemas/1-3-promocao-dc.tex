@@ -1,0 +1,12 @@
+%% 1.3 Promoção a Domain Controller
+\begin{tikzpicture}
+  \draw[caixa] (-5.10,-2.10) rectangle (2.60,1.85);
+  \node[caixatit] at (-4.98,1.77) {Domain Controller - \texttt{SR2-SRV.isec.local}};
+  \node[svc, text width=5.6cm] (ad) at (-1.25,0.85) {\textbf{Active Directory}\\domínio \texttt{isec.local} - NetBIOS \texttt{ISEC}};
+  \node[svc, text width=3.0cm] (kdc) at (-3.3,-1.0) {\textbf{KDC Kerberos}\\realm \texttt{ISEC.LOCAL}\\porta 88};
+  \node[svc, text width=3.0cm] (dns) at (0.65,-1.0) {\textbf{DNS}\\zona \texttt{isec.local}\\registos SRV};
+  \node[ext] (int) at (4.7,-1.0) {Internet};
+  \draw[linha] (ad.south -| kdc) -- (kdc.north);
+  \draw[seta] (ad.south -| dns) -- (dns.north) node[midway, right, rot] {regista SRV};
+  \draw[seta] (dns.east) -- (int.west) node[midway, above, rot, text width=1.6cm] {forwarder\\\texttt{1.1.1.1}};
+\end{tikzpicture}

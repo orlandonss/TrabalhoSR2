@@ -1,0 +1,23 @@
+%% 2.1.4 Samba: acesso à SRII com Kerberos
+\begin{tikzpicture}
+  \node[vm, text width=3.20cm, font=\footnotesize] (s) at (-5.75,0) {Ubuntu\\(\texttt{smbclient})};
+  \node[vm, text width=3.20cm, font=\footnotesize] (k) at (0.00,0) {KDC\\(\texttt{SR2-SRV}:88)};
+  \node[vm, text width=3.20cm, font=\footnotesize] (f) at (5.75,0) {Servidor SMB\\(\texttt{SR2-SRV}:445)};
+  \draw[vida] (s.south) -- (-5.75,-9.06);
+  \draw[vida] (k.south) -- (0.00,-9.06);
+  \draw[vida] (f.south) -- (5.75,-9.06);
+  \node[acao, text width=2.9cm] at (-5.75,-1.49) {TGT obtido com \texttt{kinit}};
+  \draw[seta] (-5.75,-2.47) -- (0.00,-2.47);
+  \node[rot, anchor=south] at (-2.88,-2.43) {TGS-REQ \texttt{cifs/SR2-SRV.isec.local}};
+  \draw[setad] (0.00,-3.30) -- (-5.75,-3.30);
+  \node[rot, anchor=south] at (-2.88,-3.26) {TGS-REP (ticket \texttt{cifs})};
+  \draw[seta] (-5.75,-4.13) -- (5.75,-4.13);
+  \node[rot, anchor=south] at (0.00,-4.09) {Sessão SMB com o ticket Kerberos};
+  \draw[setad] (5.75,-4.96) -- (-5.75,-4.96);
+  \node[rot, anchor=south] at (0.00,-4.92) {Sessão aceite};
+  \draw[seta] (-5.75,-5.79) -- (5.75,-5.79);
+  \node[rot, anchor=south] at (0.00,-5.75) {\texttt{ls} / \texttt{put} na partilha SRII};
+  \node[acao, text width=2.9cm] at (5.75,-6.83) {Verifica permissões\\(partilha + NTFS)};
+  \draw[setad] (5.75,-8.48) -- (-5.75,-8.48);
+  \node[rot, text width=11.15cm, anchor=south] at (0.00,-8.44) {Aluno: \texttt{ls} OK, \texttt{put} ACCESS\_DENIED\\Professor: \texttt{ls} OK, \texttt{put} OK};
+\end{tikzpicture}

@@ -1,0 +1,96 @@
+% 2.1.4
+% Ficheiro incluído por main.tex
+
+\subsection[Samba: acesso à partilha SRII com Kerberos]{Samba: acesso à partilha SRII com Kerberos}
+
+\esquema{2-1-4-samba}{Acesso à SRII com ticket Kerberos (smbclient)}
+
+\textbf{Objetivo:} provar que o professor lê e escreve na SRII e o aluno só lê, usando o cliente Samba (\texttt{smbclient}) com o ticket Kerberos, \textbf{sem} juntar a máquina ao domínio.
+
+\begin{importantebox}[title={Importante}]
+\textbf{Kerberos no \texttt{smbclient}:} a opção antiga \texttt{-k} está obsoleta (\emph{deprecated}) no Samba 4.15+. Usa-se \texttt{--use-kerberos=required}, que usa o ticket do \texttt{kinit} e \textbf{falha} (em vez de pedir palavra-passe) se não houver ticket válido.
+\end{importantebox}
+
+\passo{Passo 1 - Limpar a cache do Kerberos}
+
+\begin{lstlisting}[style=bashstyle]
+kdestroy
+klist
+\end{lstlisting}
+
+\passo{Passo 2 - Listar as pastas partilhadas do servidor}
+
+\begin{lstlisting}[style=bashstyle]
+kinit aluno.teste@ISEC.LOCAL
+smbclient -L //SR2-SRV.isec.local --use-kerberos=required
+\end{lstlisting}
+
+\emph{Verificação esperada:} aparece a partilha \textbf{SRII}. A linha \texttt{SMB1 disabled -- no workgroup available} é normal.
+
+\passo{Passo 3 - Preparar um ficheiro de testes}
+
+\begin{lstlisting}[style=bashstyle]
+echo "Escrito a partir do Ubuntu" > /tmp/teste-escrita.txt
+chmod 644 /tmp/teste-escrita.txt
+kdestroy
+klist
+\end{lstlisting}
+
+O \texttt{chmod 644} deixa os utilizadores do domínio ler o ficheiro mais tarde (2.1.8).
+
+\passo{Passo 4 - Testar o aluno}
+
+\begin{lstlisting}[style=bashstyle]
+kinit aluno.teste@ISEC.LOCAL
+smbclient //SR2-SRV.isec.local/SRII --use-kerberos=required -c 'ls'
+smbclient //SR2-SRV.isec.local/SRII --use-kerberos=required -c 'put /tmp/teste-escrita.txt aluno-escrita.txt'
+kdestroy
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{ls} funciona; \texttt{put} falha com \texttt{NT\_STATUS\_ACCESS\_DENIED}.
+
+\begin{dicabox}[title={Dica}]
+Cada comando \texttt{smbclient} ocupa \textbf{uma só linha}. Se ao colar o terminal ficar em \texttt{\textgreater{}}, a aspa ficou aberta: \texttt{Ctrl+C} e cola a linha inteira outra vez.
+\end{dicabox}
+
+\passo{Passo 5 - Testar o professor}
+
+\begin{lstlisting}[style=bashstyle]
+kinit professor.teste@ISEC.LOCAL
+smbclient //SR2-SRV.isec.local/SRII --use-kerberos=required -c 'ls'
+smbclient //SR2-SRV.isec.local/SRII --use-kerberos=required -c 'put /tmp/teste-escrita.txt professor-escrita.txt'
+smbclient //SR2-SRV.isec.local/SRII --use-kerberos=required -c 'ls'
+kdestroy
+klist
+\end{lstlisting}
+
+\emph{Verificação esperada:} o professor lista e escreve; \texttt{professor-escrita.txt} aparece no segundo \texttt{ls}.
+
+\passo{Passo 6 - Analisar resultados e discutir}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{Utilizador} & \textbf{Listar (\texttt{ls})} & \textbf{Escrever (\texttt{put})} \\
+\hline
+\texttt{aluno.teste} & Permitido & \texttt{NT\_STATUS\_ACCESS\_DENIED} \\
+\hline
+\texttt{professor.teste} & Permitido & Permitido \\
+\hline
+\end{tabularx}
+\end{center}
+
+Confirmar também no Windows Server:
+
+\begin{lstlisting}[style=psstyle]
+Get-ChildItem "$env:USERPROFILE\Desktop\SRII"
+\end{lstlisting}
+
+\emph{Verificação esperada:} existe \texttt{professor-escrita.txt} e \textbf{não} existe \texttt{aluno-escrita.txt}.
+
+\begin{itemize}
+\item Se o aluno conseguir escrever, as permissões NTFS estão demasiado abertas (ou o aluno também está no grupo de professores) - rever 1.4 e 1.5.
+\item Se algum for negado logo no \texttt{ls}, confirmar o grupo e as permissões de leitura (1.4 e 1.5).
+\end{itemize}
+
+\problemas{\hyperref[ec-b1-samba]{Erros Comuns - 2.1 Samba}}

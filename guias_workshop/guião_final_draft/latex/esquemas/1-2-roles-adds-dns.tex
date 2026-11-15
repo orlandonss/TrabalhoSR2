@@ -1,0 +1,11 @@
+%% 1.2 Instalação das roles AD DS e DNS
+\begin{tikzpicture}
+  \node[svc, text width=3.2cm] (sm) at (-4.6,0) {Server Manager\\\textit{Add roles and features}};
+  \draw[caixa] (-1.50,-1.45) rectangle (4.60,1.50);
+  \node[caixatit] at (-1.38,1.42) {Windows Server - \texttt{SR2-SRV}};
+  \node[svc, text width=3.8cm] (adds) at (1.55,0.45) {Role \textbf{AD DS}\\(instalada, por promover)};
+  \node[svc, text width=3.8cm] (dns) at (1.55,-0.75) {Role \textbf{DNS Server}};
+  \draw[seta] (sm.east) -- (adds.west) node[midway, above, rot] {instala};
+  \draw[seta] (sm.east) -- (dns.west);
+  \node[rot] at (1.55,-1.8) {bandeira amarela: promoção pendente};
+\end{tikzpicture}

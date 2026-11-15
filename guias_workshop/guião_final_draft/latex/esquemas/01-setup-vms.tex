@@ -1,0 +1,17 @@
+%% Setup das VMs no Proxmox
+\begin{tikzpicture}
+  \draw[caixa] (-7.20,-0.35) rectangle (-2.70,3.00);
+  \node[caixatit] at (-7.08,2.92) {Pool \texttt{PoolStudentTemplates}};
+  \draw[caixa] (-1.50,-0.35) rectangle (3.50,3.00);
+  \node[caixatit] at (-1.38,2.92) {Pool do grupo (\ph{POOL\_GRUPO})};
+  \node[svc, text width=3.0cm] (t1) at (-4.95,1.95) {Template\\Windows Server};
+  \node[svc, text width=3.0cm] (t2) at (-4.95,0.55) {Template\\Ubuntu Client};
+  \node[vm, text width=3.7cm, font=\footnotesize] (v1) at (1.0,1.95) {WindowsServerADDS-grp\ph{N}};
+  \node[vm, text width=3.7cm, font=\footnotesize] (v2) at (1.0,0.55) {UbuntuClient-grp\ph{N}};
+  \node[net, text width=2.2cm] (br) at (5.7,1.25) {Bridge \ph{BRIDGE}\\VLAN X};
+  \draw[seta] (t1.east) -- (v1.west) node[midway, above, rot] {Linked Clone};
+  \draw[seta] (t2.east) -- (v2.west) node[midway, above, rot] {Linked Clone};
+  \draw[linha] (v1.east) -- (br.west);
+  \draw[linha] (v2.east) -- (br.west);
+  \node[rot, text width=2.4cm] at (5.7,0.05) {sem \textit{Disconnect}\\nem \textit{Firewall}};
+\end{tikzpicture}

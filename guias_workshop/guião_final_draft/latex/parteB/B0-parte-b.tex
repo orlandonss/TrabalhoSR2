@@ -1,0 +1,10 @@
+% Capítulo 2 - Parte B (abertura) e 2.1
+% Ficheiro incluído por main.tex
+
+\chapter[Parte B - Linux Client]{Parte B - Linux Client}
+
+\section[Integração com SSSD]{Integração com SSSD}
+
+\begin{notabox}[title={Nota}]
+Nesta variante usa-se o \textbf{cliente} SMB (\texttt{smbclient}) e a adesão ao domínio faz-se com \texttt{realm join} (realmd + adcli), que gera automaticamente o \texttt{sssd.conf}. \textbf{Não é preciso configurar o \texttt{smb.conf}} nem um servidor Samba: o \texttt{smb.conf} e o \texttt{net ads join} pertencem à variante \textbf{Winbind} (2.2). \textbf{[VERIFICAR]} se o enunciado exige \texttt{smb.conf} também na variante SSSD.
+\end{notabox}

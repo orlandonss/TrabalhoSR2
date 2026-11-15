@@ -1,0 +1,54 @@
+% Introdução - Setup das Máquinas Virtuais
+% Ficheiro incluído por main.tex
+
+\section*{Setup das Máquinas Virtuais (Proxmox)}
+\addcontentsline{toc}{section}{Setup das Máquinas Virtuais (Proxmox)}
+
+\esquema{01-setup-vms}{Clonagem das VMs a partir dos templates e ligação à VLAN}
+
+\textbf{Objetivo:} ter o Windows Server e o Ubuntu clonados dos templates, na pool do grupo e ligados à bridge/VLAN do aluno.
+
+\passo{Passo 1 - Abrir a pool dos templates}
+
+Abrir o Proxmox e selecionar a pool \textbf{\texttt{PoolStudentTemplates}}.
+
+\passo{Passo 2 - Localizar os templates do grupo}
+
+Localizar os templates do \textbf{Windows Server} e do \textbf{Ubuntu Client} do grupo.
+
+\passo{Passo 3 - Clonar as duas VMs}
+
+Em cada template: \textbf{Clone} →
+
+\begin{itemize}
+\item \textbf{Mode:} \texttt{Linked Clone} (é importante selecionar \emph{Linked Clone} para não haver problemas);
+\item \textbf{Pool:} \texttt{\textless{}POOL\_GRUPO\textgreater{}} (a pool do teu grupo, ex.: \texttt{PoolTeamX});
+\item \textbf{Nome:} \texttt{WindowsServerADDS-grp\textless{}N\textgreater{}} para o Windows e \texttt{UbuntuClient-grp\textless{}N\textgreater{}} para o Ubuntu.
+\end{itemize}
+
+\passo{Passo 4 - Escolher a placa de rede (Windows Server)}
+
+Na VM do Windows: \textbf{Hardware → Network Device} → escolher a bridge \textbf{\texttt{\textless{}BRIDGE\textgreater{}}} que pertence à pool de endereços do teu grupo.
+
+\passo{Passo 5 - Escolher a placa de rede (Ubuntu)}
+
+Repetir para a VM do Ubuntu, com a \textbf{mesma} bridge \texttt{\textless{}BRIDGE\textgreater{}} (aconselhado: uma bridge por aluno, para não haver conflitos). Em ambas as VMs confirmar:
+
+\begin{itemize}
+\item \textbf{Bridge = \texttt{\textless{}BRIDGE\textgreater{}}};
+\item \textbf{Disconnect} desmarcado;
+\item \textbf{Firewall} desmarcado.
+\end{itemize}
+
+\passo{Passo 6 - Iniciar as duas VMs}
+
+\textbf{Verificação esperada:} as duas VMs aparecem dentro de \texttt{\textless{}POOL\_GRUPO\textgreater{}}, ambas com a bridge \texttt{\textless{}BRIDGE\textgreater{}}, e arrancam.
+
+\begin{notabox}[title={Nota}]
+\begin{itemize}
+\item Os templates já trazem os recursos (CPU/RAM/disco) e, no Ubuntu, as dependências instaladas (Kerberos, SSSD, Samba). \textbf{[VERIFICAR]} recursos mínimos, caso seja preciso criar uma VM de raiz.
+\item \textbf{[VERIFICAR]} O número da bridge corresponde à VLAN (ex.: \texttt{vmbr105} ↔ \texttt{192.168.105.0/\allowbreak{}24}). Confirmar com o docente a bridge/VLAN atribuída a cada aluno.
+\end{itemize}
+\end{notabox}
+
+\problemas{\hyperref[ec-setup]{Erros Comuns - Setup das VMs}}

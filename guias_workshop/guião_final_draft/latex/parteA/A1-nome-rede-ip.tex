@@ -1,0 +1,61 @@
+% 1.1
+% Ficheiro incluído por main.tex
+
+\section[Nome, rede e IP estático]{Nome, rede e IP estático}
+
+\esquema{1-1-nome-rede-ip}{Windows Server: IP estático, gateway e DNS}
+
+\passo{Passo 1 - Primeiro arranque e nome do computador}
+
+\emph{Objetivo:} concluir o assistente inicial e dar ao servidor o nome standard.
+
+\begin{enumerate}
+\item Iniciar a VM e completar o assistente com os valores aconselhados:
+\begin{itemize}
+\item Região: \textbf{Portugal}; teclado: \textbf{Português}; idioma: \textbf{Inglês};
+\item Palavra-passe do Administrator: \textbf{\texttt{\textless{}PASSWORD\_LAB\textgreater{}}} (a mesma em todo o laboratório).
+\end{itemize}
+\item Mudar o nome do computador para \textbf{\texttt{SR2-SRV}}: barra de pesquisa do Windows → \textbf{About this computer} → \textbf{Rename this PC}.
+\item Reiniciar o servidor.
+\end{enumerate}
+
+\emph{Verificação esperada:} após o reinício, \emph{About this computer} mostra o nome \texttt{SR2-SRV}.
+
+\passo{Passo 2 - Abrir as definições do adaptador de rede}
+
+\emph{Control Panel → Network and Internet → Network and Sharing Center → Change adapter settings} → botão direito no adaptador → \textbf{Properties} → \textbf{Internet Protocol Version 4 (TCP/IPv4)} → \textbf{Properties}.
+
+\passo{Passo 3 - Atribuir o IP estático e testar a conectividade}
+
+\emph{Objetivo:} dar ao DC um IP fixo e apontar o DNS para ele próprio.
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{0.32\linewidth}|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{Campo} & \textbf{Valor} \\
+\hline
+IP address & \texttt{\textless{}IP\_DC\textgreater{}} (192.168.X.Y) \\
+\hline
+Subnet mask & \texttt{255.255.255.0} \\
+\hline
+Default gateway & \texttt{192.168.X.1} \\
+\hline
+Preferred DNS & \texttt{\textless{}IP\_DC\textgreater{}} (o próprio servidor) \\
+\hline
+\end{tabularx}
+\end{center}
+
+\textbf{OK} para aplicar.
+
+\begin{lstlisting}[style=psstyle]
+ipconfig /all
+ping 192.168.X.1
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{ipconfig} mostra \texttt{\textless{}IP\_DC\textgreater{}}, gateway \texttt{192.168.X.1} e DNS \texttt{\textless{}IP\_DC\textgreater{}}; o gateway responde ao ping.
+
+\passo{Passo 4 - Aguardar o arranque dos serviços}
+
+Aguardar que os serviços do servidor iniciem (o Server Manager abre sozinho) antes de começar a configuração.
+
+\problemas{\hyperref[ec-a]{Erros Comuns - Parte A}}

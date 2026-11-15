@@ -1,0 +1,38 @@
+% =====================================================================
+%  Guião-Workshop SR2 - Grupo 10 - ficheiro principal
+%  Compilar com pdflatex (no Overleaf: main.tex como "Main document").
+%  Compilar duas vezes para o índice e o número total de páginas.
+% =====================================================================
+\documentclass[11pt,a4paper,oneside]{report}
+\input{preambulo}
+
+\begin{document}
+
+\input{capitulos/00-capa}
+\input{capitulos/01-introducao}
+\input{capitulos/02-setup-vms}
+
+\input{parteA/A0-parte-a}
+\input{parteA/A1-nome-rede-ip}
+\input{parteA/A2-roles-adds-dns}
+\input{parteA/A3-promocao-dc}
+\input{parteA/A4-grupos-utilizadores}
+\input{parteA/A5-partilha-srii}
+\input{parteA/A6-firewall}
+
+\input{parteB/B0-parte-b}
+\input{parteB/B1-1-rede-dns}
+\input{parteB/B1-2-chrony}
+\input{parteB/B1-3-kerberos}
+\input{parteB/B1-4-samba}
+\input{parteB/B1-5-realm-join}
+\input{parteB/B1-6-sssd}
+\input{parteB/B1-7-pam}
+\input{parteB/B1-8-srii-dominio}
+\input{parteB/B1-9-pam-mount}
+\input{parteB/B2-winbind}
+
+\input{capitulos/90-erros-comuns}
+\input{capitulos/99-pontos-verificar}
+
+\end{document}

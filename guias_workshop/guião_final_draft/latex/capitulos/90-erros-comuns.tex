@@ -1,0 +1,180 @@
+% Erros Comuns
+% Ficheiro incluído por main.tex
+
+\chapter*{Erros Comuns e Resolução}
+\addcontentsline{toc}{chapter}{Erros Comuns e Resolução}
+\markboth{Erros Comuns e Resolução}{}
+
+Formato: \textbf{Sintoma → Causa provável → Solução}.
+
+\phantomsection\label{ec-setup}
+
+\section*{Setup das VMs}
+\addcontentsline{toc}{section}{Setup das VMs}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{Sintoma} & \textbf{Causa provável} & \textbf{Solução} \\
+\hline
+\texttt{Destination Host Unreachable}; \texttt{ip neigh show} com \texttt{INCOMPLETE} ou \texttt{FAILED} & As VMs não estão ambas na \texttt{\textless{}BRIDGE\textgreater{}}, ou a placa tem \emph{Disconnect}/\emph{Firewall} marcados & Proxmox → \emph{Hardware → Network Device} das duas VMs (Setup das VMs, Passos 4 e 5) \\
+\hline
+\end{tabularx}
+\end{center}
+
+\phantomsection\label{ec-a}
+
+\section*{Parte A - Windows Server}
+\addcontentsline{toc}{section}{Parte A - Windows Server}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{Sintoma} & \textbf{Causa provável} & \textbf{Solução} \\
+\hline
+O ping a \texttt{\textless{}IP\_DC\textgreater{}} falha, mas o MAC aparece no \texttt{ip neigh} & Firewall do Windows a bloquear o ping & Regra ICMPv4 para \texttt{\textless{}IP\_CLIENTE\textgreater{}} (1.6) \\
+\hline
+Sem internet no Ubuntu com o DNS só no Windows & O DNS do Windows não tem forwarder & No Windows: \texttt{Add-DnsServerForwarder -IPAddress 1.1.1.1} (1.3, Passo 7) \\
+\hline
+\texttt{kinit} dá \texttt{Preauthentication failed} com a palavra-passe certa & Conta com \emph{"User must change password at next logon"} marcado, ou conta desativada & Desmarcar a opção (1.4, Passo 5) / ativar a conta \\
+\hline
+\texttt{Client not found in Kerberos database} & O logon name não existe no AD ou foi escrito de outra forma & \texttt{Get-ADUser -Filter * \textbar{} Select SamAccountName} e usar o nome exato \\
+\hline
+Aluno consegue escrever na SRII & Aluno também no Grupo-Professores, ou \emph{Modify} para \texttt{Everyone}/\texttt{Authenticated Users} & Rever 1.4 (Passo 6) e 1.5 \\
+\hline
+\texttt{NT\_STATUS\_ACCESS\_DENIED} no \texttt{ls} de ambos & Grupos ou permissões NTFS mal definidos & Rever 1.5 (Passos 2 e 3) \\
+\hline
+\end{tabularx}
+\end{center}
+
+\phantomsection\label{ec-b1-rede}
+
+\section*{Parte B - SSSD: Rede e DNS do cliente (2.1.1)}
+\addcontentsline{toc}{section}{Parte B - SSSD: Rede e DNS do cliente (2.1.1)}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{Sintoma} & \textbf{Causa provável} & \textbf{Solução} \\
+\hline
+\texttt{Conflicting default route} no \texttt{netplan apply} & Mais de um ficheiro ou método a configurar a mesma placa & Ficar com um único método: repetir 2.1.1, Passos 2 a 5 \\
+\hline
+\texttt{mv: destino '/\allowbreak{}root/\allowbreak{}netplan-bak/\allowbreak{}': Ficheiro ou pasta inexistente} & Faltou criar a pasta de backup & 2.1.1, Passo 3 e repetir o Passo 4 \\
+\hline
+\texttt{O NetworkManager não está em execução} & Serviço parado & 2.1.1, Passo 6 e repetir o Passo 7 \\
+\hline
+IP \texttt{169.254.x.x} na \texttt{ens18} & O IP estático não foi aplicado & 2.1.1, Passos 7 e 8 \\
+\hline
+DNS público (\texttt{8.8.8.8}, \texttt{1.1.1.1}) em \texttt{resolvectl status} & Falta \texttt{ipv4.ignore-auto-dns yes} & 2.1.1, Passo 7 \\
+\hline
+Perfil antigo (ex.: \texttt{Ligação com fios 1}) sem placa & Restos da configuração anterior & \texttt{sudo nmcli connection delete 'NOME'} \\
+\hline
+\texttt{Destination Host Unreachable} & VMs em bridges diferentes & Ver \hyperref[ec-setup]{Setup das VMs} \\
+\hline
+Ping ao DC falha, mas o MAC aparece no \texttt{ip neigh} & Firewall do Windows & Ver \hyperref[ec-a]{Parte A} (1.6) \\
+\hline
+\texttt{dig} funciona mas \texttt{ping isec.local} falha & \texttt{mdns4\_minimal} no \texttt{nsswitch.conf} & 2.1.1, Passo 13 \\
+\hline
+\end{tabularx}
+\end{center}
+
+\phantomsection\label{ec-b1-kerberos}
+
+\section*{Parte B - SSSD: Relógio e Kerberos (2.1.2 - 2.1.3)}
+\addcontentsline{toc}{section}{Parte B - SSSD: Relógio e Kerberos (2.1.2 - 2.1.3)}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{Sintoma} & \textbf{Causa provável} & \textbf{Solução} \\
+\hline
+\texttt{Clock skew too great} & Diferença de hora \textgreater{} 5 min entre cliente e DC & Repetir 2.1.2 (chrony) \\
+\hline
+\texttt{chrony} não existe como serviço & Nome do serviço diferente & Usar \texttt{chronyd} \\
+\hline
+\texttt{Cannot find KDC for realm} & DNS não devolve os registos SRV do domínio & Repetir 2.1.1, Passo 12 (DNS) \\
+\hline
+\texttt{Cannot resolve network address for KDC} & Nome do DC errado no \texttt{krb5.conf} ou não resolve no DNS & Repetir 2.1.1, Passo 12 e 2.1.3, Passo 2; confirmar \texttt{SR2-SRV.isec.local} no \texttt{krb5.conf} \\
+\hline
+\texttt{Client not found in Kerberos database} & O login não existe & No Windows: \texttt{Get-ADUser -Filter * \textbar{} Select SamAccountName} \\
+\hline
+\texttt{Preauthentication failed} & Palavra-passe errada, conta desativada, ou "mudar palavra-passe no próximo logon" ativo & Confirmar a palavra-passe; rever 1.4, Passo 5 \\
+\hline
+\end{tabularx}
+\end{center}
+
+\phantomsection\label{ec-b1-samba}
+
+\section*{Parte B - SSSD: Samba e SRII (2.1.4, 2.1.8)}
+\addcontentsline{toc}{section}{Parte B - SSSD: Samba e SRII (2.1.4, 2.1.8)}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{Sintoma} & \textbf{Causa provável} & \textbf{Solução} \\
+\hline
+\texttt{smbclient} avisa que \texttt{-k} está \emph{deprecated} & Opção antiga (Samba 4.15+) & Usar \texttt{--use-kerberos=required} \\
+\hline
+Terminal fica em \texttt{\textgreater{}} depois de colar \texttt{smbclient ... -c 'put ...'} & A aspa ficou aberta (comando colado em duas linhas) & \texttt{Ctrl+C} e colar a linha inteira \\
+\hline
+\texttt{NT\_STATUS\_NO\_LOGON\_SERVERS} / \texttt{NT\_STATUS\_LOGON\_FAILURE} com \texttt{--use-kerberos=required} & Ticket em falta ou expirado & \texttt{klist}; se vazio: \texttt{kinit utilizador@ISEC.LOCAL} e repetir \\
+\hline
+\texttt{NT\_STATUS\_NO\_LOGON\_SERVERS} com \texttt{creating NEG\_TOKEN\_INIT ... failed} & Falta o \texttt{kinit} dentro da sessão do utilizador do domínio (depois de \texttt{su -}) & 2.1.7, Passo 3 \\
+\hline
+\texttt{NT\_STATUS\_ACCESS\_DENIED} no \texttt{ls} de ambos & Grupos ou permissões NTFS mal definidos & Rever 1.5 (Passos 2 e 3) \\
+\hline
+\texttt{NT\_STATUS\_BAD\_NETWORK\_NAME} & Nome da partilha errado & Confirmar com \texttt{smbclient -L} (2.1.4, Passo 2) \\
+\hline
+Aluno consegue escrever & Aluno também no grupo de professores, ou \emph{Modify} para \texttt{Everyone}/\texttt{Authenticated Users} & Rever 1.4 (Passo 6) e 1.5 \\
+\hline
+\end{tabularx}
+\end{center}
+
+\phantomsection\label{ec-b1-sssd}
+
+\section*{Parte B - SSSD: Domínio e SSSD (2.1.5 - 2.1.6)}
+\addcontentsline{toc}{section}{Parte B - SSSD: Domínio e SSSD (2.1.5 - 2.1.6)}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{Sintoma} & \textbf{Causa provável} & \textbf{Solução} \\
+\hline
+\texttt{realm discover} falha & DNS ou \texttt{krb5.conf} & Repetir 2.1.1 (Passo 12) e 2.1.3 (Passo 2) \\
+\hline
+\texttt{realm join} falha com nome de máquina & Hostname com mais de 15 caracteres (ainda com o nome do template) & Repetir 2.1.5, Passo 1 \\
+\hline
+\texttt{no such user} no \texttt{id} & Cache do SSSD desatualizada ou SSSD ainda a sincronizar & Esperar 1 min; \texttt{sudo sss\_cache -E} e \texttt{sudo systemctl restart sssd} \\
+\hline
+SSSD não arranca depois de editar o \texttt{sssd.conf} & Permissões do ficheiro ou erro de sintaxe & \texttt{sudo chmod 600 /\allowbreak{}etc/\allowbreak{}sssd/\allowbreak{}sssd.conf}; \texttt{sudo sssctl config-check} (2.1.7, Passo 2) \\
+\hline
+\end{tabularx}
+\end{center}
+
+\phantomsection\label{ec-b1-pam}
+
+\section*{Parte B - SSSD: PAM e pam\_mount (2.1.7, 2.1.9)}
+\addcontentsline{toc}{section}{Parte B - SSSD: PAM e pam\_mount (2.1.7, 2.1.9)}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{Sintoma} & \textbf{Causa provável} & \textbf{Solução} \\
+\hline
+\texttt{su: System error} no login do utilizador do AD (nos registos: \texttt{pam\_sss ... Access denied ... System error}) & GPO do AD a bloquear o login & \texttt{ad\_gpo\_access\_control = permissive} no \texttt{sssd.conf} (caixa em 2.1.7, Passo 2) \\
+\hline
+Home não é criada no primeiro login & \texttt{pam\_mkhomedir} não ativo & \texttt{sudo pam-auth-update --enable mkhomedir} (2.1.7, Passo 1) \\
+\hline
+\texttt{cp} do \texttt{pam\_mount.conf.xml}: \texttt{Ficheiro ou pasta inexistente} & O pam\_mount não está instalado & 2.1.9, Passo 1 \\
+\hline
+\texttt{mount \textbar{} grep SRII} não mostra nada depois do login & \texttt{pam\_mount.so} ausente no PAM ou linhas \texttt{\textless{}volume\textgreater{}} erradas & Confirmar \texttt{pam\_mount.so} (2.1.9, Passo 1) e as linhas \texttt{\textless{}volume\textgreater{}} (Passo 4) \\
+\hline
+\end{tabularx}
+\end{center}
+
+\phantomsection\label{ec-b2}
+
+\section*{Parte B - Winbind}
+\addcontentsline{toc}{section}{Parte B - Winbind}
+
+\texttt{[A AGUARDAR CONTEÚDO]}

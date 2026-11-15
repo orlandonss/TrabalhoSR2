@@ -1,0 +1,22 @@
+%% 2.1.8 Acesso à SRII como utilizador do domínio
+\begin{tikzpicture}
+  \node[vm, text width=3.20cm, font=\footnotesize] (u) at (-5.75,0) {Sessão do utilizador\\do AD};
+  \node[vm, text width=3.20cm, font=\footnotesize] (k) at (0.00,0) {KDC\\(porta 88)};
+  \node[vm, text width=3.20cm, font=\footnotesize] (f) at (5.75,0) {Servidor SMB\\(porta 445)};
+  \draw[vida] (u.south) -- (-5.75,-7.20);
+  \draw[vida] (k.south) -- (0.00,-7.20);
+  \draw[vida] (f.south) -- (5.75,-7.20);
+  \draw[seta] (-5.75,-1.60) -- (0.00,-1.60);
+  \node[rot, anchor=south] at (-2.88,-1.56) {\texttt{kinit}};
+  \draw[setad] (0.00,-2.43) -- (-5.75,-2.43);
+  \node[rot, anchor=south] at (-2.88,-2.39) {TGT};
+  \draw[seta] (-5.75,-3.26) -- (0.00,-3.26);
+  \node[rot, anchor=south] at (-2.88,-3.22) {TGS-REQ \texttt{cifs/SR2-SRV.isec.local}};
+  \draw[setad] (0.00,-4.09) -- (-5.75,-4.09);
+  \node[rot, anchor=south] at (-2.88,-4.05) {Ticket \texttt{cifs}};
+  \draw[seta] (-5.75,-4.92) -- (5.75,-4.92);
+  \node[rot, anchor=south] at (0.00,-4.88) {\texttt{smbclient} com o ticket: \texttt{ls} / \texttt{put}};
+  \node[acao, text width=2.9cm] at (5.75,-5.63) {Permissões do grupo};
+  \draw[setad] (5.75,-6.62) -- (-5.75,-6.62);
+  \node[rot, anchor=south] at (0.00,-6.58) {Aluno só lê - Professor lê e escreve};
+\end{tikzpicture}

@@ -1,0 +1,16 @@
+%% 2.1.6 Utilizadores do AD no Linux: SSSD
+\begin{tikzpicture}
+  \draw[caixa] (-7.20,-1.80) rectangle (0.20,1.60);
+  \node[caixatit] at (-7.08,1.52) {Ubuntu Client - \texttt{ubuclient}};
+  \draw[caixa] (2.10,-1.80) rectangle (7.20,1.60);
+  \node[caixatit] at (2.22,1.52) {Windows Server - \texttt{SR2-SRV}};
+  \node[svc, text width=1.3cm] (id) at (-6.25,0) {\texttt{id}\\\texttt{getent}};
+  \node[svc, text width=2.0cm] (nss) at (-4.0,0) {NSS\\\texttt{files sss}};
+  \node[svc, text width=2.1cm] (sssd) at (-1.25,0) {\textbf{SSSD}\\\texttt{id\_provider = ad}\\cache local};
+  \node[svc, text width=4.2cm] (ldap) at (4.65,0.65) {LDAP do AD - porta 389\\utilizadores e grupos};
+  \node[svc, text width=4.2cm] (kdc) at (4.65,-0.8) {KDC - porta 88\\conta da máquina (keytab)};
+  \draw[seta] (id) -- (nss);
+  \draw[seta] (nss) -- (sssd);
+  \draw[seta] (sssd.east) -- (ldap.west) node[midway, above, rot] {pesquisa};
+  \draw[seta] (sssd.east) -- (kdc.west) node[midway, below, rot] {autentica};
+\end{tikzpicture}

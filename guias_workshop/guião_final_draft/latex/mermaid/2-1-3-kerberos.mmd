@@ -1,0 +1,12 @@
+%% 2.1.3 Kerberos: obter o ticket (TGT)
+sequenceDiagram
+    participant U as Ubuntu (kinit)
+    participant D as DNS (SR2-SRV)
+    participant K as KDC (SR2-SRV:88)
+    U->>D: Onde está o KDC de ISEC.LOCAL? (SRV _kerberos._tcp)
+    D-->>U: SR2-SRV.isec.local
+    U->>K: AS-REQ aluno.teste@ISEC.LOCAL
+    K-->>U: Pré-autenticação necessária
+    U->>K: AS-REQ com prova da palavra-passe
+    K-->>U: AS-REP com o TGT (krbtgt/ISEC.LOCAL)
+    U->>U: Guarda o TGT na cache (klist)

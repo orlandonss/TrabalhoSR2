@@ -1,0 +1,154 @@
+% Preâmbulo do guião (pacotes, estilos e caixas)
+% Para o relatório: copiar estas linhas para o preâmbulo do relatório.
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[portuguese]{babel}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[a4paper,top=2.6cm,bottom=2.6cm,left=2.4cm,right=2.4cm,headheight=14pt]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{listings}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{needspace}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,shapes.geometric}
+\usepackage{adjustbox}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage{fancyhdr}
+\usepackage[most]{tcolorbox}
+\usepackage{hyperref}
+
+\DeclareUnicodeCharacter{2192}{\ensuremath{\rightarrow}}
+\DeclareUnicodeCharacter{2194}{\ensuremath{\leftrightarrow}}
+
+% ---------- Cores ----------
+\definecolor{azul}{RGB}{31,73,125}
+\definecolor{cinza}{RGB}{90,90,90}
+
+\hypersetup{colorlinks=true,linkcolor=azul,urlcolor=azul,pdftitle={Guião-Workshop SR2}}
+
+% ---------- Texto ----------
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.45em}
+\setlist{itemsep=0.15em,topsep=0.25em}
+\widowpenalty=10000
+\clubpenalty=10000
+\emergencystretch=3em
+
+% ---------- Títulos e numeração ----------
+% Introdução (sem número); Capítulo 1 = Parte A (1.1, 1.2...); Capítulo 2 = Parte B (2.1, 2.1.1...)
+\setcounter{secnumdepth}{3}
+\titleformat{\chapter}[display]{\huge\bfseries\color{azul}}{\Large\chaptertitlename\ \thechapter}{0.4em}{}[{\vspace{0.3em}\color{azul!40}\titlerule[1pt]}]
+\titlespacing*{\chapter}{0pt}{0pt}{1.6em}
+\titleformat{\section}{\Large\bfseries\color{azul}}{\thesection}{0.8em}{}[{\color{azul!40}\titlerule[0.8pt]}]
+\titleformat{\subsection}{\large\bfseries\color{azul}}{\thesubsection}{0.7em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{azul!80!black}}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{1.6em}{1.0em}
+\titlespacing*{\subsection}{0pt}{1.5em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1.2em}{0.4em}
+
+% ---------- Esquemas (desenhados em TikZ, ficheiros em esquemas/*.tex) ----------
+\providecommand{\esquemadir}{esquemas/}
+\counterwithout{figure}{chapter}
+\captionsetup{font=small,labelfont={bf,color=azul}}
+\newcommand{\ph}[1]{\texttt{\textless{}#1\textgreater{}}}
+\tikzset{
+  vm/.style={draw=azul, very thick, fill=azul!8, rounded corners=3pt, align=center, font=\small, inner sep=5pt},
+  svc/.style={draw=azul!70, fill=white, rounded corners=2pt, align=center, font=\footnotesize, inner sep=4pt},
+  grupo/.style={draw=azul!70, fill=azul!12, rounded corners=2pt, align=center, font=\footnotesize, inner sep=4pt},
+  net/.style={draw=black!50, dashed, fill=black!4, rounded corners=2pt, align=center, font=\footnotesize, inner sep=4pt},
+  ext/.style={draw=orange!70!black, fill=orange!10, ellipse, align=center, font=\footnotesize, inner sep=3pt},
+  caixa/.style={draw=azul, thick, rounded corners=4pt, fill=azul!3},
+  caixatit/.style={font=\footnotesize\bfseries, text=azul, anchor=north west},
+  seta/.style={-{Stealth[length=2.2mm]}, thick, draw=black!70},
+  setad/.style={seta, dashed},
+  duplo/.style={{Stealth[length=2.2mm]}-{Stealth[length=2.2mm]}, thick, draw=black!70},
+  linha/.style={thick, draw=black!55},
+  rot/.style={font=\scriptsize, fill=white, inner sep=1.5pt, align=center},
+  vida/.style={draw=black!35, dashed},
+  acao/.style={draw=azul!60, fill=azul!5, rounded corners=2pt, align=center, font=\scriptsize, inner sep=3pt},
+  nota/.style={draw=orange!60!black, fill=yellow!12, align=center, font=\scriptsize, inner sep=3pt},
+}
+\newcommand{\esquema}[2]{%
+  \begin{figure}[H]
+    \centering
+    \adjustbox{max width=\linewidth}{\input{\esquemadir#1}}
+    \caption{#2}
+  \end{figure}}
+
+% Passo de um procedimento
+\newcommand{\passo}[1]{\par\needspace{6\baselineskip}\vspace{0.5em}{\color{azul}\bfseries #1}\par\nopagebreak}
+
+% Remissão para os erros comuns
+\newcommand{\problemas}[1]{\par\vspace{0.3em}{\small\color{cinza}\textit{Problemas? Ver} #1.}\par}
+
+% Marca de secção por preencher
+\newcommand{\aguardar}{{\normalfont\small\color{cinza}[A AGUARDAR CONTEÚDO]}}
+
+% ---------- Índice ----------
+\setcounter{tocdepth}{2}
+\renewcommand{\cftchappresnum}{\chaptername\ }
+\setlength{\cftchapnumwidth}{6.2em}
+\renewcommand{\cftchapfont}{\bfseries\color{azul}}
+\renewcommand{\cftchappagefont}{\bfseries\color{azul}}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftsecindent}{1.5em}
+\setlength{\cftsecnumwidth}{2.6em}
+\setlength{\cftsubsecindent}{4.1em}
+\setlength{\cftsubsecnumwidth}{3.4em}
+\addto\captionsportuguese{\renewcommand{\contentsname}{Índice}}
+
+% ---------- Cabeçalho e rodapé ----------
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\chaptermark}[1]{\markboth{\chaptername\ \thechapter\ - #1}{}}
+\renewcommand{\sectionmark}[1]{}
+\fancyhead[L]{\small\color{cinza}Guião-Workshop SR2}
+\fancyhead[R]{\small\color{cinza}\nouppercase{\leftmark}}
+\fancyfoot[C]{\small\color{cinza}\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\small\color{cinza}\thepage}\renewcommand{\headrulewidth}{0pt}}
+
+% ---------- Blocos de código ----------
+\lstdefinestyle{base}{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  breakatwhitespace=false,
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false,
+  frame=single,
+  framesep=4pt,
+  rulecolor=\color{black!20},
+  backgroundcolor=\color{black!3},
+  xleftmargin=4pt, xrightmargin=4pt,
+  aboveskip=0.7em, belowskip=0.7em,
+  upquote=true,
+  literate=
+    {á}{{\'a}}1 {à}{{\`a}}1 {â}{{\^a}}1 {ã}{{\~a}}1
+    {é}{{\'e}}1 {ê}{{\^e}}1 {í}{{\'i}}1 {ó}{{\'o}}1
+    {ô}{{\^o}}1 {õ}{{\~o}}1 {ú}{{\'u}}1 {ç}{{\c c}}1
+    {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1 {Ç}{{\c C}}1
+    {→}{{$\rightarrow$}}1
+}
+\lstdefinestyle{bashstyle}{style=base,language=bash,commentstyle=\color{green!40!black}\itshape}
+\lstdefinestyle{psstyle}{style=base,commentstyle=\color{green!40!black}\itshape,morecomment=[l]{\#}}
+\lstdefinestyle{cfgstyle}{style=base}
+\lstdefinestyle{diagstyle}{style=base,frame=none,backgroundcolor=,basicstyle=\ttfamily\footnotesize}
+
+% ---------- Caixas ----------
+\tcbset{enhanced,breakable,fonttitle=\bfseries,boxrule=0.6pt,arc=2pt,left=6pt,right=6pt,top=4pt,bottom=4pt,before skip=0.8em,after skip=0.8em}
+\newtcolorbox{avisobox}[1][]{colback=red!3,colframe=red!55!black,#1}
+\newtcolorbox{notabox}[1][]{colback=azul!4,colframe=azul,#1}
+\newtcolorbox{importantebox}[1][]{colback=orange!5,colframe=orange!70!black,#1}
+\newtcolorbox{dicabox}[1][]{colback=green!4,colframe=green!40!black,#1}
+\newtcolorbox{simplesbox}{colback=black!3,frame hidden,borderline west={2pt}{0pt}{black!35},sharp corners}

@@ -1,0 +1,19 @@
+%% Setup das VMs no Proxmox
+flowchart LR
+    subgraph TPL["Pool PoolStudentTemplates"]
+        T1["Template<br/>Windows Server"]:::svc
+        T2["Template<br/>Ubuntu Client"]:::svc
+    end
+    subgraph POOL["Pool do grupo - #lt;POOL_GRUPO#gt;"]
+        V1["WindowsServerADDS-grp#lt;N#gt;"]:::vm
+        V2["UbuntuClient-grp#lt;N#gt;"]:::vm
+    end
+    BR["Bridge #lt;BRIDGE#gt;<br/>VLAN X"]:::net
+    T1 -->|"Linked Clone"| V1
+    T2 -->|"Linked Clone"| V2
+    V1 ---|"Network Device<br/>sem Disconnect / Firewall"| BR
+    V2 ---|"Network Device<br/>sem Disconnect / Firewall"| BR
+    classDef vm fill:#e8eef7,stroke:#1f497d,stroke-width:2px,color:#000
+    classDef svc fill:#ffffff,stroke:#1f497d,stroke-width:1px,color:#000
+    classDef net fill:#f3f3f3,stroke:#777,stroke-dasharray:4 3,color:#000
+    classDef ext fill:#fff4e5,stroke:#c77700,color:#000

@@ -1,0 +1,15 @@
+%% 1.4 Grupos e utilizadores no Active Directory
+flowchart LR
+    subgraph AD["Active Directory - isec.local - pasta Users"]
+        GA["Grupo-Alunos<br/>Global - Security"]:::svc
+        GP["Grupo-Professores<br/>Global - Security"]:::svc
+        UA["aluno.teste"]:::svc
+        UP["professor.teste"]:::svc
+    end
+    UA -->|"Member Of"| GA
+    UP -->|"Member Of"| GP
+    class AD vm
+    classDef vm fill:#e8eef7,stroke:#1f497d,stroke-width:2px,color:#000
+    classDef svc fill:#ffffff,stroke:#1f497d,stroke-width:1px,color:#000
+    classDef net fill:#f3f3f3,stroke:#777,stroke-dasharray:4 3,color:#000
+    classDef ext fill:#fff4e5,stroke:#c77700,color:#000

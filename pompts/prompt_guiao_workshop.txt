@@ -1,0 +1,100 @@
+# Tarefa: Elaborar o Guião do Workshop do Trabalho Prático de SR2
+
+## Objetivo
+Produzir **um único guião de workshop**, autónomo e pronto a usar em aula, que os alunos sigam passo a passo para configurar o ambiente Windows AD DS + clientes Linux.
+O guião é a versão unificada: deve ler-se como um documento original e não como uma compilação de outros.
+
+## Documentos de base (só para uso interno, não citar no guião)
+| Documento | Conteúdo a aproveitar |
+|---|---|
+| **PowerPoint "WORKSHOP WINDOWS AD DS & LINUX SERVICES"** | **Ordem oficial dos passos** de todo o guião |
+| **Guião Lab-Windows-Server-Setup-proj-Oriented** | Setup do Windows Server e Parte A |
+| **Guião-Setup-Ubuntu-proj-oriented** | Setup do Ubuntu e rede base |
+| **Guiao-Kerberos-SSSD-SRII-SAMBA-PAM-proj-oriented** | Parte B.1 (Kerberos, Samba, SSSD, PAM) |
+
+Regras de utilização:
+- **Ordem:** o guião segue a **sequência dos diapositivos do PowerPoint**, para o workshop correr em sincronia com a apresentação.
+- **Conteúdo técnico:** vem sobretudo dos três guiões (comandos, ficheiros de configuração, explicações). O PowerPoint completa passos que lá faltem.
+- **Conflitos:** se a ordem ou um comando divergir entre fontes, a **ordem do PowerPoint prevalece**. Para o conteúdo técnico, usar a versão mais completa e correta e marcar a divergência com `[VERIFICAR]`.
+- Não perder conteúdo técnico relevante, exceto o que está nas exclusões abaixo.
+
+## O que manter
+O foco está em:
+- **Configurações** (ficheiros, parâmetros, valores);
+- **Explicações** curtas do porquê de cada passo e do papel de cada componente;
+- **Execução de comandos**, com o resultado esperado;
+- **Definições** dos conceitos necessários (AD DS, DC, Kerberos, SSSD, PAM, …);
+- **Erros comuns** e respetiva resolução.
+
+## O que retirar
+- Tudo o que se refere a **Wireshark** e **tshark**.
+- Tudo o que diz respeito ao **relatório** (o que entregar, capturas para o relatório, critérios de avaliação, etc.).
+- Passos, secções ou configurações **opcionais** (ex.: "opcional", "extra", "bónus", "se quiser").
+- **Versão e histórico** dos documentos (números de versão, datas de revisão, changelog).
+- **Referências aos documentos de base**: não mencionar os guiões originais, o "guião unificado", ficheiros de consulta nem o PowerPoint.
+- Chamadas de atenção sobre **imagens/diapositivos** (ex.: "ver figura no slide 12", "conforme a imagem").
+- Repetições: quando o mesmo passo aparece em várias fontes, fica uma só versão.
+
+## Indicações obrigatórias (caixa de aviso no início do guião)
+1. **Pools do grupo:** cada grupo cria/atribui as suas máquinas à pool do grupo.
+2. **Divisão de trabalho:** os elementos do grupo dividem entre si a pool e a VLAN em que cada um vai trabalhar.
+3. **Endereçamento IP:** todas as configurações seguem o formato `192.168.X.Y`, onde:
+   - `X` = número da VLAN em que a máquina está;
+   - `Y` = endereço da máquina, entre **2 e 254**;
+   - `.1` fica reservado para o **default gateway** da VLAN;
+   - `.255` fica reservado para **broadcast**.
+4. **Placeholders:** em todos os comandos e ficheiros, usar `192.168.X.Y`, `<DOMINIO>`, `<HOSTNAME>`, etc., em vez de valores fixos (incluindo os que vêm das fontes), e lembrar o aluno de os substituir.
+5. **Password única:** em todo o workshop usa-se sempre a mesma password, `1qazZAQ!`, para todos os serviços, contas e máquinas: administrador local do Windows Server, Administrator do domínio, password do modo de recuperação (DSRM), utilizadores do AD criados no guião, utilizador do Ubuntu, `sudo`, `kinit`, `net ads join`/`realm join` e qualquer outro pedido de password.
+   - Substituir qualquer outra password que apareça nos documentos de base por `1qazZAQ!`.
+   - Não usar placeholder para a password: escrevê-la sempre de forma explícita.
+   - Nos comandos de shell Linux em que a password vá na própria linha, usar **aspas simples** (`'1qazZAQ!'`), porque com aspas duplas o `!` é interpretado pelo bash.
+
+## Estrutura do guião
+A estrutura abaixo define os **blocos**. A **ordem dos passos dentro de cada bloco** segue o PowerPoint. Se os diapositivos impuserem outra ordem entre blocos, seguir os diapositivos.
+
+### 0. Introdução
+- Objetivo do workshop, topologia (VLANs, gateway, DC, clientes) e plano de endereçamento.
+
+### 1. Setup das Máquinas Virtuais
+- 1.1 Criação das VMs na pool do grupo (recursos, rede/VLAN)
+- 1.2 Instalação do **Windows Server**
+- 1.3 Instalação do **Ubuntu** (cliente Linux)
+- 1.4 Configuração de rede base (IP estático, gateway, DNS) e teste de conectividade
+
+### Parte A — Windows Server
+- A.1 Instalação de dependências (roles e features: AD DS, DNS, …)
+- A.2 Configuração do domínio (promoção a Domain Controller, DNS)
+- A.3 Criação de utilizadores
+- A.4 Configuração de grupos (criação e associação de utilizadores)
+- A.5 Verificação
+
+### Parte B — Linux Client
+
+#### B.1 Integração com SSSD (completa, passo a passo)
+Secções previstas (ajustar a ordem à do PowerPoint):
+1. Pré-requisitos (hostname/FQDN, DNS a apontar para o DC, hora/NTP, pacotes)
+2. **Kerberos** (`krb5.conf`, `kinit`, `klist`)
+3. **Samba** (`smb.conf`, adesão ao domínio)
+4. **SSSD** (`sssd.conf`, permissões, serviço)
+5. **PAM / NSS** (autenticação, criação automática da home)
+6. Verificação final (`id`, `getent`, login com utilizador do domínio)
+
+#### B.2 Integração com Winbind
+Deixar **apenas os títulos das secções** (no mesmo formato da B.1), marcados como `[A AGUARDAR CONTEÚDO]`.
+
+### Erros Comuns e Resolução
+- Organizados por bloco (Setup, Parte A, B.1 SSSD, B.2 Winbind com título apenas).
+- Formato: **Sintoma → Causa provável → Solução** (com comandos, quando aplicável).
+- Incluir o erro `event not found` no bash, causado por escrever a password `1qazZAQ!` entre aspas duplas (solução: usar aspas simples).
+- No fim de cada secção do guião, uma remissão curta (ex.: "Problemas? Ver Erros Comuns – B.1 Kerberos").
+
+## Formato e estilo
+- Português de Portugal, tom direto de guião de laboratório, dirigido ao aluno.
+- Cada passo segue o formato **Objetivo → Comandos/Configuração → Verificação esperada**.
+- Comandos e ficheiros em blocos de código, indicando a máquina onde se executam (`[Windows Server]` / `[Ubuntu Client]`).
+- Numeração hierárquica consistente (1.1, A.2, B.1.3…).
+- Explicações curtas: no máximo 2–3 frases por passo.
+
+## Entrega
+1. O guião completo.
+2. **Em separado, depois do guião** (não faz parte do documento para os alunos): a lista de todos os pontos `[VERIFICAR]` e das divergências encontradas entre as fontes, para revisão. Incluir também na lista os sítios onde as fontes usavam uma password diferente e que foram uniformizados.

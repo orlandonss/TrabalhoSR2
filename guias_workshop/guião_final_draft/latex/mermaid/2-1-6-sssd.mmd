@@ -1,0 +1,19 @@
+%% 2.1.6 Utilizadores do AD no Linux: SSSD
+flowchart LR
+    subgraph CL["Ubuntu Client - ubuclient"]
+        ID["id / getent"]:::svc
+        NSS["NSS<br/>passwd/group: files sss"]:::svc
+        SSSD["SSSD<br/>id_provider = ad<br/>cache local"]:::svc
+    end
+    subgraph DC["Windows Server - SR2-SRV"]
+        LDAP["LDAP do AD - 389<br/>utilizadores e grupos"]:::svc
+        KDC["KDC - 88<br/>conta da máquina"]:::svc
+    end
+    ID --> NSS --> SSSD
+    SSSD -->|"autentica com a keytab"| KDC
+    SSSD -->|"pesquisa utilizadores e grupos"| LDAP
+    class CL,DC vm
+    classDef vm fill:#e8eef7,stroke:#1f497d,stroke-width:2px,color:#000
+    classDef svc fill:#ffffff,stroke:#1f497d,stroke-width:1px,color:#000
+    classDef net fill:#f3f3f3,stroke:#777,stroke-dasharray:4 3,color:#000
+    classDef ext fill:#fff4e5,stroke:#c77700,color:#000

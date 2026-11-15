@@ -1,0 +1,12 @@
+%% 1.5 Partilha SRII: permissões de partilha e NTFS
+\begin{tikzpicture}
+  \node[grupo, text width=2.6cm] (ga) at (-5.3,0.9) {Grupo-Alunos};
+  \node[grupo, text width=2.6cm] (gp) at (-5.3,-0.9) {Grupo-Professores};
+  \draw[caixa] (-0.90,-1.90) rectangle (5.70,1.80);
+  \node[caixatit] at (-0.78,1.72) {Windows Server - \texttt{SR2-SRV}};
+  \node[svc, text width=4.0cm] (sh) at (2.4,0.55) {Partilha SMB\\\texttt{\textbackslash\textbackslash SR2-SRV\textbackslash SRII}};
+  \node[svc, text width=4.0cm] (fs) at (2.4,-0.95) {Pasta SRII (NTFS)\\\texttt{ficheiroteste.txt}};
+  \draw[seta] (ga.east) -- (sh.west) node[midway, above, rot, text width=2.9cm] {Partilha: Read\\NTFS: Read \& execute};
+  \draw[seta] (gp.east) -- (sh.west) node[midway, below, rot, text width=2.9cm] {Partilha: Full Control\\NTFS: Modify};
+  \draw[seta] (sh) -- (fs);
+\end{tikzpicture}

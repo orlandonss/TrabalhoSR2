@@ -1,0 +1,1564 @@
+% Guião-Workshop SR2 - Grupo 10 (versão num só ficheiro)
+% Compilar com pdflatex, duas vezes.
+\documentclass[11pt,a4paper,oneside]{report}
+\newcommand{\esquemadir}{latex/esquemas/}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[portuguese]{babel}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[a4paper,top=2.6cm,bottom=2.6cm,left=2.4cm,right=2.4cm,headheight=14pt]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{listings}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{needspace}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,shapes.geometric}
+\usepackage{adjustbox}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage{fancyhdr}
+\usepackage[most]{tcolorbox}
+\usepackage{hyperref}
+
+\DeclareUnicodeCharacter{2192}{\ensuremath{\rightarrow}}
+\DeclareUnicodeCharacter{2194}{\ensuremath{\leftrightarrow}}
+
+% ---------- Cores ----------
+\definecolor{azul}{RGB}{31,73,125}
+\definecolor{cinza}{RGB}{90,90,90}
+
+\hypersetup{colorlinks=true,linkcolor=azul,urlcolor=azul,pdftitle={Guião-Workshop SR2}}
+
+% ---------- Texto ----------
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.45em}
+\setlist{itemsep=0.15em,topsep=0.25em}
+\widowpenalty=10000
+\clubpenalty=10000
+\emergencystretch=3em
+
+% ---------- Títulos e numeração ----------
+% Introdução (sem número); Capítulo 1 = Parte A (1.1, 1.2...); Capítulo 2 = Parte B (2.1, 2.1.1...)
+\setcounter{secnumdepth}{3}
+\titleformat{\chapter}[display]{\huge\bfseries\color{azul}}{\Large\chaptertitlename\ \thechapter}{0.4em}{}[{\vspace{0.3em}\color{azul!40}\titlerule[1pt]}]
+\titlespacing*{\chapter}{0pt}{0pt}{1.6em}
+\titleformat{\section}{\Large\bfseries\color{azul}}{\thesection}{0.8em}{}[{\color{azul!40}\titlerule[0.8pt]}]
+\titleformat{\subsection}{\large\bfseries\color{azul}}{\thesubsection}{0.7em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{azul!80!black}}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{1.6em}{1.0em}
+\titlespacing*{\subsection}{0pt}{1.5em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1.2em}{0.4em}
+
+% ---------- Esquemas (desenhados em TikZ, ficheiros em esquemas/*.tex) ----------
+\providecommand{\esquemadir}{esquemas/}
+\counterwithout{figure}{chapter}
+\captionsetup{font=small,labelfont={bf,color=azul}}
+\newcommand{\ph}[1]{\texttt{\textless{}#1\textgreater{}}}
+\tikzset{
+  vm/.style={draw=azul, very thick, fill=azul!8, rounded corners=3pt, align=center, font=\small, inner sep=5pt},
+  svc/.style={draw=azul!70, fill=white, rounded corners=2pt, align=center, font=\footnotesize, inner sep=4pt},
+  grupo/.style={draw=azul!70, fill=azul!12, rounded corners=2pt, align=center, font=\footnotesize, inner sep=4pt},
+  net/.style={draw=black!50, dashed, fill=black!4, rounded corners=2pt, align=center, font=\footnotesize, inner sep=4pt},
+  ext/.style={draw=orange!70!black, fill=orange!10, ellipse, align=center, font=\footnotesize, inner sep=3pt},
+  caixa/.style={draw=azul, thick, rounded corners=4pt, fill=azul!3},
+  caixatit/.style={font=\footnotesize\bfseries, text=azul, anchor=north west},
+  seta/.style={-{Stealth[length=2.2mm]}, thick, draw=black!70},
+  setad/.style={seta, dashed},
+  duplo/.style={{Stealth[length=2.2mm]}-{Stealth[length=2.2mm]}, thick, draw=black!70},
+  linha/.style={thick, draw=black!55},
+  rot/.style={font=\scriptsize, fill=white, inner sep=1.5pt, align=center},
+  vida/.style={draw=black!35, dashed},
+  acao/.style={draw=azul!60, fill=azul!5, rounded corners=2pt, align=center, font=\scriptsize, inner sep=3pt},
+  nota/.style={draw=orange!60!black, fill=yellow!12, align=center, font=\scriptsize, inner sep=3pt},
+}
+\newcommand{\esquema}[2]{%
+  \begin{figure}[H]
+    \centering
+    \adjustbox{max width=\linewidth}{\input{\esquemadir#1}}
+    \caption{#2}
+  \end{figure}}
+
+% Passo de um procedimento
+\newcommand{\passo}[1]{\par\needspace{6\baselineskip}\vspace{0.5em}{\color{azul}\bfseries #1}\par\nopagebreak}
+
+% Remissão para os erros comuns
+\newcommand{\problemas}[1]{\par\vspace{0.3em}{\small\color{cinza}\textit{Problemas? Ver} #1.}\par}
+
+% Marca de secção por preencher
+\newcommand{\aguardar}{{\normalfont\small\color{cinza}[A AGUARDAR CONTEÚDO]}}
+
+% ---------- Índice ----------
+\setcounter{tocdepth}{2}
+\renewcommand{\cftchappresnum}{\chaptername\ }
+\setlength{\cftchapnumwidth}{6.2em}
+\renewcommand{\cftchapfont}{\bfseries\color{azul}}
+\renewcommand{\cftchappagefont}{\bfseries\color{azul}}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftsecindent}{1.5em}
+\setlength{\cftsecnumwidth}{2.6em}
+\setlength{\cftsubsecindent}{4.1em}
+\setlength{\cftsubsecnumwidth}{3.4em}
+\addto\captionsportuguese{\renewcommand{\contentsname}{Índice}}
+
+% ---------- Cabeçalho e rodapé ----------
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\chaptermark}[1]{\markboth{\chaptername\ \thechapter\ - #1}{}}
+\renewcommand{\sectionmark}[1]{}
+\fancyhead[L]{\small\color{cinza}Guião-Workshop SR2}
+\fancyhead[R]{\small\color{cinza}\nouppercase{\leftmark}}
+\fancyfoot[C]{\small\color{cinza}\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\small\color{cinza}\thepage}\renewcommand{\headrulewidth}{0pt}}
+
+% ---------- Blocos de código ----------
+\lstdefinestyle{base}{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  breakatwhitespace=false,
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false,
+  frame=single,
+  framesep=4pt,
+  rulecolor=\color{black!20},
+  backgroundcolor=\color{black!3},
+  xleftmargin=4pt, xrightmargin=4pt,
+  aboveskip=0.7em, belowskip=0.7em,
+  upquote=true,
+  literate=
+    {á}{{\'a}}1 {à}{{\`a}}1 {â}{{\^a}}1 {ã}{{\~a}}1
+    {é}{{\'e}}1 {ê}{{\^e}}1 {í}{{\'i}}1 {ó}{{\'o}}1
+    {ô}{{\^o}}1 {õ}{{\~o}}1 {ú}{{\'u}}1 {ç}{{\c c}}1
+    {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1 {Ç}{{\c C}}1
+    {→}{{$\rightarrow$}}1
+}
+\lstdefinestyle{bashstyle}{style=base,language=bash,commentstyle=\color{green!40!black}\itshape}
+\lstdefinestyle{psstyle}{style=base,commentstyle=\color{green!40!black}\itshape,morecomment=[l]{\#}}
+\lstdefinestyle{cfgstyle}{style=base}
+\lstdefinestyle{diagstyle}{style=base,frame=none,backgroundcolor=,basicstyle=\ttfamily\footnotesize}
+
+% ---------- Caixas ----------
+\tcbset{enhanced,breakable,fonttitle=\bfseries,boxrule=0.6pt,arc=2pt,left=6pt,right=6pt,top=4pt,bottom=4pt,before skip=0.8em,after skip=0.8em}
+\newtcolorbox{avisobox}[1][]{colback=red!3,colframe=red!55!black,#1}
+\newtcolorbox{notabox}[1][]{colback=azul!4,colframe=azul,#1}
+\newtcolorbox{importantebox}[1][]{colback=orange!5,colframe=orange!70!black,#1}
+\newtcolorbox{dicabox}[1][]{colback=green!4,colframe=green!40!black,#1}
+\newtcolorbox{simplesbox}{colback=black!3,frame hidden,borderline west={2pt}{0pt}{black!35},sharp corners}
+
+\begin{document}
+\begin{titlepage}
+  \centering
+  \vspace*{\fill}
+  {\color{azul}\rule{\linewidth}{1.2pt}\par}
+  \vspace{1.5em}
+  {\Huge\bfseries\color{azul} Guião-Workshop SR2\par}
+  \vspace{1.2em}
+  {\LARGE Windows Server (AD DS) e Linux Client\par}
+  \vspace{0.5em}
+  {\Large Kerberos, Samba, SSSD e PAM\par}
+  \vspace{1.5em}
+  {\color{azul}\rule{\linewidth}{1.2pt}\par}
+  \vspace*{\fill}
+\end{titlepage}
+
+\pagenumbering{roman}
+\pagestyle{plain}
+\tableofcontents
+\clearpage
+\pagenumbering{arabic}
+\pagestyle{fancy}
+
+\chapter*{Introdução}
+\addcontentsline{toc}{chapter}{Introdução}
+\markboth{Introdução}{}
+
+\begin{avisobox}[title={Atenção}]
+\textbf{Indicações obrigatórias - ler antes de começar}
+
+\begin{enumerate}
+\item \textbf{Pools do grupo:} cada grupo cria/atribui as suas máquinas à \textbf{pool do grupo} no Proxmox. Não trabalhes nas pools de templates nem nas de outros grupos.
+\item \textbf{Divisão de trabalho:} os elementos do grupo dividem entre si a \textbf{pool} e a \textbf{VLAN} em que cada um vai trabalhar (aconselhado: uma VLAN/bridge por aluno, para não haver conflitos de endereços).
+\item \textbf{Endereçamento IP:} todas as configurações seguem o formato \textbf{\texttt{192.168.X.Y}}, onde:
+\begin{itemize}
+\item \textbf{\texttt{X}} = número da VLAN em que a máquina está;
+\item \textbf{\texttt{Y}} = endereço da máquina, entre \textbf{2 e 254};
+\item \textbf{\texttt{.1}} fica reservado para o \textbf{default gateway} da VLAN;
+\item \textbf{\texttt{.255}} fica reservado para \textbf{broadcast}.
+\end{itemize}
+\item \textbf{Nomes iguais para todos:} o domínio é \textbf{\texttt{isec.local}} (realm \texttt{ISEC.LOCAL}, NetBIOS \texttt{ISEC}) e o Windows Server chama-se \textbf{\texttt{SR2-SRV}}. São valores standard: \textbf{todos usam estes nomes}, para que os comandos sejam iguais e se possa acompanhar o workshop em conjunto.
+\item \textbf{O que muda de aluno para aluno é só a VLAN e os IPs:} nos comandos aparecem os placeholders \textbf{\texttt{X}} (VLAN), \textbf{\texttt{\textless{}IP\_DC\textgreater{}}} e \textbf{\texttt{\textless{}IP\_CLIENTE\textgreater{}}} (ambos no formato \texttt{192.168.X.Y}). \textbf{Substitui-os sempre pelos teus valores antes de executar.} Copiar um comando com \texttt{\textless{}...\textgreater{}} ou com \texttt{X} lá dentro dá erro.
+\end{enumerate}
+\end{avisobox}
+
+\section*{Objetivos do trabalho}
+\addcontentsline{toc}{section}{Objetivos do trabalho}
+
+No fim do workshop, cada aluno terá:
+
+\begin{enumerate}
+\item Um \textbf{Windows Server} promovido a \textbf{Domain Controller} (AD DS + DNS), com grupos, utilizadores e uma partilha SMB (\textbf{SRII}) com permissões por grupo (RBAC: alunos só leem, professores leem e escrevem).
+\item Um \textbf{cliente Ubuntu} com IP estático, a usar o DC como DNS e com o relógio sincronizado com ele.
+\item Autenticação \textbf{Kerberos} a funcionar (\texttt{kinit} / \texttt{klist}) e acesso à SRII com o ticket (\texttt{smbclient}).
+\item O Ubuntu \textbf{membro do domínio} (\texttt{realm join}), com os utilizadores do AD visíveis pelo \textbf{SSSD} e login com contas do AD via \textbf{PAM} (home criada automaticamente).
+\item \textbf{Montagem automática da SRII no login} (\texttt{pam\_mount}).
+\item A variante de integração com \textbf{Winbind} (em preparação).
+\end{enumerate}
+
+\section*{Topologia}
+\addcontentsline{toc}{section}{Topologia}
+
+\esquema{00-topologia}{Topologia geral do laboratório (VLAN X)}
+
+Cada aluno trabalha na sua VLAN \texttt{X}, com o seu DC e o seu cliente. O DC é ao mesmo tempo \textbf{controlador de domínio}, \textbf{servidor DNS}, \textbf{KDC Kerberos} e \textbf{servidor da partilha SMB}.
+
+\section*{Plano de endereçamento e nomes}
+\addcontentsline{toc}{section}{Plano de endereçamento e nomes}
+
+\textbf{O que muda de aluno para aluno (substituir sempre):}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{Placeholder} & \textbf{Significado} & \textbf{Exemplo (VLAN 105)} \\
+\hline
+\texttt{X} & Número da VLAN do aluno & \texttt{105} \\
+\hline
+\texttt{192.168.X.1} & Default gateway da VLAN (reservado) & \texttt{192.168.105.1} \\
+\hline
+\texttt{\textless{}IP\_DC\textgreater{}} & IP do Windows Server, no formato \texttt{192.168.X.Y} (Y entre 2 e 254) & \texttt{192.168.105.2} \\
+\hline
+\texttt{\textless{}IP\_CLIENTE\textgreater{}} & IP do Ubuntu, no formato \texttt{192.168.X.Y} (Y entre 2 e 254, diferente do DC) & \texttt{192.168.105.3} \\
+\hline
+\texttt{/\allowbreak{}24} · \texttt{255.255.255.0} & Máscara da VLAN & - \\
+\hline
+\texttt{\textless{}BRIDGE\textgreater{}} & Placa/bridge do Proxmox associada à VLAN \texttt{X} & \texttt{vmbr105} \\
+\hline
+\texttt{\textless{}POOL\_GRUPO\textgreater{}} & Pool do grupo no Proxmox & \texttt{PoolTeamX} \\
+\hline
+\end{tabularx}
+\end{center}
+
+\textbf{Igual para todos (não alterar):}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{0.32\linewidth}|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{Item} & \textbf{Valor standard} \\
+\hline
+Domínio DNS do AD & \texttt{isec.local} \\
+\hline
+Realm Kerberos (domínio em \textbf{MAIÚSCULAS}) & \texttt{ISEC.LOCAL} \\
+\hline
+Nome NetBIOS do domínio & \texttt{ISEC} \\
+\hline
+Nome do Windows Server & \texttt{SR2-SRV} → FQDN \texttt{SR2-SRV.isec.local} \\
+\hline
+Nome do cliente Ubuntu (máx. \textbf{15} caracteres) & \texttt{ubuclient} \\
+\hline
+Placa de rede do Ubuntu & \texttt{ens18} (confirmar com \texttt{ip -br a}) \\
+\hline
+Perfil NetworkManager & \texttt{labX} (ex.: \texttt{lab105}) \\
+\hline
+Utilizadores de teste & \texttt{aluno.teste}, \texttt{professor.teste} \\
+\hline
+Grupos & \texttt{Grupo-Alunos}, \texttt{Grupo-Professores} \\
+\hline
+Partilha & \texttt{SRII} \\
+\hline
+Palavra-passe de laboratório (Administrator, DSRM, utilizadores de teste) & \texttt{\textless{}PASSWORD\_LAB\textgreater{}} - a mesma para todo o grupo \\
+\hline
+\end{tabularx}
+\end{center}
+
+\section*{Setup das Máquinas Virtuais (Proxmox)}
+\addcontentsline{toc}{section}{Setup das Máquinas Virtuais (Proxmox)}
+
+\esquema{01-setup-vms}{Clonagem das VMs a partir dos templates e ligação à VLAN}
+
+\textbf{Objetivo:} ter o Windows Server e o Ubuntu clonados dos templates, na pool do grupo e ligados à bridge/VLAN do aluno.
+
+\passo{Passo 1 - Abrir a pool dos templates}
+
+Abrir o Proxmox e selecionar a pool \textbf{\texttt{PoolStudentTemplates}}.
+
+\passo{Passo 2 - Localizar os templates do grupo}
+
+Localizar os templates do \textbf{Windows Server} e do \textbf{Ubuntu Client} do grupo.
+
+\passo{Passo 3 - Clonar as duas VMs}
+
+Em cada template: \textbf{Clone} →
+
+\begin{itemize}
+\item \textbf{Mode:} \texttt{Linked Clone} (é importante selecionar \emph{Linked Clone} para não haver problemas);
+\item \textbf{Pool:} \texttt{\textless{}POOL\_GRUPO\textgreater{}} (a pool do teu grupo, ex.: \texttt{PoolTeamX});
+\item \textbf{Nome:} \texttt{WindowsServerADDS-grp\textless{}N\textgreater{}} para o Windows e \texttt{UbuntuClient-grp\textless{}N\textgreater{}} para o Ubuntu.
+\end{itemize}
+
+\passo{Passo 4 - Escolher a placa de rede (Windows Server)}
+
+Na VM do Windows: \textbf{Hardware → Network Device} → escolher a bridge \textbf{\texttt{\textless{}BRIDGE\textgreater{}}} que pertence à pool de endereços do teu grupo.
+
+\passo{Passo 5 - Escolher a placa de rede (Ubuntu)}
+
+Repetir para a VM do Ubuntu, com a \textbf{mesma} bridge \texttt{\textless{}BRIDGE\textgreater{}} (aconselhado: uma bridge por aluno, para não haver conflitos). Em ambas as VMs confirmar:
+
+\begin{itemize}
+\item \textbf{Bridge = \texttt{\textless{}BRIDGE\textgreater{}}};
+\item \textbf{Disconnect} desmarcado;
+\item \textbf{Firewall} desmarcado.
+\end{itemize}
+
+\passo{Passo 6 - Iniciar as duas VMs}
+
+\textbf{Verificação esperada:} as duas VMs aparecem dentro de \texttt{\textless{}POOL\_GRUPO\textgreater{}}, ambas com a bridge \texttt{\textless{}BRIDGE\textgreater{}}, e arrancam.
+
+\begin{notabox}[title={Nota}]
+\begin{itemize}
+\item Os templates já trazem os recursos (CPU/RAM/disco) e, no Ubuntu, as dependências instaladas (Kerberos, SSSD, Samba). \textbf{[VERIFICAR]} recursos mínimos, caso seja preciso criar uma VM de raiz.
+\item \textbf{[VERIFICAR]} O número da bridge corresponde à VLAN (ex.: \texttt{vmbr105} ↔ \texttt{192.168.105.0/\allowbreak{}24}). Confirmar com o docente a bridge/VLAN atribuída a cada aluno.
+\end{itemize}
+\end{notabox}
+
+\problemas{\hyperref[ec-setup]{Erros Comuns - Setup das VMs}}
+
+\chapter[Parte A - Windows Server]{Parte A - Windows Server}
+
+\textbf{Cenário:} configurar um Windows Server com gestão centralizada de identidades (Active Directory) e controlo de acessos por grupos (RBAC).
+
+\section[Nome, rede e IP estático]{Nome, rede e IP estático}
+
+\esquema{1-1-nome-rede-ip}{Windows Server: IP estático, gateway e DNS}
+
+\passo{Passo 1 - Primeiro arranque e nome do computador}
+
+\emph{Objetivo:} concluir o assistente inicial e dar ao servidor o nome standard.
+
+\begin{enumerate}
+\item Iniciar a VM e completar o assistente com os valores aconselhados:
+\begin{itemize}
+\item Região: \textbf{Portugal}; teclado: \textbf{Português}; idioma: \textbf{Inglês};
+\item Palavra-passe do Administrator: \textbf{\texttt{\textless{}PASSWORD\_LAB\textgreater{}}} (a mesma em todo o laboratório).
+\end{itemize}
+\item Mudar o nome do computador para \textbf{\texttt{SR2-SRV}}: barra de pesquisa do Windows → \textbf{About this computer} → \textbf{Rename this PC}.
+\item Reiniciar o servidor.
+\end{enumerate}
+
+\emph{Verificação esperada:} após o reinício, \emph{About this computer} mostra o nome \texttt{SR2-SRV}.
+
+\passo{Passo 2 - Abrir as definições do adaptador de rede}
+
+\emph{Control Panel → Network and Internet → Network and Sharing Center → Change adapter settings} → botão direito no adaptador → \textbf{Properties} → \textbf{Internet Protocol Version 4 (TCP/IPv4)} → \textbf{Properties}.
+
+\passo{Passo 3 - Atribuir o IP estático e testar a conectividade}
+
+\emph{Objetivo:} dar ao DC um IP fixo e apontar o DNS para ele próprio.
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{0.32\linewidth}|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{Campo} & \textbf{Valor} \\
+\hline
+IP address & \texttt{\textless{}IP\_DC\textgreater{}} (192.168.X.Y) \\
+\hline
+Subnet mask & \texttt{255.255.255.0} \\
+\hline
+Default gateway & \texttt{192.168.X.1} \\
+\hline
+Preferred DNS & \texttt{\textless{}IP\_DC\textgreater{}} (o próprio servidor) \\
+\hline
+\end{tabularx}
+\end{center}
+
+\textbf{OK} para aplicar.
+
+\begin{lstlisting}[style=psstyle]
+ipconfig /all
+ping 192.168.X.1
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{ipconfig} mostra \texttt{\textless{}IP\_DC\textgreater{}}, gateway \texttt{192.168.X.1} e DNS \texttt{\textless{}IP\_DC\textgreater{}}; o gateway responde ao ping.
+
+\passo{Passo 4 - Aguardar o arranque dos serviços}
+
+Aguardar que os serviços do servidor iniciem (o Server Manager abre sozinho) antes de começar a configuração.
+
+\problemas{\hyperref[ec-a]{Erros Comuns - Parte A}}
+
+\section[Instalação das roles AD DS e DNS]{Instalação das roles AD DS e DNS}
+
+\esquema{1-2-roles-adds-dns}{Roles AD DS e DNS instaladas no Windows Server}
+
+\passo{Passo 1 - Add Roles and Features}
+
+\emph{Objetivo:} abrir o assistente de instalação de funções.
+
+\textbf{Server Manager} → \textbf{Add roles and features} → avançar com as opções por defeito até ao separador \textbf{Server Roles}.
+
+\passo{Passo 2 - Selecionar as roles e instalar}
+
+\begin{enumerate}
+\item Selecionar \textbf{Active Directory Domain Services} e \textbf{DNS Server} (clicar em \textbf{Add Features} quando pedido).
+\item \textbf{Next} até ao fim → \textbf{Install}. Aguardar a conclusão.
+\end{enumerate}
+
+\emph{Verificação esperada:} no Server Manager aparecem \emph{AD DS} e \emph{DNS} no painel lateral, e uma \textbf{bandeira amarela} de aviso (promoção pendente).
+
+\problemas{\hyperref[ec-a]{Erros Comuns - Parte A}}
+
+\section[Promoção a Domain Controller (isec.local)]{Promoção a Domain Controller (\texttt{isec.local})}
+
+\esquema{1-3-promocao-dc}{Domain Controller: AD, KDC Kerberos e DNS do domínio isec.local}
+
+\passo{Passo 1 - Promover o servidor}
+
+No Server Manager, clicar na \textbf{bandeira amarela} → \textbf{Promote this server to a domain controller}.
+
+\passo{Passo 2 - Nova floresta}
+
+\textbf{Add a new forest} → \emph{Root domain name:} \textbf{\texttt{isec.local}} → Next.
+
+\passo{Passo 3 - Palavra-passe de restauro (DSRM)}
+
+Definir a palavra-passe \textbf{DSRM} (\texttt{\textless{}PASSWORD\_LAB\textgreater{}}) e memorizá-la → Next.
+
+\passo{Passo 4 - Aviso de DNS Delegation}
+
+Ignorar o aviso de \textbf{DNS Delegation} e prosseguir com \textbf{Next}.
+
+\passo{Passo 5 - Nome NetBIOS e instalação}
+
+Verificar que o nome \textbf{NetBIOS} é \textbf{\texttt{ISEC}} → \textbf{Next} em todos os ecrãs seguintes → \textbf{Install}.
+
+\passo{Passo 6 - Reinício e login no domínio}
+
+O servidor reinicia sozinho para concluir o processo.
+
+\emph{Verificação esperada:} no arranque seguinte, o login passa a ser feito como \textbf{\texttt{ISEC\textbackslash{}Administrator}} (Domain Administrator). Iniciar sessão e aguardar que o sistema arranque por completo.
+
+\begin{simplesbox}
+A promoção cria automaticamente a zona DNS \texttt{isec.local} e os registos SRV (\texttt{\_ldap.\_tcp.dc.\_msdcs.isec.local}, \texttt{\_kerberos.\_tcp.isec.local}) que o Kerberos e o SSSD usam para descobrir o DC.
+\end{simplesbox}
+
+\passo{Passo 7 - Forwarder DNS (acesso à internet a partir do cliente)}
+
+\emph{Objetivo:} como o Ubuntu vai usar \textbf{só} o DNS do Windows, o DC tem de reencaminhar para fora os nomes que não conhece.
+
+\begin{lstlisting}[style=psstyle]
+Add-DnsServerForwarder -IPAddress 1.1.1.1
+Get-DnsServerForwarder
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{Get-DnsServerForwarder} lista \texttt{1.1.1.1}.
+
+\problemas{\hyperref[ec-a]{Erros Comuns - Parte A}}
+
+\section[Grupos e utilizadores no Active Directory]{Grupos e utilizadores no Active Directory}
+
+\esquema{1-4-grupos-utilizadores}{Utilizadores e grupos no Active Directory}
+
+\passo{Passo 1 - Abrir o Active Directory Users and Computers}
+
+\textbf{Server Manager} → menu \textbf{Tools} (canto superior direito) → \textbf{Active Directory Users and Computers}.
+
+\passo{Passo 2 - Pasta Users}
+
+Expandir o domínio \textbf{\texttt{isec.local}} e clicar na pasta \textbf{Users}.
+
+\passo{Passo 3 - Criar os grupos}
+
+Ícone \textbf{Create a new group}:
+
+\begin{enumerate}
+\item \textbf{Grupo-Alunos} - \emph{Group scope:} \textbf{Global}, \emph{Group type:} \textbf{Security} → OK.
+\item \textbf{Grupo-Professores} - mesmas opções → OK.
+\end{enumerate}
+
+\passo{Passo 4 - Criar os utilizadores}
+
+Ícone \textbf{Create a new user}:
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{First name} & \textbf{Last name} & \textbf{User logon name} & \textbf{Grupo} \\
+\hline
+Professor & Teste & \texttt{professor.teste} & Grupo-Professores \\
+\hline
+Aluno & Teste & \texttt{aluno.teste} & Grupo-Alunos \\
+\hline
+\end{tabularx}
+\end{center}
+
+\passo{Passo 5 - Palavra-passe dos utilizadores}
+
+Atribuir a palavra-passe \texttt{\textless{}PASSWORD\_LAB\textgreater{}}, \textbf{desmarcar} \emph{"User must change password at next logon"} e manter \emph{"Password never expires"} \textbf{desmarcada}.
+
+\begin{simplesbox}
+Por norma o utilizador mudaria a palavra-passe no primeiro login; aqui desmarca-se a opção porque, caso contrário, o \texttt{kinit} no Linux falha.
+\end{simplesbox}
+
+\passo{Passo 6 - Atribuir os grupos aos utilizadores}
+
+\begin{enumerate}
+\item Na pasta \emph{Users}, localizar os utilizadores criados: \textbf{Professor Teste} e \textbf{Aluno Teste}.
+\item Duplo clique em \textbf{Professor Teste} → separador \textbf{Member Of} → \textbf{Add...} → \texttt{Grupo-Professores} → OK.
+\item Duplo clique em \textbf{Aluno Teste} → \textbf{Member Of} → \textbf{Add...} → \texttt{Grupo-Alunos} → OK.
+\end{enumerate}
+
+\emph{Verificação esperada:} em \emph{Member Of}, cada utilizador mostra \texttt{Domain Users} e o seu grupo.
+
+\problemas{\hyperref[ec-a]{Erros Comuns - Parte A}}
+
+\section[Partilha SRII: SMB e permissões NTFS]{Partilha SRII: SMB e permissões NTFS}
+
+\esquema{1-5-partilha-srii}{Partilha SRII e permissões por grupo}
+
+\textbf{Objetivo:} criar a pasta partilhada \textbf{SRII} onde o Grupo-Alunos só lê e o Grupo-Professores lê e escreve.
+
+\passo{Passo 1 - Criar a pasta e partilhá-la}
+
+\begin{enumerate}
+\item Criar uma pasta no \textbf{Ambiente de Trabalho (Desktop)} com o nome \textbf{\texttt{SRII}}.
+\item Botão direito → \textbf{Properties} → separador \textbf{Sharing} → \textbf{Advanced Sharing...}
+\item Marcar \textbf{Share this folder} → \textbf{Permissions}.
+\end{enumerate}
+
+\passo{Passo 2 - Permissões de partilha (grupos)}
+
+\begin{enumerate}
+\item \textbf{Remover} o grupo \texttt{Everyone} (por segurança).
+\item \textbf{Add...} → \texttt{Grupo-Professores} → OK → coluna \emph{Allow}: \textbf{Full Control}.
+\item \textbf{Add...} → \texttt{Grupo-Alunos} → OK → coluna \emph{Allow}: \textbf{apenas Read}.
+\item \textbf{OK} duas vezes para voltar às propriedades.
+\end{enumerate}
+
+\begin{simplesbox}
+\textbf{[VERIFICAR]} Para o Grupo-Professores, \emph{Change} também seria suficiente (com NTFS \emph{Modify} o professor já lê e escreve). Decidir qual das duas usar.
+\end{simplesbox}
+
+\passo{Passo 3 - Permissões de segurança (NTFS)}
+
+\begin{enumerate}
+\item Separador \textbf{Security} → \textbf{Edit...} → \textbf{Add...} → adicionar \texttt{Grupo-Alunos} e \texttt{Grupo-Professores}.
+\item Selecionar \texttt{Grupo-Alunos} e verificar que estão marcadas \textbf{Read \& execute}, \textbf{List folder contents} e \textbf{Read}.
+\item Selecionar \texttt{Grupo-Professores} e marcar \textbf{Modify} na coluna \emph{Allow}.
+\item \textbf{OK} para aplicar e fechar as propriedades.
+\end{enumerate}
+
+\passo{Passo 4 - Ficheiro de teste}
+
+Criar dentro da SRII um ficheiro de texto \textbf{\texttt{ficheiroteste.txt}} (com qualquer conteúdo), para os testes de leitura no Ubuntu.
+
+\begin{simplesbox}
+\textbf{[VERIFICAR]} Nome do ficheiro de teste: \texttt{ficheiroteste.txt} ou \texttt{notas.txt} - usar o mesmo em todo o workshop.
+\end{simplesbox}
+
+\emph{Verificação esperada:} a pasta mostra o ícone de partilha e contém \texttt{ficheiroteste.txt}.
+
+\problemas{\hyperref[ec-a]{Erros Comuns - Parte A}}
+
+\section[Firewall do Windows: permitir ping do Ubuntu]{Firewall do Windows: permitir ping do Ubuntu}
+
+\esquema{1-6-firewall}{Regra de firewall para o ping do Ubuntu}
+
+\textbf{Objetivo:} permitir que o Ubuntu faça ping ao DC (por defeito o Windows bloqueia).
+
+\passo{Passo 1 - Nova regra de entrada}
+
+\emph{Iniciar} → escrever \textbf{Windows Defender Firewall with Advanced Security} e abrir. Painel esquerdo: \textbf{Inbound Rules}; painel direito: \textbf{New Rule...}
+
+\passo{Passo 2 - Tipo de regra e protocolo}
+
+\textbf{Custom} → Next → \textbf{All programs} → Next → \textbf{Protocol type: ICMPv4} → Next.
+
+\passo{Passo 3 - IP de origem}
+
+Em \emph{Which remote IP addresses does this rule apply to?} → \textbf{These IP addresses} → \textbf{Add...} → \texttt{\textless{}IP\_CLIENTE\textgreater{}} → OK → Next.
+
+\passo{Passo 4 - Permitir e dar nome}
+
+\textbf{Allow the connection} → Next → Next → Nome: \textbf{\texttt{SR2 Allow Ping Ubuntu}} → \textbf{Finish}.
+
+\emph{Verificação esperada:} a regra aparece ativa (visto verde) em \emph{Inbound Rules}. O teste de ping faz-se a partir do Ubuntu (2.1.1, Passo 11).
+
+\problemas{\hyperref[ec-a]{Erros Comuns - Parte A}}
+
+\chapter[Parte B - Linux Client]{Parte B - Linux Client}
+
+\section[Integração com SSSD]{Integração com SSSD}
+
+\begin{notabox}[title={Nota}]
+Nesta variante usa-se o \textbf{cliente} SMB (\texttt{smbclient}) e a adesão ao domínio faz-se com \texttt{realm join} (realmd + adcli), que gera automaticamente o \texttt{sssd.conf}. \textbf{Não é preciso configurar o \texttt{smb.conf}} nem um servidor Samba: o \texttt{smb.conf} e o \texttt{net ads join} pertencem à variante \textbf{Winbind} (2.2). \textbf{[VERIFICAR]} se o enunciado exige \texttt{smb.conf} também na variante SSSD.
+\end{notabox}
+
+\subsection[Ubuntu: IP estático e DNS do Windows]{Ubuntu: IP estático e DNS do Windows}
+
+\esquema{2-1-1-rede-dns}{Rede e DNS do Ubuntu apontados para o Windows Server}
+
+\textbf{Objetivo:} no fim, o Ubuntu tem IP estático, um único perfil de rede, usa \textbf{apenas} o DC como DNS e resolve \texttt{isec.local} pelo nome. Sem o DNS apontado ao Windows, o Kerberos e o SSSD não conseguem descobrir o domínio.
+
+\passo{Passo 1 - Iniciar a VM e abrir o terminal}
+
+Trabalha \textbf{na consola da VM} (não por SSH): a rede vai ser reconfigurada e uma sessão SSH cairia.
+
+\begin{simplesbox}
+Confirma o nome da placa com \texttt{ip -br a}. Se não for \texttt{ens18}, troca \texttt{ens18} pelo nome real nos comandos desta secção.
+\end{simplesbox}
+
+\passo{Passo 2 - Ver a configuração de rede existente}
+
+\emph{Objetivo:} perceber que ficheiros e ligações já configuram a placa, para evitar conflitos.
+
+\begin{lstlisting}[style=bashstyle]
+ls /etc/netplan
+nmcli -f NAME,DEVICE,TYPE connection show
+\end{lstlisting}
+
+\begin{itemize}
+\item \texttt{ls /\allowbreak{}etc/\allowbreak{}netplan} lista os ficheiros do Netplan (o sistema que define a rede no Ubuntu).
+\item \texttt{nmcli ... connection show} lista as ligações geridas pelo NetworkManager.
+\end{itemize}
+
+\emph{Porquê:} o erro \texttt{Conflicting default route} aparece quando mais de um ficheiro ou perfil configura a mesma placa com uma rota por defeito.
+
+\passo{Passo 3 - Criar uma pasta de backup}
+
+\emph{Objetivo:} guardar a configuração antiga em vez de a apagar, para poder repor se algo correr mal.
+
+\begin{lstlisting}[style=bashstyle]
+sudo mkdir -p /root/netplan-bak
+\end{lstlisting}
+
+\texttt{-p} não dá erro se a pasta já existir; fica em \texttt{/\allowbreak{}root}, só acessível ao administrador.
+
+\emph{Se saltares este passo, o Passo 4 falha com \texttt{Ficheiro ou pasta inexistente}.}
+
+\passo{Passo 4 - Remover os ficheiros em conflito}
+
+\emph{Objetivo:} deixar um único método de configuração de rede: o NetworkManager por linha de comandos.
+
+\begin{lstlisting}[style=bashstyle]
+cd /etc/netplan
+sudo mv 00-installer-config.yaml 01-netcfg.yaml 90-NM-*.yaml /root/netplan-bak/
+ls /etc/netplan
+cd ~
+\end{lstlisting}
+
+\emph{Verificação esperada:} o \texttt{ls} mostra \textbf{só} \texttt{01-network-manager-all.yaml} (que apenas diz que o NetworkManager gere a rede e não configura nenhuma placa).
+
+\emph{Nota:} os nomes dos ficheiros podem variar - a regra é mover \textbf{todos exceto} \texttt{01-network-manager-all.yaml}.
+
+\passo{Passo 5 - Aplicar a limpeza}
+
+\begin{lstlisting}[style=bashstyle]
+sudo netplan apply
+\end{lstlisting}
+
+Como já não há ficheiro a configurar a \texttt{ens18}, o perfil antigo desaparece.
+
+\emph{Nota:} podem aparecer avisos amarelos sobre o \texttt{systemd-networkd} - são inofensivos, porque não o usamos.
+
+\passo{Passo 6 - Garantir que o NetworkManager está a correr}
+
+\begin{lstlisting}[style=bashstyle]
+sudo systemctl start NetworkManager
+systemctl is-active NetworkManager
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{active}.
+
+\emph{Porquê:} sem o serviço ativo, o \texttt{nmcli} falha com \texttt{O NetworkManager não está em execução} e a ligação do Passo 7 nunca é criada.
+
+\passo{Passo 7 - Criar a ligação com IP estático e DNS do Windows Server}
+
+\begin{lstlisting}[style=bashstyle]
+sudo nmcli connection add type ethernet ifname ens18 con-name labX \
+     ipv4.method manual \
+     ipv4.addresses <IP_CLIENTE>/24 \
+     ipv4.gateway 192.168.X.1 \
+     ipv4.dns <IP_DC> \
+     ipv4.dns-search isec.local \
+     ipv4.ignore-auto-dns yes
+\end{lstlisting}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{Parâmetro} & \textbf{Valor} & \textbf{O que faz} \\
+\hline
+\texttt{ifname} & \texttt{ens18} & Placa de rede a configurar \\
+\hline
+\texttt{con-name} & \texttt{labX} & Nome do perfil \\
+\hline
+\texttt{ipv4.method} & \texttt{manual} & IP fixo, sem DHCP \\
+\hline
+\texttt{ipv4.addresses} & \texttt{\textless{}IP\_CLIENTE\textgreater{}/\allowbreak{}24} & IP do Ubuntu e máscara \\
+\hline
+\texttt{ipv4.gateway} & \texttt{192.168.X.1} & Saída da rede \\
+\hline
+\texttt{ipv4.dns} & \texttt{\textless{}IP\_DC\textgreater{}} & DNS = Windows Server \\
+\hline
+\texttt{ipv4.dns-search} & \texttt{isec.local} & Domínio de pesquisa (escreves \texttt{SR2-SRV} em vez de \texttt{SR2-SRV.isec.local}) \\
+\hline
+\texttt{ipv4.ignore-auto-dns} & \texttt{yes} & Impede que outro DNS entre automaticamente \\
+\hline
+\end{tabularx}
+\end{center}
+
+\begin{importantebox}[title={Importante}]
+\textbf{Só o DNS do Windows:} não ponhas \texttt{8.8.8.8} como alternativo. O Ubuntu pode perguntar-lhe e não encontrar os registos internos do AD. A internet continua a funcionar através do \textbf{forwarder} do DNS do Windows (1.3, Passo 7).
+\end{importantebox}
+
+\emph{Verificação esperada:} o comando termina sem erros.
+
+\passo{Passo 8 - Ativar a ligação e confirmar}
+
+\begin{lstlisting}[style=bashstyle]
+sudo nmcli connection up labX
+nmcli -f NAME,DEVICE,TYPE connection show
+\end{lstlisting}
+
+\emph{Verificação esperada:} o perfil \texttt{labX} aparece associado à placa \texttt{ens18}.
+
+\emph{Nota:} se aparecer outro perfil antigo sem placa (ex.: \texttt{Ligação com fios 1}), apaga-o para não confundir:
+
+\begin{lstlisting}[style=bashstyle]
+sudo nmcli connection delete 'NOME'
+\end{lstlisting}
+
+\passo{Passo 9 - Confirmar o IP e a rota}
+
+\begin{lstlisting}[style=bashstyle]
+ip -br a
+ip route
+\end{lstlisting}
+
+\emph{Verificação esperada:}
+
+\begin{itemize}
+\item \texttt{ens18} aparece \textbf{UP} com \texttt{\textless{}IP\_CLIENTE\textgreater{}/\allowbreak{}24} - e \textbf{não} com um endereço \texttt{169.254.x.x} (que significa que o IP estático não foi aplicado);
+\item existe \textbf{uma única} linha \texttt{default via 192.168.X.1} (o conflito do início desapareceu).
+\end{itemize}
+
+\passo{Passo 10 - Confirmar que o DNS é o do Windows}
+
+\begin{lstlisting}[style=bashstyle]
+resolvectl status ens18
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{Current DNS Server: \textless{}IP\_DC\textgreater{}}, \texttt{DNS Servers: \textless{}IP\_DC\textgreater{}} (sem \texttt{8.8.8.8} nem \texttt{1.1.1.1}), \texttt{DNS Domain: isec.local}.
+
+\emph{Porquê:} se ainda aparecerem DNS públicos, o Ubuntu pode perguntar a um deles e falhar a descoberta do domínio. Volta ao Passo 7 e confirma \texttt{ipv4.ignore-auto-dns yes}.
+
+\passo{Passo 11 - Testar a ligação ao servidor}
+
+\begin{lstlisting}[style=bashstyle]
+ping -c 3 <IP_DC>
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{0\% packet loss}.
+
+\emph{Porquê:} prova que há rede, mas ainda não que o DNS funciona (o ping por IP não precisa de DNS).
+
+\passo{Passo 12 - Testar o DNS do domínio}
+
+\emph{Objetivo:} provar que o DNS do Windows responde sobre o domínio e anuncia os serviços de autenticação.
+
+\begin{lstlisting}[style=bashstyle]
+dig @<IP_DC> isec.local +short
+dig @<IP_DC> _ldap._tcp.dc._msdcs.isec.local SRV +short
+\end{lstlisting}
+
+\emph{Verificação esperada:}
+
+\begin{itemize}
+\item o 1.º devolve \texttt{\textless{}IP\_DC\textgreater{}};
+\item o 2.º devolve algo como \texttt{0 100 389 sr2-srv.isec.local.}
+\end{itemize}
+
+\emph{Porquê:} os registos SRV são a peça mais importante - é com eles que o Kerberos e o SSSD descobrem o controlador de domínio. \textbf{Se falhar, é DNS: não avances.}
+
+\passo{Passo 13 - Corrigir o ping a \texttt{isec.local} (desativar o mDNS para \texttt{.local})}
+
+\emph{Objetivo:} fazer o Ubuntu perguntar ao DNS do Windows quando o nome acaba em \texttt{.local}.
+
+\begin{lstlisting}[style=bashstyle]
+sudo cp /etc/nsswitch.conf /etc/nsswitch.conf.bak
+grep ^hosts /etc/nsswitch.conf
+sudo sed -i 's/mdns4_minimal \[NOTFOUND=return\] //' /etc/nsswitch.conf
+grep ^hosts /etc/nsswitch.conf
+\end{lstlisting}
+
+\emph{Porquê:} por defeito, o Ubuntu trata nomes \texttt{.local} como \textbf{mDNS} (descoberta na rede local) e responde logo "nome desconhecido", sem perguntar ao DNS do Windows. Por isso o \texttt{dig} funciona e o \texttt{ping isec.local} falha. \textbf{Este passo é obrigatório:} sem ele, o Kerberos, o \texttt{smbclient} e o \texttt{realm} também não conseguem resolver \texttt{SR2-SRV.isec.local}.
+
+\emph{Verificação esperada:} a linha passa de \texttt{hosts: files mdns4\_minimal [NOTFOUND=return] dns} para \texttt{hosts: files dns}.
+
+\passo{Passo 14 - Testar o \texttt{isec.local}}
+
+\begin{lstlisting}[style=bashstyle]
+getent hosts isec.local
+ping -c 3 isec.local
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{getent} devolve \texttt{\textless{}IP\_DC\textgreater{} isec.local} e o ping responde com \texttt{0\% packet loss}.
+
+\problemas{\hyperref[ec-b1-rede]{Erros Comuns - 2.1 Rede e DNS do cliente}}
+
+\subsection[Sincronização do relógio (chrony)]{Sincronização do relógio (chrony)}
+
+\esquema{2-1-2-chrony}{Sincronização do relógio por NTP}
+
+\textbf{Objetivo:} acertar a hora do Ubuntu pela do DC. O Kerberos rejeita pedidos com mais de \textbf{5 minutos} de diferença entre o cliente e o servidor.
+
+\passo{Passo 1 - Direcionar o chrony ao Windows Server}
+
+\begin{lstlisting}[style=bashstyle]
+grep -q "^server <IP_DC>" /etc/chrony/chrony.conf || \
+  echo "server <IP_DC> iburst" | sudo tee -a /etc/chrony/chrony.conf
+grep "^server <IP_DC>" /etc/chrony/chrony.conf
+\end{lstlisting}
+
+Só acrescenta se ainda não existir, por isso não duplica. \texttt{server} = fonte de tempo; \texttt{iburst} = sincroniza mais depressa no arranque.
+
+\passo{Passo 2 - Reiniciar o chrony e confirmar}
+
+\begin{lstlisting}[style=bashstyle]
+sudo systemctl restart chrony
+systemctl status chrony --no-pager
+chronyc sources -v
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{active (running)} (se o serviço não existir, tenta \texttt{chronyd}) e, no \texttt{chronyc sources -v}, a linha de \texttt{\textless{}IP\_DC\textgreater{}} com \texttt{\textasciicircum{}*} ou \texttt{\textasciicircum{}+} - prova de que o relógio está mesmo a ser acertado pelo DC. Se \texttt{\textless{}IP\_DC\textgreater{}} aparecer com \texttt{\textasciicircum{}?}, espera uns segundos e repete o comando.
+
+\problemas{\hyperref[ec-b1-kerberos]{Erros Comuns - 2.1 Relógio e Kerberos}}
+
+\subsection[Kerberos: configurar o realm e obter o ticket]{Kerberos: configurar o realm e obter o ticket}
+
+\esquema{2-1-3-kerberos}{Pedido do TGT Kerberos (kinit)}
+
+\passo{Passo 1 - Guardar uma cópia do ficheiro original}
+
+\begin{lstlisting}[style=bashstyle]
+sudo cp /etc/krb5.conf /etc/krb5.conf.original 2>/dev/null
+\end{lstlisting}
+
+\passo{Passo 2 - Escrever o novo \texttt{krb5.conf}}
+
+\begin{lstlisting}[style=bashstyle]
+sudo tee /etc/krb5.conf > /dev/null << 'EOF'
+[libdefaults]
+    default_realm = ISEC.LOCAL
+    dns_lookup_realm = false
+    dns_lookup_kdc = true
+    rdns = false
+
+[realms]
+    ISEC.LOCAL = {
+        kdc = SR2-SRV.isec.local
+        admin_server = SR2-SRV.isec.local
+    }
+
+[domain_realm]
+    .isec.local = ISEC.LOCAL
+    isec.local = ISEC.LOCAL
+EOF
+cat /etc/krb5.conf
+\end{lstlisting}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{0.32\linewidth}|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{Parâmetro} & \textbf{O que faz} \\
+\hline
+\texttt{default\_realm} & Realm usado quando escreves só \texttt{kinit aluno.teste}. Em \textbf{MAIÚSCULAS}. \\
+\hline
+\texttt{dns\_lookup\_realm = false} & Não descobre o realm por DNS (já está definido). \\
+\hline
+\texttt{dns\_lookup\_kdc = true} & Descobre o KDC pelos registos DNS \texttt{\_kerberos.\_tcp}. \\
+\hline
+\texttt{rdns = false} & Desativa o DNS inverso, que costuma falhar em laboratório. \\
+\hline
+\texttt{kdc} & Servidor que emite os tickets (porta 88). No AD é o DC. \\
+\hline
+\texttt{admin\_server} & Servidor de contas e palavras-passe. No AD é o mesmo. \\
+\hline
+\texttt{.isec.local = ISEC.LOCAL} / \texttt{isec.local = ISEC.LOCAL} & Máquinas dentro do domínio / o próprio domínio. São precisas as duas. \\
+\hline
+\end{tabularx}
+\end{center}
+
+\emph{Verificação esperada:} o \texttt{cat} mostra o ficheiro exatamente como acima.
+
+\passo{Passo 3 - Obter o ticket}
+
+\begin{lstlisting}[style=bashstyle]
+kinit aluno.teste@ISEC.LOCAL
+klist
+kdestroy
+\end{lstlisting}
+
+\emph{Verificação esperada:} o \texttt{kinit} pede a palavra-passe e não mostra mais nada (\textbf{silêncio = sucesso}); o \texttt{klist} mostra o utilizador e o ticket \texttt{krbtgt/\allowbreak{}ISEC.LOCAL@ISEC.LOCAL}. O \texttt{kdestroy} apaga o ticket para começar limpo na secção seguinte.
+
+\problemas{\hyperref[ec-b1-kerberos]{Erros Comuns - 2.1 Relógio e Kerberos}}
+
+\subsection[Samba: acesso à partilha SRII com Kerberos]{Samba: acesso à partilha SRII com Kerberos}
+
+\esquema{2-1-4-samba}{Acesso à SRII com ticket Kerberos (smbclient)}
+
+\textbf{Objetivo:} provar que o professor lê e escreve na SRII e o aluno só lê, usando o cliente Samba (\texttt{smbclient}) com o ticket Kerberos, \textbf{sem} juntar a máquina ao domínio.
+
+\begin{importantebox}[title={Importante}]
+\textbf{Kerberos no \texttt{smbclient}:} a opção antiga \texttt{-k} está obsoleta (\emph{deprecated}) no Samba 4.15+. Usa-se \texttt{--use-kerberos=required}, que usa o ticket do \texttt{kinit} e \textbf{falha} (em vez de pedir palavra-passe) se não houver ticket válido.
+\end{importantebox}
+
+\passo{Passo 1 - Limpar a cache do Kerberos}
+
+\begin{lstlisting}[style=bashstyle]
+kdestroy
+klist
+\end{lstlisting}
+
+\passo{Passo 2 - Listar as pastas partilhadas do servidor}
+
+\begin{lstlisting}[style=bashstyle]
+kinit aluno.teste@ISEC.LOCAL
+smbclient -L //SR2-SRV.isec.local --use-kerberos=required
+\end{lstlisting}
+
+\emph{Verificação esperada:} aparece a partilha \textbf{SRII}. A linha \texttt{SMB1 disabled -- no workgroup available} é normal.
+
+\passo{Passo 3 - Preparar um ficheiro de testes}
+
+\begin{lstlisting}[style=bashstyle]
+echo "Escrito a partir do Ubuntu" > /tmp/teste-escrita.txt
+chmod 644 /tmp/teste-escrita.txt
+kdestroy
+klist
+\end{lstlisting}
+
+O \texttt{chmod 644} deixa os utilizadores do domínio ler o ficheiro mais tarde (2.1.8).
+
+\passo{Passo 4 - Testar o aluno}
+
+\begin{lstlisting}[style=bashstyle]
+kinit aluno.teste@ISEC.LOCAL
+smbclient //SR2-SRV.isec.local/SRII --use-kerberos=required -c 'ls'
+smbclient //SR2-SRV.isec.local/SRII --use-kerberos=required -c 'put /tmp/teste-escrita.txt aluno-escrita.txt'
+kdestroy
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{ls} funciona; \texttt{put} falha com \texttt{NT\_STATUS\_ACCESS\_DENIED}.
+
+\begin{dicabox}[title={Dica}]
+Cada comando \texttt{smbclient} ocupa \textbf{uma só linha}. Se ao colar o terminal ficar em \texttt{\textgreater{}}, a aspa ficou aberta: \texttt{Ctrl+C} e cola a linha inteira outra vez.
+\end{dicabox}
+
+\passo{Passo 5 - Testar o professor}
+
+\begin{lstlisting}[style=bashstyle]
+kinit professor.teste@ISEC.LOCAL
+smbclient //SR2-SRV.isec.local/SRII --use-kerberos=required -c 'ls'
+smbclient //SR2-SRV.isec.local/SRII --use-kerberos=required -c 'put /tmp/teste-escrita.txt professor-escrita.txt'
+smbclient //SR2-SRV.isec.local/SRII --use-kerberos=required -c 'ls'
+kdestroy
+klist
+\end{lstlisting}
+
+\emph{Verificação esperada:} o professor lista e escreve; \texttt{professor-escrita.txt} aparece no segundo \texttt{ls}.
+
+\passo{Passo 6 - Analisar resultados e discutir}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{Utilizador} & \textbf{Listar (\texttt{ls})} & \textbf{Escrever (\texttt{put})} \\
+\hline
+\texttt{aluno.teste} & Permitido & \texttt{NT\_STATUS\_ACCESS\_DENIED} \\
+\hline
+\texttt{professor.teste} & Permitido & Permitido \\
+\hline
+\end{tabularx}
+\end{center}
+
+Confirmar também no Windows Server:
+
+\begin{lstlisting}[style=psstyle]
+Get-ChildItem "$env:USERPROFILE\Desktop\SRII"
+\end{lstlisting}
+
+\emph{Verificação esperada:} existe \texttt{professor-escrita.txt} e \textbf{não} existe \texttt{aluno-escrita.txt}.
+
+\begin{itemize}
+\item Se o aluno conseguir escrever, as permissões NTFS estão demasiado abertas (ou o aluno também está no grupo de professores) - rever 1.4 e 1.5.
+\item Se algum for negado logo no \texttt{ls}, confirmar o grupo e as permissões de leitura (1.4 e 1.5).
+\end{itemize}
+
+\problemas{\hyperref[ec-b1-samba]{Erros Comuns - 2.1 Samba}}
+
+\subsection[Entrada no domínio: realmd e adcli]{Entrada no domínio: realmd e adcli}
+
+\esquema{2-1-5-realm-join}{Adesão ao domínio com realmd e adcli}
+
+\textbf{Objetivo:} o Ubuntu passar a ser \textbf{membro do domínio}. Até aqui só usava tickets pedidos à mão (\texttt{kinit}); o computador não existia no AD e não conhecia os utilizadores. O \texttt{realm join} cria a conta da máquina no AD (através do \texttt{adcli}) e configura o SSSD.
+
+\passo{Passo 1 - Ajustar o nome do cliente}
+
+\begin{lstlisting}[style=bashstyle]
+hostnamectl
+sudo hostnamectl set-hostname ubuclient
+hostnamectl
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{Static hostname: ubuclient}.
+
+\emph{Porquê:} o nome original do template (\texttt{user-ClientUbuntu}) tem 17 caracteres e o limite do nome NetBIOS no AD é \textbf{15}. Todos usam \texttt{ubuclient}: como cada aluno tem o seu DC na sua VLAN, o nome não colide entre colegas.
+
+\passo{Passo 2 - Descobrir o domínio}
+
+\begin{lstlisting}[style=bashstyle]
+realm discover isec.local
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{type: kerberos}, \texttt{realm-name: ISEC.LOCAL}, \texttt{server-software: active-directory}. Se falhar, repete 2.1.1 (Passo 12, DNS) e 2.1.3 (Passo 2, \texttt{krb5.conf}).
+
+\passo{Passo 3 - Fazer o join ao domínio}
+
+\begin{lstlisting}[style=bashstyle]
+sudo realm join -U Administrator isec.local
+\end{lstlisting}
+
+Pede a palavra-passe do \emph{Administrator} do domínio. \textbf{Silêncio = sucesso.} Cria o objeto da máquina no AD e gera \texttt{/\allowbreak{}etc/\allowbreak{}sssd/\allowbreak{}sssd.conf}.
+
+\passo{Passo 4 - Confirmar o join ao domínio}
+
+\begin{lstlisting}[style=bashstyle]
+realm list
+sudo systemctl status sssd --no-pager
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{realm list} mostra \texttt{configured: kerberos-member}; o \texttt{sssd} está \texttt{active (running)}.
+
+\problemas{\hyperref[ec-b1-sssd]{Erros Comuns - 2.1 Domínio e SSSD}}
+
+\subsection[Utilizadores do AD no Linux: SSSD]{Utilizadores do AD no Linux: SSSD}
+
+\esquema{2-1-6-sssd}{Resolução de utilizadores do AD pelo SSSD}
+
+\passo{Passo 1 - Confirmar que o Linux localiza os utilizadores do AD e ver a configuração do SSSD}
+
+\begin{lstlisting}[style=bashstyle]
+id aluno.teste@isec.local
+id professor.teste@isec.local
+sudo cat /etc/sssd/sssd.conf
+\end{lstlisting}
+
+\emph{Verificação esperada:}
+
+\begin{itemize}
+\item \texttt{id} mostra o UID e os grupos, ex.: \texttt{groups=...(domain users@isec.local),\allowbreak{}...(grupo-alunos@isec.local)} - os grupos aparecem em \textbf{minúsculas};
+\item o \texttt{sssd.conf} (gerado pelo \texttt{realm join}) contém:
+\end{itemize}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{0.32\linewidth}|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{Parâmetro} & \textbf{Significado} \\
+\hline
+\texttt{domains = isec.local} & Domínio que o SSSD serve \\
+\hline
+\texttt{id\_provider = ad} & Vai buscar utilizadores e grupos ao Active Directory \\
+\hline
+\texttt{access\_provider = ad} & O AD decide quem pode entrar \\
+\hline
+\texttt{use\_fully\_qualified\_names = True} & Utilizadores escrevem-se \texttt{utilizador@isec.local} \\
+\hline
+\texttt{fallback\_homedir = /\allowbreak{}home/\allowbreak{}\%u@\%d} & Homes em \texttt{/\allowbreak{}home/\allowbreak{}utilizador@isec.local} \\
+\hline
+\end{tabularx}
+\end{center}
+
+Se o \texttt{id} der \texttt{no such user}, espera um minuto ou limpa a cache: \texttt{sudo sss\_cache -E} e tenta outra vez.
+
+\problemas{\hyperref[ec-b1-sssd]{Erros Comuns - 2.1 Domínio e SSSD}}
+
+\subsection[Login com contas do AD: PAM]{Login com contas do AD: PAM}
+
+\esquema{2-1-7-pam}{Login de um utilizador do AD com PAM e SSSD}
+
+\passo{Passo 1 - Ativar a criação automática da home no primeiro login}
+
+\begin{lstlisting}[style=bashstyle]
+sudo pam-auth-update --enable mkhomedir
+grep mkhomedir /etc/pam.d/common-session
+\end{lstlisting}
+
+\emph{Verificação esperada:} o \texttt{grep} mostra \texttt{pam\_mkhomedir.so}. Não há MFA configurado: o login pede só utilizador e palavra-passe.
+
+\passo{Passo 2 - Login com uma conta do AD}
+
+\begin{lstlisting}[style=bashstyle]
+su - aluno.teste@isec.local
+whoami
+id
+pwd
+\end{lstlisting}
+
+\emph{Verificação esperada:} o \texttt{su -} autentica o aluno no AD através do \textbf{PAM + SSSD}; \texttt{whoami} mostra \texttt{aluno.teste@isec.local}; a home é criada na primeira vez (\texttt{pwd} → \texttt{/\allowbreak{}home/\allowbreak{}aluno.teste@isec.local}).
+
+\begin{importantebox}[title={Importante}]
+\textbf{Se o \texttt{su -} der \texttt{su: System error}}, o SSSD está a aplicar as GPO do AD ao login e bloqueia-o. Volta ao terminal do utilizador local e corrige o \texttt{sssd.conf}:
+
+\begin{lstlisting}[style=bashstyle]
+# [Linux Client]  (terminal do utilizador local)
+sudo nano /etc/sssd/sssd.conf
+\end{lstlisting}
+
+Na secção \texttt{[domain/\allowbreak{}isec.local]}, acrescenta a linha \texttt{ad\_gpo\_access\_control = permissive} (e apaga \texttt{config\_file\_version = 2}, se existir). Guarda (\texttt{Ctrl+O}, \texttt{Enter}, \texttt{Ctrl+X}) e reinicia o SSSD:
+
+\begin{lstlisting}[style=bashstyle]
+sudo chmod 600 /etc/sssd/sssd.conf
+sudo sssctl config-check
+sudo systemctl restart sssd
+\end{lstlisting}
+
+Depois repete este passo. O modo \texttt{permissive} regista as GPO mas não as impõe (solução de laboratório).
+\end{importantebox}
+
+\passo{Passo 3 - Obter o ticket Kerberos na sessão}
+
+\begin{lstlisting}[style=bashstyle]
+kinit aluno.teste@ISEC.LOCAL
+klist
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{klist} mostra \texttt{krbtgt/\allowbreak{}ISEC.LOCAL@ISEC.LOCAL}.
+
+\emph{Porquê:} o ticket pertence a quem o pede - um \texttt{kinit} feito como utilizador local não serve ao aluno. Por isso faz-se \textbf{dentro} da sessão do aluno. \textbf{Não saias da sessão:} continua em 2.1.8.
+
+\problemas{\hyperref[ec-b1-pam]{Erros Comuns - 2.1 PAM e pam\_mount}}
+
+\subsection[Acesso à SRII como utilizador do domínio]{Acesso à SRII como utilizador do domínio}
+
+\esquema{2-1-8-srii-dominio}{Acesso à SRII a partir da sessão do utilizador do domínio}
+
+\subsubsection[Aluno]{Aluno}
+
+\passo{Passo 1 - Obter o ticket na sessão do aluno}
+
+Continuando na sessão do aluno (2.1.7):
+
+\begin{lstlisting}[style=bashstyle]
+kinit aluno.teste@ISEC.LOCAL
+klist
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{klist} mostra \texttt{krbtgt/\allowbreak{}ISEC.LOCAL@ISEC.LOCAL}.
+
+\passo{Passo 2 - Listar a SRII com o ticket}
+
+\begin{lstlisting}[style=bashstyle]
+smbclient //SR2-SRV.isec.local/SRII --use-kerberos=required -c 'ls'
+\end{lstlisting}
+
+\emph{Verificação esperada:} a listagem da SRII aparece.
+
+\passo{Passo 3 - Testar a escrita}
+
+\begin{lstlisting}[style=bashstyle]
+smbclient //SR2-SRV.isec.local/SRII --use-kerberos=required -c 'put /tmp/teste-escrita.txt aluno-escrita2.txt'
+klist
+exit
+\end{lstlisting}
+
+\emph{Verificação esperada:} o \texttt{put} falha com \texttt{NT\_STATUS\_ACCESS\_DENIED}; o \texttt{klist} mostra dois tickets: \texttt{krbtgt/\allowbreak{}ISEC.LOCAL} e \texttt{cifs/\allowbreak{}SR2-SRV.isec.local} (o ticket da partilha).
+
+\subsubsection[Professor]{Professor}
+
+\passo{Passo 1 - Entrar como professor}
+
+\begin{lstlisting}[style=bashstyle]
+su - professor.teste@isec.local
+\end{lstlisting}
+
+\passo{Passo 2 - Obter o ticket na sessão}
+
+\begin{lstlisting}[style=bashstyle]
+kinit professor.teste@ISEC.LOCAL
+\end{lstlisting}
+
+\passo{Passo 3 - Ler e escrever na SRII}
+
+\begin{lstlisting}[style=bashstyle]
+smbclient //SR2-SRV.isec.local/SRII --use-kerberos=required -c 'ls'
+smbclient //SR2-SRV.isec.local/SRII --use-kerberos=required -c 'put /tmp/teste-escrita.txt professor-escrita2.txt'
+smbclient //SR2-SRV.isec.local/SRII --use-kerberos=required -c 'ls'
+klist
+exit
+\end{lstlisting}
+
+\emph{Verificação esperada:} o professor lista e escreve; \texttt{professor-escrita2.txt} aparece na segunda listagem.
+
+\begin{simplesbox}
+Se aparecer \texttt{NT\_STATUS\_NO\_LOGON\_SERVERS} com \texttt{creating NEG\_TOKEN\_INIT ... failed}, falta o \texttt{kinit} dentro da sessão do utilizador.
+\end{simplesbox}
+
+\problemas{\hyperref[ec-b1-samba]{Erros Comuns - 2.1 Samba}}
+
+\subsection[Montagem automática da SRII no login: pam\_mount]{Montagem automática da SRII no login: pam\_mount}
+
+\esquema{2-1-9-pam-mount}{Montagem automática da SRII no login (pam\_mount)}
+
+\textbf{Objetivo:} quando um utilizador do AD faz login, a SRII aparece sozinha em \texttt{\textasciitilde{}/\allowbreak{}SRII}, sem \texttt{kinit} nem \texttt{smbclient}, e com as permissões do AD (aluno só lê, professor lê e escreve).
+
+\begin{simplesbox}
+\textbf{Como funciona:} o \texttt{pam\_mount} é um módulo PAM. No login recebe a palavra-passe escrita pelo utilizador e monta a partilha com \texttt{mount.cifs} (pacote \texttt{cifs-utils}); no logout desmonta-a. A partilha, os grupos e as permissões NTFS são os da SRII (1.5) - não é preciso mudar nada no Windows.
+\end{simplesbox}
+
+\passo{Passo 1 - Instalar o pam\_mount e o cifs-utils} (terminal do utilizador local)
+
+\begin{lstlisting}[style=bashstyle]
+sudo apt install -y libpam-mount cifs-utils
+grep pam_mount /etc/pam.d/common-auth /etc/pam.d/common-session
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{pam\_mount.so} aparece nos dois ficheiros. Se não aparecer: \texttt{sudo pam-auth-update --enable libpam-mount}.
+
+\passo{Passo 2 - Cópia de segurança e abrir a configuração}
+
+\begin{lstlisting}[style=bashstyle]
+sudo cp /etc/security/pam_mount.conf.xml /etc/security/pam_mount.conf.xml.bak
+sudo nano /etc/security/pam_mount.conf.xml
+\end{lstlisting}
+
+Se o \texttt{cp} der \texttt{Ficheiro ou pasta inexistente}, o pam\_mount não está instalado: repete o Passo 1.
+
+\passo{Passo 3 - Colar as linhas \texttt{\textless{}volume\textgreater{}} (uma por utilizador)}
+
+Logo abaixo da linha \texttt{\textless{}!-- Volume definitions --\textgreater{}}, colar:
+
+\begin{lstlisting}[style=cfgstyle]
+<!-- [Linux Client] /etc/security/pam_mount.conf.xml - igual para todos -->
+<volume user="aluno.teste@isec.local" fstype="cifs"
+        server="SR2-SRV.isec.local" path="SRII" mountpoint="~/SRII"
+        options="sec=ntlmssp,vers=3.0,domain=ISEC,username=aluno.teste,uid=%(USERUID),gid=%(USERGID)" />
+
+<volume user="professor.teste@isec.local" fstype="cifs"
+        server="SR2-SRV.isec.local" path="SRII" mountpoint="~/SRII"
+        options="sec=ntlmssp,vers=3.0,domain=ISEC,username=professor.teste,uid=%(USERUID),gid=%(USERGID)" />
+\end{lstlisting}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{0.32\linewidth}|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{Atributo} & \textbf{Significado} \\
+\hline
+\texttt{user=} & A linha só se aplica a esse utilizador \\
+\hline
+\texttt{path="SRII"} / \texttt{mountpoint="\textasciitilde{}/\allowbreak{}SRII"} & Nome da partilha / pasta na home (criada automaticamente) \\
+\hline
+\texttt{sec=ntlmssp} & A montagem usa a palavra-passe do login. O ticket criado pelo SSSD no login não funciona com o SMB neste laboratório, por isso não se usa \texttt{sec=krb5}. \\
+\hline
+\texttt{uid=\%(USERUID),\allowbreak{}gid=\%(USERGID)} & Os ficheiros aparecem como sendo do utilizador. Quem decide se pode escrever é o Windows (NTFS). \\
+\hline
+\end{tabularx}
+\end{center}
+
+\begin{simplesbox}
+Cada \texttt{\textless{}volume\textgreater{}} pode ficar numa ou em várias linhas: o XML aceita quebras entre atributos, mas \textbf{não dentro das aspas}.
+\end{simplesbox}
+
+\passo{Passo 4 - Guardar e confirmar as duas linhas}
+
+Guardar com \texttt{Ctrl+O}, \texttt{Enter}; sair com \texttt{Ctrl+X}. Depois:
+
+\begin{lstlisting}[style=bashstyle]
+grep -n -A2 "<volume user" /etc/security/pam_mount.conf.xml
+\end{lstlisting}
+
+\emph{Verificação esperada:} aparecem as duas entradas (aluno e professor), logo abaixo de \emph{Volume definitions}.
+
+\passo{Passo 5 - Entrar como professor: a SRII é montada sozinha}
+
+\begin{lstlisting}[style=bashstyle]
+su - professor.teste@isec.local
+mount | grep SRII
+exit
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{/\allowbreak{}/\allowbreak{}SR2-SRV.isec.local/\allowbreak{}SRII on /\allowbreak{}home/\allowbreak{}professor.teste@isec.local/\allowbreak{}SRII type cifs (rw,\allowbreak{}...,\allowbreak{}sec=ntlmssp,\allowbreak{}...)}.
+
+\passo{Passo 6 - Entrar como aluno: a SRII também é montada}
+
+\begin{lstlisting}[style=bashstyle]
+su - aluno.teste@isec.local
+mount | grep SRII
+exit
+\end{lstlisting}
+
+\emph{Verificação esperada:} a mesma linha \texttt{type cifs}, agora em \texttt{/\allowbreak{}home/\allowbreak{}aluno.teste@isec.local/\allowbreak{}SRII} - montada só com o login, sem \texttt{kinit} nem \texttt{smbclient}.
+
+\passo{Passo 7 - Aluno lê, mas não escreve}
+
+\begin{lstlisting}[style=bashstyle]
+su - aluno.teste@isec.local
+cat ~/SRII/ficheiroteste.txt
+echo "teste" > ~/SRII/aluno-tenta.txt
+exit
+\end{lstlisting}
+
+\emph{Verificação esperada:} o aluno lê o ficheiro, mas o \texttt{echo} dá \texttt{Permissão recusada} (só tem leitura).
+
+\passo{Passo 8 - Professor lê e escreve}
+
+\begin{lstlisting}[style=bashstyle]
+su - professor.teste@isec.local
+cat ~/SRII/ficheiroteste.txt
+echo "Criado no Ubuntu pelo professor" > ~/SRII/criado-no-ubuntu.txt
+ls -l ~/SRII
+exit
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{criado-no-ubuntu.txt} aparece no \texttt{ls -l}. No Windows Server, na pasta SRII, está \texttt{criado-no-ubuntu.txt} e \textbf{não} \texttt{aluno-tenta.txt}.
+
+\problemas{\hyperref[ec-b1-pam]{Erros Comuns - 2.1 PAM e pam\_mount}}
+
+\clearpage
+\section[Integração com Winbind]{Integração com Winbind}
+
+\begin{notabox}[title={Nota}]
+\textbf{[A AGUARDAR CONTEÚDO]} - o conteúdo desta parte está em preparação. Usar um \textbf{novo clone} do Ubuntu (não usar SSSD e Winbind na mesma máquina).
+\end{notabox}
+
+\subsection[Configuração de um novo cliente (clone, IP estático, DNS)]{Configuração de um novo cliente (clone, IP estático, DNS) \aguardar}
+
+\subsection[Configuração do Samba (smb.conf)]{Configuração do Samba (\texttt{smb.conf}) \aguardar}
+
+\subsection[Configuração do Kerberos e adesão ao domínio]{Configuração do Kerberos e adesão ao domínio \aguardar}
+
+\subsection[Validar a associação ao domínio]{Validar a associação ao domínio \aguardar}
+
+\subsection[Diagnosticar o Winbind]{Diagnosticar o Winbind \aguardar}
+
+\subsection[Integração do Winbind com NSS]{Integração do Winbind com NSS \aguardar}
+
+\subsection[Configurar a autenticação PAM]{Configurar a autenticação PAM \aguardar}
+
+\subsection[Testar o início de sessão com um utilizador AD]{Testar o início de sessão com um utilizador AD \aguardar}
+
+\subsection[Testar a partilha SMB do Windows Server]{Testar a partilha SMB do Windows Server \aguardar}
+
+\subsection[Início de sessão gráfico com AD (GDM3)]{Início de sessão gráfico com AD (GDM3) \aguardar}
+
+\chapter*{Erros Comuns e Resolução}
+\addcontentsline{toc}{chapter}{Erros Comuns e Resolução}
+\markboth{Erros Comuns e Resolução}{}
+
+Formato: \textbf{Sintoma → Causa provável → Solução}.
+
+\phantomsection\label{ec-setup}
+
+\section*{Setup das VMs}
+\addcontentsline{toc}{section}{Setup das VMs}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{Sintoma} & \textbf{Causa provável} & \textbf{Solução} \\
+\hline
+\texttt{Destination Host Unreachable}; \texttt{ip neigh show} com \texttt{INCOMPLETE} ou \texttt{FAILED} & As VMs não estão ambas na \texttt{\textless{}BRIDGE\textgreater{}}, ou a placa tem \emph{Disconnect}/\emph{Firewall} marcados & Proxmox → \emph{Hardware → Network Device} das duas VMs (Setup das VMs, Passos 4 e 5) \\
+\hline
+\end{tabularx}
+\end{center}
+
+\phantomsection\label{ec-a}
+
+\section*{Parte A - Windows Server}
+\addcontentsline{toc}{section}{Parte A - Windows Server}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{Sintoma} & \textbf{Causa provável} & \textbf{Solução} \\
+\hline
+O ping a \texttt{\textless{}IP\_DC\textgreater{}} falha, mas o MAC aparece no \texttt{ip neigh} & Firewall do Windows a bloquear o ping & Regra ICMPv4 para \texttt{\textless{}IP\_CLIENTE\textgreater{}} (1.6) \\
+\hline
+Sem internet no Ubuntu com o DNS só no Windows & O DNS do Windows não tem forwarder & No Windows: \texttt{Add-DnsServerForwarder -IPAddress 1.1.1.1} (1.3, Passo 7) \\
+\hline
+\texttt{kinit} dá \texttt{Preauthentication failed} com a palavra-passe certa & Conta com \emph{"User must change password at next logon"} marcado, ou conta desativada & Desmarcar a opção (1.4, Passo 5) / ativar a conta \\
+\hline
+\texttt{Client not found in Kerberos database} & O logon name não existe no AD ou foi escrito de outra forma & \texttt{Get-ADUser -Filter * \textbar{} Select SamAccountName} e usar o nome exato \\
+\hline
+Aluno consegue escrever na SRII & Aluno também no Grupo-Professores, ou \emph{Modify} para \texttt{Everyone}/\texttt{Authenticated Users} & Rever 1.4 (Passo 6) e 1.5 \\
+\hline
+\texttt{NT\_STATUS\_ACCESS\_DENIED} no \texttt{ls} de ambos & Grupos ou permissões NTFS mal definidos & Rever 1.5 (Passos 2 e 3) \\
+\hline
+\end{tabularx}
+\end{center}
+
+\phantomsection\label{ec-b1-rede}
+
+\section*{Parte B - SSSD: Rede e DNS do cliente (2.1.1)}
+\addcontentsline{toc}{section}{Parte B - SSSD: Rede e DNS do cliente (2.1.1)}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{Sintoma} & \textbf{Causa provável} & \textbf{Solução} \\
+\hline
+\texttt{Conflicting default route} no \texttt{netplan apply} & Mais de um ficheiro ou método a configurar a mesma placa & Ficar com um único método: repetir 2.1.1, Passos 2 a 5 \\
+\hline
+\texttt{mv: destino '/\allowbreak{}root/\allowbreak{}netplan-bak/\allowbreak{}': Ficheiro ou pasta inexistente} & Faltou criar a pasta de backup & 2.1.1, Passo 3 e repetir o Passo 4 \\
+\hline
+\texttt{O NetworkManager não está em execução} & Serviço parado & 2.1.1, Passo 6 e repetir o Passo 7 \\
+\hline
+IP \texttt{169.254.x.x} na \texttt{ens18} & O IP estático não foi aplicado & 2.1.1, Passos 7 e 8 \\
+\hline
+DNS público (\texttt{8.8.8.8}, \texttt{1.1.1.1}) em \texttt{resolvectl status} & Falta \texttt{ipv4.ignore-auto-dns yes} & 2.1.1, Passo 7 \\
+\hline
+Perfil antigo (ex.: \texttt{Ligação com fios 1}) sem placa & Restos da configuração anterior & \texttt{sudo nmcli connection delete 'NOME'} \\
+\hline
+\texttt{Destination Host Unreachable} & VMs em bridges diferentes & Ver \hyperref[ec-setup]{Setup das VMs} \\
+\hline
+Ping ao DC falha, mas o MAC aparece no \texttt{ip neigh} & Firewall do Windows & Ver \hyperref[ec-a]{Parte A} (1.6) \\
+\hline
+\texttt{dig} funciona mas \texttt{ping isec.local} falha & \texttt{mdns4\_minimal} no \texttt{nsswitch.conf} & 2.1.1, Passo 13 \\
+\hline
+\end{tabularx}
+\end{center}
+
+\phantomsection\label{ec-b1-kerberos}
+
+\section*{Parte B - SSSD: Relógio e Kerberos (2.1.2 - 2.1.3)}
+\addcontentsline{toc}{section}{Parte B - SSSD: Relógio e Kerberos (2.1.2 - 2.1.3)}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{Sintoma} & \textbf{Causa provável} & \textbf{Solução} \\
+\hline
+\texttt{Clock skew too great} & Diferença de hora \textgreater{} 5 min entre cliente e DC & Repetir 2.1.2 (chrony) \\
+\hline
+\texttt{chrony} não existe como serviço & Nome do serviço diferente & Usar \texttt{chronyd} \\
+\hline
+\texttt{Cannot find KDC for realm} & DNS não devolve os registos SRV do domínio & Repetir 2.1.1, Passo 12 (DNS) \\
+\hline
+\texttt{Cannot resolve network address for KDC} & Nome do DC errado no \texttt{krb5.conf} ou não resolve no DNS & Repetir 2.1.1, Passo 12 e 2.1.3, Passo 2; confirmar \texttt{SR2-SRV.isec.local} no \texttt{krb5.conf} \\
+\hline
+\texttt{Client not found in Kerberos database} & O login não existe & No Windows: \texttt{Get-ADUser -Filter * \textbar{} Select SamAccountName} \\
+\hline
+\texttt{Preauthentication failed} & Palavra-passe errada, conta desativada, ou "mudar palavra-passe no próximo logon" ativo & Confirmar a palavra-passe; rever 1.4, Passo 5 \\
+\hline
+\end{tabularx}
+\end{center}
+
+\phantomsection\label{ec-b1-samba}
+
+\section*{Parte B - SSSD: Samba e SRII (2.1.4, 2.1.8)}
+\addcontentsline{toc}{section}{Parte B - SSSD: Samba e SRII (2.1.4, 2.1.8)}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{Sintoma} & \textbf{Causa provável} & \textbf{Solução} \\
+\hline
+\texttt{smbclient} avisa que \texttt{-k} está \emph{deprecated} & Opção antiga (Samba 4.15+) & Usar \texttt{--use-kerberos=required} \\
+\hline
+Terminal fica em \texttt{\textgreater{}} depois de colar \texttt{smbclient ... -c 'put ...'} & A aspa ficou aberta (comando colado em duas linhas) & \texttt{Ctrl+C} e colar a linha inteira \\
+\hline
+\texttt{NT\_STATUS\_NO\_LOGON\_SERVERS} / \texttt{NT\_STATUS\_LOGON\_FAILURE} com \texttt{--use-kerberos=required} & Ticket em falta ou expirado & \texttt{klist}; se vazio: \texttt{kinit utilizador@ISEC.LOCAL} e repetir \\
+\hline
+\texttt{NT\_STATUS\_NO\_LOGON\_SERVERS} com \texttt{creating NEG\_TOKEN\_INIT ... failed} & Falta o \texttt{kinit} dentro da sessão do utilizador do domínio (depois de \texttt{su -}) & 2.1.7, Passo 3 \\
+\hline
+\texttt{NT\_STATUS\_ACCESS\_DENIED} no \texttt{ls} de ambos & Grupos ou permissões NTFS mal definidos & Rever 1.5 (Passos 2 e 3) \\
+\hline
+\texttt{NT\_STATUS\_BAD\_NETWORK\_NAME} & Nome da partilha errado & Confirmar com \texttt{smbclient -L} (2.1.4, Passo 2) \\
+\hline
+Aluno consegue escrever & Aluno também no grupo de professores, ou \emph{Modify} para \texttt{Everyone}/\texttt{Authenticated Users} & Rever 1.4 (Passo 6) e 1.5 \\
+\hline
+\end{tabularx}
+\end{center}
+
+\phantomsection\label{ec-b1-sssd}
+
+\section*{Parte B - SSSD: Domínio e SSSD (2.1.5 - 2.1.6)}
+\addcontentsline{toc}{section}{Parte B - SSSD: Domínio e SSSD (2.1.5 - 2.1.6)}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{Sintoma} & \textbf{Causa provável} & \textbf{Solução} \\
+\hline
+\texttt{realm discover} falha & DNS ou \texttt{krb5.conf} & Repetir 2.1.1 (Passo 12) e 2.1.3 (Passo 2) \\
+\hline
+\texttt{realm join} falha com nome de máquina & Hostname com mais de 15 caracteres (ainda com o nome do template) & Repetir 2.1.5, Passo 1 \\
+\hline
+\texttt{no such user} no \texttt{id} & Cache do SSSD desatualizada ou SSSD ainda a sincronizar & Esperar 1 min; \texttt{sudo sss\_cache -E} e \texttt{sudo systemctl restart sssd} \\
+\hline
+SSSD não arranca depois de editar o \texttt{sssd.conf} & Permissões do ficheiro ou erro de sintaxe & \texttt{sudo chmod 600 /\allowbreak{}etc/\allowbreak{}sssd/\allowbreak{}sssd.conf}; \texttt{sudo sssctl config-check} (2.1.7, Passo 2) \\
+\hline
+\end{tabularx}
+\end{center}
+
+\phantomsection\label{ec-b1-pam}
+
+\section*{Parte B - SSSD: PAM e pam\_mount (2.1.7, 2.1.9)}
+\addcontentsline{toc}{section}{Parte B - SSSD: PAM e pam\_mount (2.1.7, 2.1.9)}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{Sintoma} & \textbf{Causa provável} & \textbf{Solução} \\
+\hline
+\texttt{su: System error} no login do utilizador do AD (nos registos: \texttt{pam\_sss ... Access denied ... System error}) & GPO do AD a bloquear o login & \texttt{ad\_gpo\_access\_control = permissive} no \texttt{sssd.conf} (caixa em 2.1.7, Passo 2) \\
+\hline
+Home não é criada no primeiro login & \texttt{pam\_mkhomedir} não ativo & \texttt{sudo pam-auth-update --enable mkhomedir} (2.1.7, Passo 1) \\
+\hline
+\texttt{cp} do \texttt{pam\_mount.conf.xml}: \texttt{Ficheiro ou pasta inexistente} & O pam\_mount não está instalado & 2.1.9, Passo 1 \\
+\hline
+\texttt{mount \textbar{} grep SRII} não mostra nada depois do login & \texttt{pam\_mount.so} ausente no PAM ou linhas \texttt{\textless{}volume\textgreater{}} erradas & Confirmar \texttt{pam\_mount.so} (2.1.9, Passo 1) e as linhas \texttt{\textless{}volume\textgreater{}} (Passo 4) \\
+\hline
+\end{tabularx}
+\end{center}
+
+\phantomsection\label{ec-b2}
+
+\section*{Parte B - Winbind}
+\addcontentsline{toc}{section}{Parte B - Winbind}
+
+\texttt{[A AGUARDAR CONTEÚDO]}
+
+\chapter*{Lista de pontos [VERIFICAR]}
+\addcontentsline{toc}{chapter}{Lista de pontos [VERIFICAR]}
+\markboth{Lista de pontos [VERIFICAR]}{}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{0.04\linewidth}|>{\raggedright\arraybackslash}p{0.2\linewidth}|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{\#} & \textbf{Secção} & \textbf{Ponto a rever} \\
+\hline
+1 & 1 & Recursos mínimos das VMs (CPU/RAM/disco), caso seja preciso criar uma VM de raiz. \\
+\hline
+2 & 1 & Correspondência bridge \texttt{vmbrNNN} ↔ VLAN \texttt{X} a confirmar com o docente. \\
+\hline
+3 & 1.5, Passo 2 & Permissão de partilha do Grupo-Professores: \emph{Full Control} ou \emph{Change}. \\
+\hline
+4 & 1.5, Passo 4 & Nome do ficheiro de teste: \texttt{ficheiroteste.txt} ou \texttt{notas.txt}. \\
+\hline
+5 & 2.1 (nota inicial) & Se o enunciado exige \texttt{smb.conf} também na variante SSSD. \\
+\hline
+6 & 2.1.7, Passo 2 & Correção \texttt{ad\_gpo\_access\_control = permissive}: se todos os alunos apanharem \texttt{su: System error}, passar a passo normal e acrescentá-la aos diapositivos. \\
+\hline
+\end{tabularx}
+\end{center}
+
+\end{document}

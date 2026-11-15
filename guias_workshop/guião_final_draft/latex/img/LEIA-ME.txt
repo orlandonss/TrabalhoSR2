@@ -1,0 +1,36 @@
+Pasta das imagens dos esquemas (para os slides)
+===============================================
+
+O guião em LaTeX NÃO usa esta pasta: os esquemas do PDF estão desenhados
+em TikZ, em ../esquemas/*.tex.
+
+Esta pasta serve para guardar as imagens dos mesmos esquemas para usar
+nos slides. A fonte de cada esquema em Mermaid está em ../mermaid/<nome>.mmd.
+Gera a imagem e guarda-a aqui com o MESMO nome e extensão .png. Exemplo:
+
+  ../mermaid/00-topologia.mmd   ->   img/00-topologia.png
+
+Esquemas disponíveis:
+  00-topologia            Topologia geral (Introdução)
+  01-setup-vms            Setup das VMs (Introdução)
+  1-1-nome-rede-ip        1.1
+  1-2-roles-adds-dns      1.2
+  1-3-promocao-dc         1.3
+  1-4-grupos-utilizadores 1.4
+  1-5-partilha-srii       1.5
+  1-6-firewall            1.6
+  2-1-1-rede-dns          2.1.1
+  2-1-2-chrony            2.1.2
+  2-1-3-kerberos          2.1.3
+  2-1-4-samba             2.1.4
+  2-1-5-realm-join        2.1.5
+  2-1-6-sssd              2.1.6
+  2-1-7-pam               2.1.7
+  2-1-8-srii-dominio      2.1.8
+  2-1-9-pam-mount         2.1.9
+
+Para gerar: colar o .mmd em https://mermaid.live e exportar PNG/SVG,
+ou com o mermaid-cli:  mmdc -i ../mermaid/00-topologia.mmd -o 00-topologia.png -s 3
+
+Nota: se mudares um esquema, muda-o nos dois sítios (mermaid/*.mmd para
+os slides e esquemas/*.tex para o guião), para continuarem iguais.

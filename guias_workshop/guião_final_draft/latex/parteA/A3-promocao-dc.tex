@@ -1,0 +1,49 @@
+% 1.3
+% Ficheiro incluído por main.tex
+
+\section[Promoção a Domain Controller (isec.local)]{Promoção a Domain Controller (\texttt{isec.local})}
+
+\esquema{1-3-promocao-dc}{Domain Controller: AD, KDC Kerberos e DNS do domínio isec.local}
+
+\passo{Passo 1 - Promover o servidor}
+
+No Server Manager, clicar na \textbf{bandeira amarela} → \textbf{Promote this server to a domain controller}.
+
+\passo{Passo 2 - Nova floresta}
+
+\textbf{Add a new forest} → \emph{Root domain name:} \textbf{\texttt{isec.local}} → Next.
+
+\passo{Passo 3 - Palavra-passe de restauro (DSRM)}
+
+Definir a palavra-passe \textbf{DSRM} (\texttt{\textless{}PASSWORD\_LAB\textgreater{}}) e memorizá-la → Next.
+
+\passo{Passo 4 - Aviso de DNS Delegation}
+
+Ignorar o aviso de \textbf{DNS Delegation} e prosseguir com \textbf{Next}.
+
+\passo{Passo 5 - Nome NetBIOS e instalação}
+
+Verificar que o nome \textbf{NetBIOS} é \textbf{\texttt{ISEC}} → \textbf{Next} em todos os ecrãs seguintes → \textbf{Install}.
+
+\passo{Passo 6 - Reinício e login no domínio}
+
+O servidor reinicia sozinho para concluir o processo.
+
+\emph{Verificação esperada:} no arranque seguinte, o login passa a ser feito como \textbf{\texttt{ISEC\textbackslash{}Administrator}} (Domain Administrator). Iniciar sessão e aguardar que o sistema arranque por completo.
+
+\begin{simplesbox}
+A promoção cria automaticamente a zona DNS \texttt{isec.local} e os registos SRV (\texttt{\_ldap.\_tcp.dc.\_msdcs.isec.local}, \texttt{\_kerberos.\_tcp.isec.local}) que o Kerberos e o SSSD usam para descobrir o DC.
+\end{simplesbox}
+
+\passo{Passo 7 - Forwarder DNS (acesso à internet a partir do cliente)}
+
+\emph{Objetivo:} como o Ubuntu vai usar \textbf{só} o DNS do Windows, o DC tem de reencaminhar para fora os nomes que não conhece.
+
+\begin{lstlisting}[style=psstyle]
+Add-DnsServerForwarder -IPAddress 1.1.1.1
+Get-DnsServerForwarder
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{Get-DnsServerForwarder} lista \texttt{1.1.1.1}.
+
+\problemas{\hyperref[ec-a]{Erros Comuns - Parte A}}

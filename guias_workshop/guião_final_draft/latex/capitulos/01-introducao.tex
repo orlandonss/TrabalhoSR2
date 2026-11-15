@@ -1,0 +1,104 @@
+% Introdução (com o aviso inicial)
+% Ficheiro incluído por main.tex
+
+\chapter*{Introdução}
+\addcontentsline{toc}{chapter}{Introdução}
+\markboth{Introdução}{}
+
+\begin{avisobox}[title={Atenção}]
+\textbf{Indicações obrigatórias - ler antes de começar}
+
+\begin{enumerate}
+\item \textbf{Pools do grupo:} cada grupo cria/atribui as suas máquinas à \textbf{pool do grupo} no Proxmox. Não trabalhes nas pools de templates nem nas de outros grupos.
+\item \textbf{Divisão de trabalho:} os elementos do grupo dividem entre si a \textbf{pool} e a \textbf{VLAN} em que cada um vai trabalhar (aconselhado: uma VLAN/bridge por aluno, para não haver conflitos de endereços).
+\item \textbf{Endereçamento IP:} todas as configurações seguem o formato \textbf{\texttt{192.168.X.Y}}, onde:
+\begin{itemize}
+\item \textbf{\texttt{X}} = número da VLAN em que a máquina está;
+\item \textbf{\texttt{Y}} = endereço da máquina, entre \textbf{2 e 254};
+\item \textbf{\texttt{.1}} fica reservado para o \textbf{default gateway} da VLAN;
+\item \textbf{\texttt{.255}} fica reservado para \textbf{broadcast}.
+\end{itemize}
+\item \textbf{Nomes iguais para todos:} o domínio é \textbf{\texttt{isec.local}} (realm \texttt{ISEC.LOCAL}, NetBIOS \texttt{ISEC}) e o Windows Server chama-se \textbf{\texttt{SR2-SRV}}. São valores standard: \textbf{todos usam estes nomes}, para que os comandos sejam iguais e se possa acompanhar o workshop em conjunto.
+\item \textbf{O que muda de aluno para aluno é só a VLAN e os IPs:} nos comandos aparecem os placeholders \textbf{\texttt{X}} (VLAN), \textbf{\texttt{\textless{}IP\_DC\textgreater{}}} e \textbf{\texttt{\textless{}IP\_CLIENTE\textgreater{}}} (ambos no formato \texttt{192.168.X.Y}). \textbf{Substitui-os sempre pelos teus valores antes de executar.} Copiar um comando com \texttt{\textless{}...\textgreater{}} ou com \texttt{X} lá dentro dá erro.
+\end{enumerate}
+\end{avisobox}
+
+\section*{Objetivos do trabalho}
+\addcontentsline{toc}{section}{Objetivos do trabalho}
+
+No fim do workshop, cada aluno terá:
+
+\begin{enumerate}
+\item Um \textbf{Windows Server} promovido a \textbf{Domain Controller} (AD DS + DNS), com grupos, utilizadores e uma partilha SMB (\textbf{SRII}) com permissões por grupo (RBAC: alunos só leem, professores leem e escrevem).
+\item Um \textbf{cliente Ubuntu} com IP estático, a usar o DC como DNS e com o relógio sincronizado com ele.
+\item Autenticação \textbf{Kerberos} a funcionar (\texttt{kinit} / \texttt{klist}) e acesso à SRII com o ticket (\texttt{smbclient}).
+\item O Ubuntu \textbf{membro do domínio} (\texttt{realm join}), com os utilizadores do AD visíveis pelo \textbf{SSSD} e login com contas do AD via \textbf{PAM} (home criada automaticamente).
+\item \textbf{Montagem automática da SRII no login} (\texttt{pam\_mount}).
+\item A variante de integração com \textbf{Winbind} (em preparação).
+\end{enumerate}
+
+\section*{Topologia}
+\addcontentsline{toc}{section}{Topologia}
+
+\esquema{00-topologia}{Topologia geral do laboratório (VLAN X)}
+
+Cada aluno trabalha na sua VLAN \texttt{X}, com o seu DC e o seu cliente. O DC é ao mesmo tempo \textbf{controlador de domínio}, \textbf{servidor DNS}, \textbf{KDC Kerberos} e \textbf{servidor da partilha SMB}.
+
+\section*{Plano de endereçamento e nomes}
+\addcontentsline{toc}{section}{Plano de endereçamento e nomes}
+
+\textbf{O que muda de aluno para aluno (substituir sempre):}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{Placeholder} & \textbf{Significado} & \textbf{Exemplo (VLAN 105)} \\
+\hline
+\texttt{X} & Número da VLAN do aluno & \texttt{105} \\
+\hline
+\texttt{192.168.X.1} & Default gateway da VLAN (reservado) & \texttt{192.168.105.1} \\
+\hline
+\texttt{\textless{}IP\_DC\textgreater{}} & IP do Windows Server, no formato \texttt{192.168.X.Y} (Y entre 2 e 254) & \texttt{192.168.105.2} \\
+\hline
+\texttt{\textless{}IP\_CLIENTE\textgreater{}} & IP do Ubuntu, no formato \texttt{192.168.X.Y} (Y entre 2 e 254, diferente do DC) & \texttt{192.168.105.3} \\
+\hline
+\texttt{/\allowbreak{}24} · \texttt{255.255.255.0} & Máscara da VLAN & - \\
+\hline
+\texttt{\textless{}BRIDGE\textgreater{}} & Placa/bridge do Proxmox associada à VLAN \texttt{X} & \texttt{vmbr105} \\
+\hline
+\texttt{\textless{}POOL\_GRUPO\textgreater{}} & Pool do grupo no Proxmox & \texttt{PoolTeamX} \\
+\hline
+\end{tabularx}
+\end{center}
+
+\textbf{Igual para todos (não alterar):}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{0.32\linewidth}|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{Item} & \textbf{Valor standard} \\
+\hline
+Domínio DNS do AD & \texttt{isec.local} \\
+\hline
+Realm Kerberos (domínio em \textbf{MAIÚSCULAS}) & \texttt{ISEC.LOCAL} \\
+\hline
+Nome NetBIOS do domínio & \texttt{ISEC} \\
+\hline
+Nome do Windows Server & \texttt{SR2-SRV} → FQDN \texttt{SR2-SRV.isec.local} \\
+\hline
+Nome do cliente Ubuntu (máx. \textbf{15} caracteres) & \texttt{ubuclient} \\
+\hline
+Placa de rede do Ubuntu & \texttt{ens18} (confirmar com \texttt{ip -br a}) \\
+\hline
+Perfil NetworkManager & \texttt{labX} (ex.: \texttt{lab105}) \\
+\hline
+Utilizadores de teste & \texttt{aluno.teste}, \texttt{professor.teste} \\
+\hline
+Grupos & \texttt{Grupo-Alunos}, \texttt{Grupo-Professores} \\
+\hline
+Partilha & \texttt{SRII} \\
+\hline
+Palavra-passe de laboratório (Administrator, DSRM, utilizadores de teste) & \texttt{\textless{}PASSWORD\_LAB\textgreater{}} - a mesma para todo o grupo \\
+\hline
+\end{tabularx}
+\end{center}

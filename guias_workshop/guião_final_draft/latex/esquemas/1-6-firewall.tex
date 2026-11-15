@@ -1,0 +1,11 @@
+%% 1.6 Firewall do Windows: permitir ping do Ubuntu
+\begin{tikzpicture}
+  \node[vm, text width=2.6cm] (cl) at (-5.2,0.2) {Ubuntu Client\\\ph{IP\_CLIENTE}};
+  \draw[caixa] (-2.30,-1.75) rectangle (5.70,1.55);
+  \node[caixatit] at (-2.18,1.47) {Windows Server - \texttt{SR2-SRV}};
+  \node[svc, text width=3.7cm] (fw) at (0.55,0.2) {Windows Defender Firewall\\Inbound Rule\\\textit{SR2 Allow Ping Ubuntu}\\ICMPv4 de \ph{IP\_CLIENTE}};
+  \node[svc, text width=1.6cm] (os) at (4.35,0.2) {Sistema};
+  \draw[seta] (cl.east) -- (fw.west) node[midway, above, rot] {echo request};
+  \draw[seta] (fw.east) -- (os.west) node[midway, above, rot] {permitido};
+  \draw[setad] (os.south) -- (4.35,-1.35) -- (-5.2,-1.35) node[pos=0.5, below, rot] {ICMP echo reply} -- (cl.south);
+\end{tikzpicture}

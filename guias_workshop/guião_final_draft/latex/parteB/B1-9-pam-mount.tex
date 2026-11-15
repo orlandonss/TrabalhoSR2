@@ -1,0 +1,120 @@
+% 2.1.9
+% Ficheiro incluído por main.tex
+
+\subsection[Montagem automática da SRII no login: pam\_mount]{Montagem automática da SRII no login: pam\_mount}
+
+\esquema{2-1-9-pam-mount}{Montagem automática da SRII no login (pam\_mount)}
+
+\textbf{Objetivo:} quando um utilizador do AD faz login, a SRII aparece sozinha em \texttt{\textasciitilde{}/\allowbreak{}SRII}, sem \texttt{kinit} nem \texttt{smbclient}, e com as permissões do AD (aluno só lê, professor lê e escreve).
+
+\begin{simplesbox}
+\textbf{Como funciona:} o \texttt{pam\_mount} é um módulo PAM. No login recebe a palavra-passe escrita pelo utilizador e monta a partilha com \texttt{mount.cifs} (pacote \texttt{cifs-utils}); no logout desmonta-a. A partilha, os grupos e as permissões NTFS são os da SRII (1.5) - não é preciso mudar nada no Windows.
+\end{simplesbox}
+
+\passo{Passo 1 - Instalar o pam\_mount e o cifs-utils} (terminal do utilizador local)
+
+\begin{lstlisting}[style=bashstyle]
+sudo apt install -y libpam-mount cifs-utils
+grep pam_mount /etc/pam.d/common-auth /etc/pam.d/common-session
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{pam\_mount.so} aparece nos dois ficheiros. Se não aparecer: \texttt{sudo pam-auth-update --enable libpam-mount}.
+
+\passo{Passo 2 - Cópia de segurança e abrir a configuração}
+
+\begin{lstlisting}[style=bashstyle]
+sudo cp /etc/security/pam_mount.conf.xml /etc/security/pam_mount.conf.xml.bak
+sudo nano /etc/security/pam_mount.conf.xml
+\end{lstlisting}
+
+Se o \texttt{cp} der \texttt{Ficheiro ou pasta inexistente}, o pam\_mount não está instalado: repete o Passo 1.
+
+\passo{Passo 3 - Colar as linhas \texttt{\textless{}volume\textgreater{}} (uma por utilizador)}
+
+Logo abaixo da linha \texttt{\textless{}!-- Volume definitions --\textgreater{}}, colar:
+
+\begin{lstlisting}[style=cfgstyle]
+<!-- [Linux Client] /etc/security/pam_mount.conf.xml - igual para todos -->
+<volume user="aluno.teste@isec.local" fstype="cifs"
+        server="SR2-SRV.isec.local" path="SRII" mountpoint="~/SRII"
+        options="sec=ntlmssp,vers=3.0,domain=ISEC,username=aluno.teste,uid=%(USERUID),gid=%(USERGID)" />
+
+<volume user="professor.teste@isec.local" fstype="cifs"
+        server="SR2-SRV.isec.local" path="SRII" mountpoint="~/SRII"
+        options="sec=ntlmssp,vers=3.0,domain=ISEC,username=professor.teste,uid=%(USERUID),gid=%(USERGID)" />
+\end{lstlisting}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{0.32\linewidth}|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{Atributo} & \textbf{Significado} \\
+\hline
+\texttt{user=} & A linha só se aplica a esse utilizador \\
+\hline
+\texttt{path="SRII"} / \texttt{mountpoint="\textasciitilde{}/\allowbreak{}SRII"} & Nome da partilha / pasta na home (criada automaticamente) \\
+\hline
+\texttt{sec=ntlmssp} & A montagem usa a palavra-passe do login. O ticket criado pelo SSSD no login não funciona com o SMB neste laboratório, por isso não se usa \texttt{sec=krb5}. \\
+\hline
+\texttt{uid=\%(USERUID),\allowbreak{}gid=\%(USERGID)} & Os ficheiros aparecem como sendo do utilizador. Quem decide se pode escrever é o Windows (NTFS). \\
+\hline
+\end{tabularx}
+\end{center}
+
+\begin{simplesbox}
+Cada \texttt{\textless{}volume\textgreater{}} pode ficar numa ou em várias linhas: o XML aceita quebras entre atributos, mas \textbf{não dentro das aspas}.
+\end{simplesbox}
+
+\passo{Passo 4 - Guardar e confirmar as duas linhas}
+
+Guardar com \texttt{Ctrl+O}, \texttt{Enter}; sair com \texttt{Ctrl+X}. Depois:
+
+\begin{lstlisting}[style=bashstyle]
+grep -n -A2 "<volume user" /etc/security/pam_mount.conf.xml
+\end{lstlisting}
+
+\emph{Verificação esperada:} aparecem as duas entradas (aluno e professor), logo abaixo de \emph{Volume definitions}.
+
+\passo{Passo 5 - Entrar como professor: a SRII é montada sozinha}
+
+\begin{lstlisting}[style=bashstyle]
+su - professor.teste@isec.local
+mount | grep SRII
+exit
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{/\allowbreak{}/\allowbreak{}SR2-SRV.isec.local/\allowbreak{}SRII on /\allowbreak{}home/\allowbreak{}professor.teste@isec.local/\allowbreak{}SRII type cifs (rw,\allowbreak{}...,\allowbreak{}sec=ntlmssp,\allowbreak{}...)}.
+
+\passo{Passo 6 - Entrar como aluno: a SRII também é montada}
+
+\begin{lstlisting}[style=bashstyle]
+su - aluno.teste@isec.local
+mount | grep SRII
+exit
+\end{lstlisting}
+
+\emph{Verificação esperada:} a mesma linha \texttt{type cifs}, agora em \texttt{/\allowbreak{}home/\allowbreak{}aluno.teste@isec.local/\allowbreak{}SRII} - montada só com o login, sem \texttt{kinit} nem \texttt{smbclient}.
+
+\passo{Passo 7 - Aluno lê, mas não escreve}
+
+\begin{lstlisting}[style=bashstyle]
+su - aluno.teste@isec.local
+cat ~/SRII/ficheiroteste.txt
+echo "teste" > ~/SRII/aluno-tenta.txt
+exit
+\end{lstlisting}
+
+\emph{Verificação esperada:} o aluno lê o ficheiro, mas o \texttt{echo} dá \texttt{Permissão recusada} (só tem leitura).
+
+\passo{Passo 8 - Professor lê e escreve}
+
+\begin{lstlisting}[style=bashstyle]
+su - professor.teste@isec.local
+cat ~/SRII/ficheiroteste.txt
+echo "Criado no Ubuntu pelo professor" > ~/SRII/criado-no-ubuntu.txt
+ls -l ~/SRII
+exit
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{criado-no-ubuntu.txt} aparece no \texttt{ls -l}. No Windows Server, na pasta SRII, está \texttt{criado-no-ubuntu.txt} e \textbf{não} \texttt{aluno-tenta.txt}.
+
+\problemas{\hyperref[ec-b1-pam]{Erros Comuns - 2.1 PAM e pam\_mount}}

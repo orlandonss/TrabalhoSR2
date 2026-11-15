@@ -1,0 +1,13 @@
+%% 2.1.5 Entrada no domínio com realmd e adcli
+sequenceDiagram
+    participant R as Ubuntu (realm / adcli)
+    participant D as DNS (SR2-SRV:53)
+    participant K as KDC (SR2-SRV:88)
+    participant L as LDAP do AD (SR2-SRV:389)
+    R->>D: realm discover - SRV _ldap / _kerberos
+    D-->>R: SR2-SRV.isec.local (active-directory)
+    R->>K: Autentica Administrator (Kerberos)
+    K-->>R: Ticket do Administrator
+    R->>L: Cria a conta de computador UBUCLIENT
+    L-->>R: Conta criada
+    R->>R: Gera keytab e /etc/sssd/sssd.conf, arranca o SSSD

@@ -1,0 +1,16 @@
+%% 1.5 Partilha SRII: permissões de partilha e NTFS
+flowchart LR
+    GA["Grupo-Alunos"]:::svc
+    GP["Grupo-Professores"]:::svc
+    subgraph DC["Windows Server - SR2-SRV"]
+        SH["Partilha SMB \\SR2-SRV\SRII"]:::svc
+        FS["Pasta SRII (NTFS)<br/>ficheiroteste.txt"]:::svc
+    end
+    GA -->|"Partilha: Read<br/>NTFS: Read #amp; execute"| SH
+    GP -->|"Partilha: Full Control<br/>NTFS: Modify"| SH
+    SH --> FS
+    class DC vm
+    classDef vm fill:#e8eef7,stroke:#1f497d,stroke-width:2px,color:#000
+    classDef svc fill:#ffffff,stroke:#1f497d,stroke-width:1px,color:#000
+    classDef net fill:#f3f3f3,stroke:#777,stroke-dasharray:4 3,color:#000
+    classDef ext fill:#fff4e5,stroke:#c77700,color:#000

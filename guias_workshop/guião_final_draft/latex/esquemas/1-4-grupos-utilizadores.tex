@@ -1,0 +1,11 @@
+%% 1.4 Grupos e utilizadores no Active Directory
+\begin{tikzpicture}
+  \draw[caixa] (-5.00,-1.55) rectangle (5.00,1.75);
+  \node[caixatit] at (-4.88,1.67) {Active Directory - \texttt{isec.local} - pasta \textit{Users}};
+  \node[svc, text width=2.8cm] (ua) at (-2.8,0.6) {\texttt{aluno.teste}};
+  \node[svc, text width=2.8cm] (up) at (-2.8,-0.7) {\texttt{professor.teste}};
+  \node[grupo, text width=3.0cm] (ga) at (2.8,0.6) {\textbf{Grupo-Alunos}\\Global - Security};
+  \node[grupo, text width=3.0cm] (gp) at (2.8,-0.7) {\textbf{Grupo-Professores}\\Global - Security};
+  \draw[seta] (ua.east) -- (ga.west) node[midway, above, rot] {Member Of};
+  \draw[seta] (up.east) -- (gp.west) node[midway, above, rot] {Member Of};
+\end{tikzpicture}

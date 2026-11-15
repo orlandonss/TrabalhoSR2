@@ -1,0 +1,16 @@
+%% 1.3 Promoção a Domain Controller
+flowchart LR
+    subgraph DC["Domain Controller - SR2-SRV.isec.local"]
+        AD["Active Directory<br/>Floresta / domínio isec.local<br/>NetBIOS ISEC"]:::svc
+        KDC["KDC Kerberos<br/>realm ISEC.LOCAL - porta 88"]:::svc
+        DNS["DNS - zona isec.local<br/>registos SRV _ldap / _kerberos"]:::svc
+    end
+    INT(("Internet")):::ext
+    AD --- KDC
+    AD -->|"regista SRV"| DNS
+    DNS -->|"forwarder 1.1.1.1<br/>nomes externos"| INT
+    class DC vm
+    classDef vm fill:#e8eef7,stroke:#1f497d,stroke-width:2px,color:#000
+    classDef svc fill:#ffffff,stroke:#1f497d,stroke-width:1px,color:#000
+    classDef net fill:#f3f3f3,stroke:#777,stroke-dasharray:4 3,color:#000
+    classDef ext fill:#fff4e5,stroke:#c77700,color:#000
