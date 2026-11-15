@@ -44,7 +44,7 @@ No fim do workshop, cada aluno terá:
 3. Autenticação **Kerberos** a funcionar (`kinit` / `klist`) e acesso à SRII com o ticket (`smbclient`).
 4. O Ubuntu **membro do domínio** (`realm join`), com os utilizadores do AD visíveis pelo **SSSD** e login com contas do AD via **PAM** (home criada automaticamente).
 5. **Montagem automática da SRII no login** (`pam_mount`).
-6. A variante de integração com **Winbind** (em preparação).
+6. Um **segundo cliente Ubuntu** integrado no mesmo domínio com **Samba + Winbind** (`net ads join`), com login por terminal e gráfico (GDM3) e acesso à SRII.
 
 ### Topologia
 
@@ -62,7 +62,8 @@ Cada aluno trabalha na sua VLAN `X`, com o seu DC e o seu cliente. O DC é ao me
 | `X` | Número da VLAN do aluno | `105` |
 | `192.168.X.1` | Default gateway da VLAN (reservado) | `192.168.105.1` |
 | `<IP_DC>` | IP do Windows Server, no formato `192.168.X.Y` (Y entre 2 e 254) | `192.168.105.2` |
-| `<IP_CLIENTE>` | IP do Ubuntu, no formato `192.168.X.Y` (Y entre 2 e 254, diferente do DC) | `192.168.105.3` |
+| `<IP_CLIENTE>` | IP do cliente Ubuntu SSSD, no formato `192.168.X.Y` (Y entre 2 e 254, diferente do DC) | `192.168.105.3` |
+| `<IP_CLIENTE_WB>` | IP do cliente Ubuntu Winbind (2.2), no formato `192.168.X.Y` (diferente dos outros dois) | `192.168.105.4` |
 | `/24` · `255.255.255.0` | Máscara da VLAN | - |
 | `<BRIDGE>` | Placa/bridge do Proxmox associada à VLAN `X` | `vmbr105` |
 | `<POOL_GRUPO>` | Pool do grupo no Proxmox | `PoolTeamX` |
@@ -75,7 +76,8 @@ Cada aluno trabalha na sua VLAN `X`, com o seu DC e o seu cliente. O DC é ao me
 | Realm Kerberos (domínio em **MAIÚSCULAS**) | `ISEC.LOCAL` |
 | Nome NetBIOS do domínio | `ISEC` |
 | Nome do Windows Server | `SR2-SRV` → FQDN `SR2-SRV.isec.local` |
-| Nome do cliente Ubuntu (máx. **15** caracteres) | `ubuclient` |
+| Nome do cliente SSSD (máx. **15** caracteres) | `ubuclient` (no AD: `UBUCLIENT`) |
+| Nome do cliente Winbind no AD (`netbios name`) | `UBU-WINBIND` |
 | Placa de rede do Ubuntu | `ens18` (confirmar com `ip -br a`) |
 | Perfil NetworkManager | `labX` (ex.: `lab105`) |
 | Utilizadores de teste | `aluno.teste`, `professor.teste` |
@@ -97,14 +99,16 @@ Abrir o Proxmox e selecionar a pool **`PoolStudentTemplates`**.
 
 **Passo 2 - Localizar os templates do grupo**
 
-Localizar os templates do **Windows Server** e do **Ubuntu Client** do grupo.
+Localizar os templates do grupo:
+- **Windows Server** - o Domain Controller (Parte A);
+- **UbuntuClient** - o cliente Ubuntu, com os pacotes do SSSD e do Winbind. O mesmo template dá origem aos dois clientes: o da integração com SSSD (2.1, clonado agora) e o da integração com Winbind (2.2, clonado em 2.2.1).
 
 **Passo 3 - Clonar as duas VMs**
 
-Em cada template: **Clone** →
+No template do Windows Server e no **UbuntuClient**: **Clone** →
 - **Mode:** `Linked Clone` (é importante selecionar *Linked Clone* para não haver problemas);
 - **Pool:** `<POOL_GRUPO>` (a pool do teu grupo, ex.: `PoolTeamX`);
-- **Nome:** `WindowsServerADDS-grp<N>` para o Windows e `UbuntuClient-grp<N>` para o Ubuntu.
+- **Nome:** `WindowsServerADDS-grp<N>` para o Windows e `UbuntuClient-SSSD-grp<N>` para o Ubuntu (o cliente da parte 2.1).
 
 **Passo 4 - Escolher a placa de rede (Windows Server)**
 
@@ -122,7 +126,7 @@ Repetir para a VM do Ubuntu, com a **mesma** bridge `<BRIDGE>` (aconselhado: uma
 **Verificação esperada:** as duas VMs aparecem dentro de `<POOL_GRUPO>`, ambas com a bridge `<BRIDGE>`, e arrancam.
 
 > [!NOTE]
-> - Os templates já trazem os recursos (CPU/RAM/disco) e, no Ubuntu, as dependências instaladas (Kerberos, SSSD, Samba). **[VERIFICAR]** recursos mínimos, caso seja preciso criar uma VM de raiz.
+> - Os templates já trazem os recursos (CPU/RAM/disco) e **todas as dependências instaladas**: no workshop não é preciso instalar nenhum pacote. O template Ubuntu traz as duas variantes (SSSD e Winbind), mas como não podem estar ativas na mesma máquina, vem com **só o SSSD ativo** (o Winbind está desativado). O cliente SSSD confirma isso em 2.1.1; o cliente Winbind desativa o SSSD e ativa o Winbind em 2.2.2. **[VERIFICAR]** recursos mínimos, caso seja preciso criar uma VM de raiz.
 > - **[VERIFICAR]** O número da bridge corresponde à VLAN (ex.: `vmbr105` ↔ `192.168.105.0/24`). Confirmar com o docente a bridge/VLAN atribuída a cada aluno.
 
 > Problemas? Ver [Erros Comuns - Setup das VMs](#ec-setup).
@@ -137,17 +141,15 @@ Repetir para a VM do Ubuntu, com a **mesma** bridge `<BRIDGE>` (aconselhado: uma
 
 <!-- esquema: 1-1-nome-rede-ip | Windows Server: IP estático, gateway e DNS -->
 
-**Passo 1 - Primeiro arranque e nome do computador**
+**Passo 1 - Primeiro arranque**
 
-*Objetivo:* concluir o assistente inicial e dar ao servidor o nome standard.
+*Objetivo:* concluir o assistente inicial. O nome do computador (**`SR2-SRV`**) já vem definido no template.
 
-1. Iniciar a VM e completar o assistente com os valores aconselhados:
-   - Região: **Portugal**; teclado: **Português**; idioma: **Inglês**;
-   - Palavra-passe do Administrator: **`<PASSWORD_LAB>`** (a mesma em todo o laboratório).
-2. Mudar o nome do computador para **`SR2-SRV`**: barra de pesquisa do Windows → **About this computer** → **Rename this PC**.
-3. Reiniciar o servidor.
+Iniciar a VM e completar o assistente com os valores aconselhados:
+- Região: **Portugal**; teclado: **Português**; idioma: **Inglês**;
+- Palavra-passe do Administrator: **`<PASSWORD_LAB>`** (a mesma em todo o laboratório).
 
-*Verificação esperada:* após o reinício, *About this computer* mostra o nome `SR2-SRV`.
+*Verificação esperada:* barra de pesquisa do Windows → **About this computer** mostra o nome `SR2-SRV`.
 
 **Passo 2 - Abrir as definições do adaptador de rede**
 
@@ -340,13 +342,13 @@ Criar dentro da SRII um ficheiro de texto **`ficheiroteste.txt`** (com qualquer 
 
 **Passo 3 - IP de origem**
 
-Em *Which remote IP addresses does this rule apply to?* → **These IP addresses** → **Add...** → `<IP_CLIENTE>` → OK → Next.
+Em *Which remote IP addresses does this rule apply to?* → **These IP addresses** → **Add...** → `<IP_CLIENTE>` → OK. Repetir **Add...** com `<IP_CLIENTE_WB>` (o cliente Winbind de 2.2) → OK → Next.
 
 **Passo 4 - Permitir e dar nome**
 
 **Allow the connection** → Next → Next → Nome: **`SR2 Allow Ping Ubuntu`** → **Finish**.
 
-*Verificação esperada:* a regra aparece ativa (visto verde) em *Inbound Rules*. O teste de ping faz-se a partir do Ubuntu (2.1.1, Passo 11).
+*Verificação esperada:* a regra aparece ativa (visto verde) em *Inbound Rules*. O teste de ping faz-se a partir do Ubuntu (2.1.2, Passo 11).
 
 > Problemas? Ver [Erros Comuns - Parte A](#ec-a).
 
@@ -359,9 +361,41 @@ Em *Which remote IP addresses does this rule apply to?* → **These IP addresses
 > [!NOTE]
 > Nesta variante usa-se o **cliente** SMB (`smbclient`) e a adesão ao domínio faz-se com `realm join` (realmd + adcli), que gera automaticamente o `sssd.conf`. **Não é preciso configurar o `smb.conf`** nem um servidor Samba: o `smb.conf` e o `net ads join` pertencem à variante **Winbind** (2.2). **[VERIFICAR]** se o enunciado exige `smb.conf` também na variante SSSD.
 
-### 2.1.1 Ubuntu: IP estático e DNS do Windows
+### 2.1.1 Preparar o cliente: confirmar que o Winbind está desativado
 
-<!-- esquema: 2-1-1-rede-dns | Rede e DNS do Ubuntu apontados para o Windows Server -->
+<!-- esquema: 2-1-1-desativar-winbind | O template traz o SSSD e o Winbind: neste cliente fica ativo só o SSSD -->
+
+**Objetivo:** o template UbuntuClient traz instalados os pacotes das duas variantes (SSSD e Winbind), mas já vem com o **Winbind desativado**, porque as duas não podem estar ativas ao mesmo tempo. Antes de começar, confirma-se que está mesmo desativado.
+
+**Passo 1 - Confirmar que o serviço Winbind está desativado**
+
+```bash
+# [Linux Client]
+systemctl is-enabled winbind
+```
+*Verificação esperada:* `disabled`. Se aparecer `enabled`: `sudo systemctl disable --now winbind`.
+
+**Passo 2 - Confirmar que o Winbind não está no PAM**
+
+```bash
+# [Linux Client]
+grep -c pam_winbind /etc/pam.d/common-auth
+```
+*Verificação esperada:* `0`. Se der outro número: `sudo pam-auth-update --disable winbind`.
+
+**Passo 3 - Confirmar que o Winbind não está no NSS**
+
+```bash
+# [Linux Client]
+grep -E '^(passwd|group):' /etc/nsswitch.conf
+```
+*Verificação esperada:* as linhas `passwd:` e `group:` não têm `winbind` (ex.: `passwd: files systemd sss`). Se tiverem: `sudo sed -i -E '/^(passwd|group):/ s/ winbind//' /etc/nsswitch.conf`.
+
+> Problemas? Ver [Erros Comuns - 2.1 Domínio e SSSD](#ec-b1-sssd).
+
+### 2.1.2 Ubuntu: IP estático e DNS do Windows
+
+<!-- esquema: 2-1-2-rede-dns | Rede e DNS do Ubuntu apontados para o Windows Server -->
 
 **Objetivo:** no fim, o Ubuntu tem IP estático, um único perfil de rede, usa **apenas** o DC como DNS e resolve `isec.local` pelo nome. Sem o DNS apontado ao Windows, o Kerberos e o SSSD não conseguem descobrir o domínio.
 
@@ -540,9 +574,9 @@ ping -c 3 isec.local
 
 > Problemas? Ver [Erros Comuns - 2.1 Rede e DNS do cliente](#ec-b1-rede).
 
-### 2.1.2 Sincronização do relógio (chrony)
+### 2.1.3 Sincronização do relógio (chrony)
 
-<!-- esquema: 2-1-2-chrony | Sincronização do relógio por NTP -->
+<!-- esquema: 2-1-3-chrony | Sincronização do relógio por NTP -->
 
 **Objetivo:** acertar a hora do Ubuntu pela do DC. O Kerberos rejeita pedidos com mais de **5 minutos** de diferença entre o cliente e o servidor.
 
@@ -568,9 +602,9 @@ chronyc sources -v
 
 > Problemas? Ver [Erros Comuns - 2.1 Relógio e Kerberos](#ec-b1-kerberos).
 
-### 2.1.3 Kerberos: configurar o realm e obter o ticket
+### 2.1.4 Kerberos: configurar o realm e obter o ticket
 
-<!-- esquema: 2-1-3-kerberos | Pedido do TGT Kerberos (kinit) -->
+<!-- esquema: 2-1-4-kerberos | Pedido do TGT Kerberos (kinit) -->
 
 **Passo 1 - Guardar uma cópia do ficheiro original**
 
@@ -627,9 +661,9 @@ kdestroy
 
 > Problemas? Ver [Erros Comuns - 2.1 Relógio e Kerberos](#ec-b1-kerberos).
 
-### 2.1.4 Samba: acesso à partilha SRII com Kerberos
+### 2.1.5 Samba: acesso à partilha SRII com Kerberos
 
-<!-- esquema: 2-1-4-samba | Acesso à SRII com ticket Kerberos (smbclient) -->
+<!-- esquema: 2-1-5-samba | Acesso à SRII com ticket Kerberos (smbclient) -->
 
 **Objetivo:** provar que o professor lê e escreve na SRII e o aluno só lê, usando o cliente Samba (`smbclient`) com o ticket Kerberos, **sem** juntar a máquina ao domínio.
 
@@ -662,7 +696,7 @@ chmod 644 /tmp/teste-escrita.txt
 kdestroy
 klist
 ```
-O `chmod 644` deixa os utilizadores do domínio ler o ficheiro mais tarde (2.1.8).
+O `chmod 644` deixa os utilizadores do domínio ler o ficheiro mais tarde (2.1.9).
 
 **Passo 4 - Testar o aluno**
 
@@ -710,9 +744,9 @@ Get-ChildItem "$env:USERPROFILE\Desktop\SRII"
 
 > Problemas? Ver [Erros Comuns - 2.1 Samba](#ec-b1-samba).
 
-### 2.1.5 Entrada no domínio: realmd e adcli
+### 2.1.6 Entrada no domínio: realmd e adcli
 
-<!-- esquema: 2-1-5-realm-join | Adesão ao domínio com realmd e adcli -->
+<!-- esquema: 2-1-6-realm-join | Adesão ao domínio com realmd e adcli -->
 
 **Objetivo:** o Ubuntu passar a ser **membro do domínio**. Até aqui só usava tickets pedidos à mão (`kinit`); o computador não existia no AD e não conhecia os utilizadores. O `realm join` cria a conta da máquina no AD (através do `adcli`) e configura o SSSD.
 
@@ -733,7 +767,7 @@ hostnamectl
 # [Linux Client]
 realm discover isec.local
 ```
-*Verificação esperada:* `type: kerberos`, `realm-name: ISEC.LOCAL`, `server-software: active-directory`. Se falhar, repete 2.1.1 (Passo 12, DNS) e 2.1.3 (Passo 2, `krb5.conf`).
+*Verificação esperada:* `type: kerberos`, `realm-name: ISEC.LOCAL`, `server-software: active-directory`. Se falhar, repete 2.1.2 (Passo 12, DNS) e 2.1.4 (Passo 2, `krb5.conf`).
 
 **Passo 3 - Fazer o join ao domínio**
 
@@ -754,9 +788,9 @@ sudo systemctl status sssd --no-pager
 
 > Problemas? Ver [Erros Comuns - 2.1 Domínio e SSSD](#ec-b1-sssd).
 
-### 2.1.6 Utilizadores do AD no Linux: SSSD
+### 2.1.7 Utilizadores do AD no Linux: SSSD
 
-<!-- esquema: 2-1-6-sssd | Resolução de utilizadores do AD pelo SSSD -->
+<!-- esquema: 2-1-7-sssd | Resolução de utilizadores do AD pelo SSSD -->
 
 **Passo 1 - Confirmar que o Linux localiza os utilizadores do AD e ver a configuração do SSSD**
 
@@ -782,9 +816,9 @@ Se o `id` der `no such user`, espera um minuto ou limpa a cache: `sudo sss_cache
 
 > Problemas? Ver [Erros Comuns - 2.1 Domínio e SSSD](#ec-b1-sssd).
 
-### 2.1.7 Login com contas do AD: PAM
+### 2.1.8 Login com contas do AD: PAM
 
-<!-- esquema: 2-1-7-pam | Login de um utilizador do AD com PAM e SSSD -->
+<!-- esquema: 2-1-8-pam | Login de um utilizador do AD com PAM e SSSD -->
 
 **Passo 1 - Ativar a criação automática da home no primeiro login**
 
@@ -828,19 +862,19 @@ kinit aluno.teste@ISEC.LOCAL
 klist
 ```
 *Verificação esperada:* `klist` mostra `krbtgt/ISEC.LOCAL@ISEC.LOCAL`.
-*Porquê:* o ticket pertence a quem o pede - um `kinit` feito como utilizador local não serve ao aluno. Por isso faz-se **dentro** da sessão do aluno. **Não saias da sessão:** continua em 2.1.8.
+*Porquê:* o ticket pertence a quem o pede - um `kinit` feito como utilizador local não serve ao aluno. Por isso faz-se **dentro** da sessão do aluno. **Não saias da sessão:** continua em 2.1.9.
 
 > Problemas? Ver [Erros Comuns - 2.1 PAM e pam_mount](#ec-b1-pam).
 
-### 2.1.8 Acesso à SRII como utilizador do domínio
+### 2.1.9 Acesso à SRII como utilizador do domínio
 
-<!-- esquema: 2-1-8-srii-dominio | Acesso à SRII a partir da sessão do utilizador do domínio -->
+<!-- esquema: 2-1-9-srii-dominio | Acesso à SRII a partir da sessão do utilizador do domínio -->
 
-#### 2.1.8.1 Aluno
+#### 2.1.9.1 Aluno
 
 **Passo 1 - Obter o ticket na sessão do aluno**
 
-Continuando na sessão do aluno (2.1.7):
+Continuando na sessão do aluno (2.1.8):
 ```bash
 # [Linux Client]  (sessão de aluno.teste@isec.local)
 kinit aluno.teste@ISEC.LOCAL
@@ -866,7 +900,7 @@ exit
 ```
 *Verificação esperada:* o `put` falha com `NT_STATUS_ACCESS_DENIED`; o `klist` mostra dois tickets: `krbtgt/ISEC.LOCAL` e `cifs/SR2-SRV.isec.local` (o ticket da partilha).
 
-#### 2.1.8.2 Professor
+#### 2.1.9.2 Professor
 
 **Passo 1 - Entrar como professor**
 
@@ -898,19 +932,20 @@ exit
 
 > Problemas? Ver [Erros Comuns - 2.1 Samba](#ec-b1-samba).
 
-### 2.1.9 Montagem automática da SRII no login: pam_mount
+### 2.1.10 Montagem automática da SRII no login: pam_mount
 
-<!-- esquema: 2-1-9-pam-mount | Montagem automática da SRII no login (pam_mount) -->
+<!-- esquema: 2-1-10-pam-mount | Montagem automática da SRII no login (pam_mount) -->
 
 **Objetivo:** quando um utilizador do AD faz login, a SRII aparece sozinha em `~/SRII`, sem `kinit` nem `smbclient`, e com as permissões do AD (aluno só lê, professor lê e escreve).
 
 > **Como funciona:** o `pam_mount` é um módulo PAM. No login recebe a palavra-passe escrita pelo utilizador e monta a partilha com `mount.cifs` (pacote `cifs-utils`); no logout desmonta-a. A partilha, os grupos e as permissões NTFS são os da SRII (1.5) - não é preciso mudar nada no Windows.
 
-**Passo 1 - Instalar o pam_mount e o cifs-utils** (terminal do utilizador local)
+**Passo 1 - Confirmar que o pam_mount está ativo no PAM** (terminal do utilizador local)
+
+O `pam_mount` e o `cifs-utils` já vêm instalados no template UbuntuClient.
 
 ```bash
 # [Linux Client]
-sudo apt install -y libpam-mount cifs-utils
 grep pam_mount /etc/pam.d/common-auth /etc/pam.d/common-session
 ```
 *Verificação esperada:* `pam_mount.so` aparece nos dois ficheiros. Se não aparecer: `sudo pam-auth-update --enable libpam-mount`.
@@ -922,7 +957,7 @@ grep pam_mount /etc/pam.d/common-auth /etc/pam.d/common-session
 sudo cp /etc/security/pam_mount.conf.xml /etc/security/pam_mount.conf.xml.bak
 sudo nano /etc/security/pam_mount.conf.xml
 ```
-Se o `cp` der `Ficheiro ou pasta inexistente`, o pam_mount não está instalado: repete o Passo 1.
+Se o `cp` der `Ficheiro ou pasta inexistente`, o pam_mount não está instalado: a VM não foi clonada do template UbuntuClient.
 
 **Passo 3 - Colar as linhas `<volume>` (uma por utilizador)**
 
@@ -1006,18 +1041,479 @@ exit
 ## 2.2 Integração com Winbind
 
 > [!NOTE]
-> **[A AGUARDAR CONTEÚDO]** - o conteúdo desta parte está em preparação. Usar um **novo clone** do Ubuntu (não usar SSSD e Winbind na mesma máquina).
+> Nesta variante o Ubuntu entra no domínio através do Samba (`net ads join`) e o serviço **Winbind** faz a ponte entre o Linux (NSS e PAM) e o Active Directory. Usa-se uma **VM nova**, clonada do mesmo template **UbuntuClient**, onde se desativa o SSSD e se ativa o Winbind (2.2.2): as duas variantes não podem estar ativas na mesma máquina. O Windows Server é o mesmo da Parte A (domínio, utilizadores, grupos e SRII já existem).
 
-### 2.2.1 Configuração de um novo cliente (clone, IP estático, DNS) `[A AGUARDAR CONTEÚDO]`
-### 2.2.2 Configuração do Samba (`smb.conf`) `[A AGUARDAR CONTEÚDO]`
-### 2.2.3 Configuração do Kerberos e adesão ao domínio `[A AGUARDAR CONTEÚDO]`
-### 2.2.4 Validar a associação ao domínio `[A AGUARDAR CONTEÚDO]`
-### 2.2.5 Diagnosticar o Winbind `[A AGUARDAR CONTEÚDO]`
-### 2.2.6 Integração do Winbind com NSS `[A AGUARDAR CONTEÚDO]`
-### 2.2.7 Configurar a autenticação PAM `[A AGUARDAR CONTEÚDO]`
-### 2.2.8 Testar o início de sessão com um utilizador AD `[A AGUARDAR CONTEÚDO]`
-### 2.2.9 Testar a partilha SMB do Windows Server `[A AGUARDAR CONTEÚDO]`
-### 2.2.10 Início de sessão gráfico com AD (GDM3) `[A AGUARDAR CONTEÚDO]`
+### 2.2.1 Configuração de um novo cliente (clone, IP estático, DNS)
+
+<!-- esquema: 2-2-1-novo-cliente | Novo cliente Winbind na mesma VLAN e no mesmo domínio -->
+
+**Passo 1 - Clonar o template UbuntuClient**
+
+No Proxmox, tal como em *Setup das VMs* (Passos 3 a 6), clonar o template **UbuntuClient** com *Linked Clone* para a pool do grupo, com o nome `UbuntuClient-Winbind-grp<N>`, e ligá-lo à **mesma** bridge `<BRIDGE>`. Iniciar a VM.
+
+**Passo 2 - Atribuir um IP estático disponível na rede**
+
+Repetir 2.1.2, Passos 1 a 10, nesta VM, com o IP **`<IP_CLIENTE_WB>`** (formato `192.168.X.Y`, diferente do DC e do cliente SSSD):
+
+```bash
+# [Linux Client - Winbind]  - substitui X, <IP_CLIENTE_WB> e <IP_DC>
+sudo nmcli connection add type ethernet ifname ens18 con-name labX \
+     ipv4.method manual \
+     ipv4.addresses <IP_CLIENTE_WB>/24 \
+     ipv4.gateway 192.168.X.1 \
+     ipv4.dns <IP_DC> \
+     ipv4.dns-search isec.local \
+     ipv4.ignore-auto-dns yes
+sudo nmcli connection up labX
+```
+*Verificação esperada:* `ip -br a` mostra `ens18` com `<IP_CLIENTE_WB>/24` e `resolvectl status ens18` mostra só o DNS `<IP_DC>`.
+
+No Windows Server, acrescentar `<IP_CLIENTE_WB>` à regra **SR2 Allow Ping Ubuntu** (1.6): *Properties* → *Scope* → *Remote IP address* → **Add...**
+
+**Passo 3 - Configurar o DNS e confirmar o domínio**
+
+Repetir 2.1.2, Passos 11 a 14: `ping` ao DC, `dig` aos registos SRV, correção do mDNS no `nsswitch.conf` e `ping isec.local`.
+
+*Verificação esperada:* `getent hosts isec.local` devolve `<IP_DC>` e `ping -c 3 isec.local` responde.
+
+**Passo 4 - Sincronizar o relógio**
+
+Repetir 2.1.3 (Passos 1 e 2) nesta VM. Sem relógio certo, o `kinit` e o `net ads join` falham com `Clock skew too great`.
+
+*Verificação esperada:* `chronyc sources -v` mostra `<IP_DC>` com `^*` ou `^+`.
+
+> Problemas? Ver [Erros Comuns - 2.1 Rede e DNS do cliente](#ec-b1-rede).
+
+### 2.2.2 Preparar o cliente: desativar o SSSD e ativar o Winbind
+
+<!-- esquema: 2-2-2-trocar-variante | Neste cliente desativa-se o SSSD e ativa-se o Winbind -->
+
+**Objetivo:** este cliente foi clonado do mesmo template UbuntuClient, que vem com o SSSD ativo e o Winbind desativado. Aqui faz-se o contrário: desativa-se o SSSD e ativa-se o Winbind.
+
+**Passo 1 - Parar e desativar o serviço SSSD**
+
+```bash
+# [Linux Client - Winbind]
+sudo systemctl disable --now sssd
+systemctl is-enabled sssd
+```
+*Verificação esperada:* `disabled`.
+
+**Passo 2 - Retirar o SSSD do PAM**
+
+```bash
+# [Linux Client - Winbind]
+sudo pam-auth-update --disable sss
+grep -c pam_sss /etc/pam.d/common-auth
+```
+*Verificação esperada:* `0` (o `pam_sss` já não está na pilha de autenticação).
+
+**Passo 3 - Retirar o SSSD do NSS**
+
+```bash
+# [Linux Client - Winbind]
+sudo cp -a /etc/nsswitch.conf /etc/nsswitch.conf.orig
+sudo sed -i -E '/^(passwd|group|shadow):/ s/ sss//' /etc/nsswitch.conf
+grep -E '^(passwd|group|shadow):' /etc/nsswitch.conf
+```
+*Verificação esperada:* as linhas `passwd:`, `group:` e `shadow:` já não têm `sss`. O `winbind` é configurado no NSS em 2.2.7.
+
+**Passo 4 - Ativar o serviço Winbind**
+
+```bash
+# [Linux Client - Winbind]
+sudo systemctl enable winbind
+systemctl is-enabled winbind
+```
+*Verificação esperada:* `enabled`. O serviço só arranca depois de configurado o `smb.conf` e feito o join (2.2.5, Passo 1).
+
+> Problemas? Ver [Erros Comuns - 2.2 Winbind](#ec-b2).
+
+### 2.2.3 Configuração do Samba (`smb.conf`)
+
+<!-- esquema: 2-2-3-smb-conf | O smb.conf define o Ubuntu como membro do domínio ISEC -->
+
+**Passo 1 - Guardar a configuração original**
+
+```bash
+# [Linux Client - Winbind]
+sudo cp -a /etc/samba/smb.conf /etc/samba/smb.conf.bak
+```
+
+**Passo 2 - Definir a secção `[global]`**
+
+```bash
+# [Linux Client - Winbind]
+sudo nano /etc/samba/smb.conf
+```
+Substituir toda a secção `[global]` (até à linha `#======================= Share Definitions =======================`) por:
+```ini
+[global]
+    # Identificação do domínio Active Directory
+    workgroup = ISEC
+    realm = ISEC.LOCAL
+    security = ADS
+
+    # Nome NetBIOS (máximo 15 caracteres) - nome da máquina no AD
+    netbios name = UBU-WINBIND
+
+    # Mapeamento de identificadores Windows para Linux
+    idmap config * : backend = tdb
+    idmap config * : range = 3000-7999
+    idmap config ISEC : backend = rid
+    idmap config ISEC : range = 10000-999999
+
+    # Integração com Winbind
+    winbind use default domain = yes
+    winbind enum users = yes
+    winbind enum groups = yes
+    winbind refresh tickets = yes
+
+    # Ambiente dos utilizadores do domínio
+    template shell = /bin/bash
+    template homedir = /home/%U
+
+    # Integração com PAM
+    obey pam restrictions = yes
+```
+Guardar com `Ctrl+O`, `Enter`; sair com `Ctrl+X`.
+
+| Parâmetro | O que faz |
+|---|---|
+| `workgroup`, `realm`, `security = ADS` | Domínio NetBIOS `ISEC`, realm Kerberos `ISEC.LOCAL` e modo membro de Active Directory |
+| `netbios name = UBU-WINBIND` | Nome da máquina no AD. É diferente do cliente SSSD (`UBUCLIENT`), por isso os dois podem estar no mesmo domínio |
+| `idmap config * : ...` (`tdb`) | UIDs/GIDs para contas fora do domínio (ex.: `BUILTIN`), entre 3000 e 7999 |
+| `idmap config ISEC : ...` (`rid`) | UIDs/GIDs dos utilizadores do domínio calculados a partir do RID do AD (10000 + RID): são sempre os mesmos |
+| `winbind use default domain = yes` | Os utilizadores escrevem-se sem domínio: `professor.teste` em vez de `ISEC\professor.teste` |
+| `winbind enum users/groups = yes` | Permite listar todos os utilizadores e grupos (`wbinfo -u`, `wbinfo -g`) |
+| `winbind refresh tickets = yes` | Renova automaticamente os tickets Kerberos dos utilizadores |
+| `template shell`, `template homedir` | Shell e pasta pessoal dos utilizadores do domínio (`/home/professor.teste`) |
+| `obey pam restrictions = yes` | O Samba respeita as regras do PAM |
+
+**Passo 3 - Verificar e validar a sintaxe**
+
+```bash
+# [Linux Client - Winbind]
+sudo testparm -s
+```
+*Verificação esperada:* `Loaded services file OK.` e **`Server role: ROLE_DOMAIN_MEMBER`**, seguido dos parâmetros da `[global]`. O aviso `Weak crypto is allowed by GnuTLS` é normal.
+
+> Problemas? Ver [Erros Comuns - 2.2 Winbind](#ec-b2).
+
+### 2.2.4 Configuração do Kerberos e adesão ao domínio
+
+<!-- esquema: 2-2-4-net-ads-join | Adesão ao domínio com net ads join -->
+
+**Passo 1 - Guardar a configuração original**
+
+```bash
+# [Linux Client - Winbind]
+sudo cp -a /etc/krb5.conf /etc/krb5.conf.bak
+```
+
+**Passo 2 - Escrever o `krb5.conf` (substituir todo o conteúdo)**
+
+```bash
+# [Linux Client - Winbind]  - ficheiro igual para todos
+sudo tee /etc/krb5.conf > /dev/null << 'EOF'
+[libdefaults]
+    default_realm = ISEC.LOCAL
+    dns_lookup_realm = false
+    dns_lookup_kdc = true
+    rdns = false
+    ticket_lifetime = 24h
+    forwardable = true
+
+[realms]
+    ISEC.LOCAL = {
+        kdc = SR2-SRV.isec.local
+        admin_server = SR2-SRV.isec.local
+    }
+
+[domain_realm]
+    .isec.local = ISEC.LOCAL
+    isec.local = ISEC.LOCAL
+EOF
+cat /etc/krb5.conf
+```
+É o mesmo ficheiro de 2.1.4, Passo 2, com mais duas linhas: `ticket_lifetime = 24h` (validade dos tickets) e `forwardable = true` (tickets que podem ser reencaminhados para outros serviços).
+
+**Passo 3 - Testar a autenticação Kerberos**
+
+```bash
+# [Linux Client - Winbind]
+kinit professor.teste@ISEC.LOCAL
+klist
+```
+*Verificação esperada:* o `kinit` pede a palavra-passe e não mostra mais nada; o `klist` mostra `Default principal: professor.teste@ISEC.LOCAL` e o ticket `krbtgt/ISEC.LOCAL@ISEC.LOCAL`.
+
+**Passo 4 - Juntar a máquina ao domínio (cria a conta de computador no AD)**
+
+```bash
+# [Linux Client - Winbind]
+sudo net ads join -U Administrator
+```
+Pede a palavra-passe do *Administrator* do domínio.
+
+*Verificação esperada:*
+```
+Using short domain name -- ISEC
+Joined 'UBU-WINBIND' to dns domain 'isec.local'
+```
+
+> Problemas? Ver [Erros Comuns - 2.2 Winbind](#ec-b2).
+
+### 2.2.5 Validar a associação ao domínio
+
+<!-- esquema: 2-2-5-validar | Validação da associação e da relação de confiança -->
+
+**Passo 1 - Verificar se o Ubuntu está associado ao domínio**
+
+```bash
+# [Linux Client - Winbind]
+sudo systemctl restart winbind
+sudo systemctl status winbind --no-pager
+sudo net ads testjoin
+```
+*Verificação esperada:* `winbind.service` com `active (running)` e `Status: "winbindd: ready to serve connections..."`; o `testjoin` responde **`Join is OK`**.
+
+**Passo 2 - Verificar a relação de confiança**
+
+```bash
+# [Linux Client - Winbind]
+sudo wbinfo -t
+```
+*Verificação esperada:* `checking the trust secret for domain ISEC via RPC calls succeeded`.
+
+**Passo 3 - Verificar se o Winbind identifica os utilizadores e grupos do AD**
+
+```bash
+# [Linux Client - Winbind]
+sudo wbinfo -u
+sudo wbinfo -g
+```
+*Verificação esperada:* o `-u` lista, entre outros, `professor.teste` e `aluno.teste`; o `-g` lista, entre outros, `grupo-professores` e `grupo-alunos` (em minúsculas).
+
+> Problemas? Ver [Erros Comuns - 2.2 Winbind](#ec-b2).
+
+### 2.2.6 Diagnosticar o Winbind
+
+<!-- esquema: 2-2-6-diagnostico | Diagnóstico do Winbind: contacto com o DC e resolução de identidades -->
+
+**Passo 1 - Verificar se o Winbind contacta o controlador de domínio**
+
+```bash
+# [Linux Client - Winbind]
+wbinfo --ping-dc
+```
+*Verificação esperada:* `checking the NETLOGON for domain[ISEC] dc connection to "SR2-SRV.isec.local" succeeded`.
+
+**Passo 2 - Verificar se o domínio está online para o Winbind**
+
+```bash
+# [Linux Client - Winbind]
+wbinfo --online-status
+```
+*Verificação esperada:* `BUILTIN`, `UBU-WINBIND` e `ISEC` com `active connection`.
+
+**Passo 3 - Verificar a resolução de identidades**
+
+```bash
+# [Linux Client - Winbind]
+wbinfo -i professor.teste
+wbinfo -i aluno.teste
+```
+*Verificação esperada:* uma linha por utilizador no formato do `/etc/passwd`, por exemplo `professor.teste:*:11103:10513:Professor Teste:/home/professor.teste:/bin/bash`. O UID (`11103`) é 10000 + RID do utilizador no AD, por isso os números podem ser diferentes de aluno para aluno.
+
+> Problemas? Ver [Erros Comuns - 2.2 Winbind](#ec-b2).
+
+### 2.2.7 Integração do Winbind com NSS
+
+<!-- esquema: 2-2-7-nss | O NSS passa a perguntar ao Winbind pelos utilizadores e grupos do AD -->
+
+**Passo 1 - Editar a configuração NSS**
+
+```bash
+# [Linux Client - Winbind]
+sudo cp -a /etc/nsswitch.conf /etc/nsswitch.conf.bak
+sudo nano /etc/nsswitch.conf
+```
+Deixar as linhas `passwd` e `group` assim (a linha `shadow` fica como está):
+```
+passwd:         files systemd winbind
+group:          files systemd winbind
+shadow:         files systemd
+```
+Se aparecer `sss` nestas linhas, retirar: neste cliente não se usa o SSSD.
+
+**Passo 2 - Validar a integração**
+
+```bash
+# [Linux Client - Winbind]
+getent passwd professor.teste
+getent passwd aluno.teste
+id professor.teste
+id aluno.teste
+getent group grupo-professores
+getent group grupo-alunos
+```
+*Verificação esperada:*
+- `getent passwd` devolve a mesma linha do `wbinfo -i` (2.2.6, Passo 3);
+- `id professor.teste` inclui `grupo-professores` e `id aluno.teste` inclui `grupo-alunos`, além de `domain users`;
+- `getent group` devolve cada grupo com o seu GID (ex.: `grupo-professores:x:11101:`).
+
+> Problemas? Ver [Erros Comuns - 2.2 Winbind](#ec-b2).
+
+### 2.2.8 Configurar a autenticação PAM
+
+<!-- esquema: 2-2-8-pam | Perfis do PAM ativos no cliente Winbind -->
+
+**Passo 1 - Ativar os perfis PAM do Winbind**
+
+```bash
+# [Linux Client - Winbind]
+sudo pam-auth-update
+```
+No menu (espaço para marcar, `Tab` para ir ao **OK**):
+- **marcar:** *Unix authentication*, *Winbind NT/Active Directory authentication* e *Create home directory on login*;
+- **desmarcar**, se aparecerem: *SSS authentication*, as opções *SSS ... smart card* e qualquer perfil do *ADsys* (neste cliente não se usa o ADsys);
+- as restantes opções ficam como estão.
+
+*Verificação esperada:*
+```bash
+# [Linux Client - Winbind]
+grep -E "pam_winbind|pam_mkhomedir" /etc/pam.d/common-auth /etc/pam.d/common-session
+```
+mostra `pam_winbind.so` no `common-auth` e `pam_mkhomedir.so` no `common-session`.
+
+> Problemas? Ver [Erros Comuns - 2.2 Winbind](#ec-b2).
+
+### 2.2.9 Testar o início de sessão com um utilizador AD
+
+<!-- esquema: 2-2-9-login | Login de um utilizador do AD com PAM e Winbind -->
+
+**Passo 1 - Verificar se a pasta pessoal já existe**
+
+```bash
+# [Linux Client - Winbind]
+ls -ld /home/professor.teste
+```
+*Verificação esperada:* na primeira vez, `No such file or directory` (a pasta ainda não existe; é criada no login).
+
+**Passo 2 - Autenticar o utilizador**
+
+```bash
+# [Linux Client - Winbind]
+su - professor.teste
+```
+Pede a palavra-passe do utilizador no AD. Repara que se escreve só `professor.teste`, sem `@isec.local` (por causa do `winbind use default domain = yes`).
+
+**Passo 3 - Validar a sessão**
+
+```bash
+# [Linux Client - Winbind]  (sessão de professor.teste)
+whoami
+id
+pwd
+echo "$HOME"
+touch teste-winbind.txt
+ls -l teste-winbind.txt
+```
+*Verificação esperada:* `whoami` → `professor.teste`; o `id` inclui `grupo-professores`; `pwd` e `$HOME` → `/home/professor.teste`; o ficheiro criado pertence a `professor.teste` e ao grupo `domain users`.
+
+**Passo 4 - Regressar à conta local**
+
+```bash
+# [Linux Client - Winbind]  (sessão de professor.teste)
+exit
+```
+*Verificação esperada:* `logout` e o prompt volta a ser o do utilizador local.
+
+> Problemas? Ver [Erros Comuns - 2.2 Winbind](#ec-b2).
+
+### 2.2.10 Testar a partilha SMB do Windows Server
+
+<!-- esquema: 2-2-10-smb | Acesso à SRII com smbclient e palavra-passe -->
+
+**Passo 1 - Listar as partilhas e entrar na SRII como professor**
+
+```bash
+# [Linux Client - Winbind]
+smbclient -L //SR2-SRV.isec.local -U 'ISEC\professor.teste'
+smbclient //SR2-SRV.isec.local/SRII -U 'ISEC\professor.teste'
+```
+*Verificação esperada:* a lista mostra a partilha **SRII**; o segundo comando abre o prompt `smb: \>`.
+
+> Ao contrário de 2.1.5, aqui o `smbclient` autentica-se com a palavra-passe (`-U`) e não precisa de `kinit`.
+
+**Passo 2 - Testar a escrita (professor)**
+
+No prompt `smb: \>`:
+```
+ls
+mkdir teste-professor-winbind
+ls
+exit
+```
+*Verificação esperada:* a pasta `teste-professor-winbind` aparece no segundo `ls`.
+
+**Passo 3 - Entrar como aluno e testar a escrita**
+
+```bash
+# [Linux Client - Winbind]
+smbclient //SR2-SRV.isec.local/SRII -U 'ISEC\aluno.teste'
+```
+No prompt `smb: \>`:
+```
+ls
+mkdir teste-aluno-winbind
+ls
+exit
+```
+*Verificação esperada:* o aluno vê `teste-professor-winbind`, mas o `mkdir` dá `NT_STATUS_ACCESS_DENIED making remote directory \teste-aluno-winbind`: só tem leitura.
+
+> Problemas? Ver [Erros Comuns - 2.1 Samba e SRII](#ec-b1-samba).
+
+### 2.2.11 Início de sessão gráfico com AD (GDM3)
+
+<!-- esquema: 2-2-11-gdm3 | Login gráfico com um utilizador do AD -->
+
+**Passo 1 - Configurar o GDM3 para permitir escrever o nome do utilizador**
+
+```bash
+# [Linux Client - Winbind]
+sudo mkdir -p /etc/dconf/db/gdm.d
+sudo tee /etc/dconf/db/gdm.d/00-login-ad > /dev/null << 'EOF'
+[org/gnome/login-screen]
+disable-user-list=true
+EOF
+sudo cat /etc/dconf/db/gdm.d/00-login-ad
+sudo dconf update
+sudo systemctl restart gdm3
+```
+`disable-user-list=true` esconde a lista de utilizadores locais e deixa escrever qualquer nome, incluindo os do AD.
+
+> O `systemctl restart gdm3` fecha a sessão gráfica: guarda o que estiveres a fazer antes de o correr.
+
+*Verificação esperada:* o ecrã de login mostra a opção **"Não está listado?"**.
+
+**Passo 2 - Testar o início de sessão gráfico com `professor.teste` e `aluno.teste`**
+
+No ecrã de login: **Não está listado?** → escrever `professor.teste` → palavra-passe do AD. Repetir depois com `aluno.teste`.
+
+*Verificação esperada:* entra no ambiente de trabalho do utilizador do domínio (no primeiro login, a pasta pessoal é criada).
+
+**Passo 3 - Confirmar a autenticação e os grupos do domínio**
+
+Abrir um terminal na sessão gráfica:
+```bash
+# [Linux Client - Winbind]  (sessão gráfica de aluno.teste)
+whoami
+id
+```
+*Verificação esperada:* `whoami` → `aluno.teste`; o `id` inclui `domain users` e `grupo-alunos`: a autenticação e os grupos vêm do domínio `isec.local`, através do Winbind.
+
+> Problemas? Ver [Erros Comuns - 2.2 Winbind](#ec-b2).
 
 ---
 
@@ -1045,69 +1541,85 @@ Formato: **Sintoma → Causa provável → Solução**.
 | `NT_STATUS_ACCESS_DENIED` no `ls` de ambos | Grupos ou permissões NTFS mal definidos | Rever 1.5 (Passos 2 e 3) |
 
 <a id="ec-b1-rede"></a>
-### Parte B - SSSD: Rede e DNS do cliente (2.1.1)
+### Parte B - SSSD: Rede e DNS do cliente (2.1.2)
 
 | Sintoma | Causa provável | Solução |
 |---|---|---|
-| `Conflicting default route` no `netplan apply` | Mais de um ficheiro ou método a configurar a mesma placa | Ficar com um único método: repetir 2.1.1, Passos 2 a 5 |
-| `mv: destino '/root/netplan-bak/': Ficheiro ou pasta inexistente` | Faltou criar a pasta de backup | 2.1.1, Passo 3 e repetir o Passo 4 |
-| `O NetworkManager não está em execução` | Serviço parado | 2.1.1, Passo 6 e repetir o Passo 7 |
-| IP `169.254.x.x` na `ens18` | O IP estático não foi aplicado | 2.1.1, Passos 7 e 8 |
-| DNS público (`8.8.8.8`, `1.1.1.1`) em `resolvectl status` | Falta `ipv4.ignore-auto-dns yes` | 2.1.1, Passo 7 |
+| `Conflicting default route` no `netplan apply` | Mais de um ficheiro ou método a configurar a mesma placa | Ficar com um único método: repetir 2.1.2, Passos 2 a 5 |
+| `mv: destino '/root/netplan-bak/': Ficheiro ou pasta inexistente` | Faltou criar a pasta de backup | 2.1.2, Passo 3 e repetir o Passo 4 |
+| `O NetworkManager não está em execução` | Serviço parado | 2.1.2, Passo 6 e repetir o Passo 7 |
+| IP `169.254.x.x` na `ens18` | O IP estático não foi aplicado | 2.1.2, Passos 7 e 8 |
+| DNS público (`8.8.8.8`, `1.1.1.1`) em `resolvectl status` | Falta `ipv4.ignore-auto-dns yes` | 2.1.2, Passo 7 |
 | Perfil antigo (ex.: `Ligação com fios 1`) sem placa | Restos da configuração anterior | `sudo nmcli connection delete 'NOME'` |
 | `Destination Host Unreachable` | VMs em bridges diferentes | Ver [Setup das VMs](#ec-setup) |
 | Ping ao DC falha, mas o MAC aparece no `ip neigh` | Firewall do Windows | Ver [Parte A](#ec-a) (1.6) |
-| `dig` funciona mas `ping isec.local` falha | `mdns4_minimal` no `nsswitch.conf` | 2.1.1, Passo 13 |
+| `dig` funciona mas `ping isec.local` falha | `mdns4_minimal` no `nsswitch.conf` | 2.1.2, Passo 13 |
 
 <a id="ec-b1-kerberos"></a>
-### Parte B - SSSD: Relógio e Kerberos (2.1.2 - 2.1.3)
+### Parte B - SSSD: Relógio e Kerberos (2.1.3 - 2.1.4)
 
 | Sintoma | Causa provável | Solução |
 |---|---|---|
-| `Clock skew too great` | Diferença de hora > 5 min entre cliente e DC | Repetir 2.1.2 (chrony) |
+| `Clock skew too great` | Diferença de hora > 5 min entre cliente e DC | Repetir 2.1.3 (chrony) |
 | `chrony` não existe como serviço | Nome do serviço diferente | Usar `chronyd` |
-| `Cannot find KDC for realm` | DNS não devolve os registos SRV do domínio | Repetir 2.1.1, Passo 12 (DNS) |
-| `Cannot resolve network address for KDC` | Nome do DC errado no `krb5.conf` ou não resolve no DNS | Repetir 2.1.1, Passo 12 e 2.1.3, Passo 2; confirmar `SR2-SRV.isec.local` no `krb5.conf` |
+| `Cannot find KDC for realm` | DNS não devolve os registos SRV do domínio | Repetir 2.1.2, Passo 12 (DNS) |
+| `Cannot resolve network address for KDC` | Nome do DC errado no `krb5.conf` ou não resolve no DNS | Repetir 2.1.2, Passo 12 e 2.1.4, Passo 2; confirmar `SR2-SRV.isec.local` no `krb5.conf` |
 | `Client not found in Kerberos database` | O login não existe | No Windows: `Get-ADUser -Filter * \| Select SamAccountName` |
 | `Preauthentication failed` | Palavra-passe errada, conta desativada, ou "mudar palavra-passe no próximo logon" ativo | Confirmar a palavra-passe; rever 1.4, Passo 5 |
 
 <a id="ec-b1-samba"></a>
-### Parte B - SSSD: Samba e SRII (2.1.4, 2.1.8)
+### Parte B - SSSD: Samba e SRII (2.1.5, 2.1.9)
 
 | Sintoma | Causa provável | Solução |
 |---|---|---|
 | `smbclient` avisa que `-k` está *deprecated* | Opção antiga (Samba 4.15+) | Usar `--use-kerberos=required` |
 | Terminal fica em `>` depois de colar `smbclient ... -c 'put ...'` | A aspa ficou aberta (comando colado em duas linhas) | `Ctrl+C` e colar a linha inteira |
 | `NT_STATUS_NO_LOGON_SERVERS` / `NT_STATUS_LOGON_FAILURE` com `--use-kerberos=required` | Ticket em falta ou expirado | `klist`; se vazio: `kinit utilizador@ISEC.LOCAL` e repetir |
-| `NT_STATUS_NO_LOGON_SERVERS` com `creating NEG_TOKEN_INIT ... failed` | Falta o `kinit` dentro da sessão do utilizador do domínio (depois de `su -`) | 2.1.7, Passo 3 |
+| `NT_STATUS_NO_LOGON_SERVERS` com `creating NEG_TOKEN_INIT ... failed` | Falta o `kinit` dentro da sessão do utilizador do domínio (depois de `su -`) | 2.1.8, Passo 3 |
 | `NT_STATUS_ACCESS_DENIED` no `ls` de ambos | Grupos ou permissões NTFS mal definidos | Rever 1.5 (Passos 2 e 3) |
-| `NT_STATUS_BAD_NETWORK_NAME` | Nome da partilha errado | Confirmar com `smbclient -L` (2.1.4, Passo 2) |
+| `NT_STATUS_BAD_NETWORK_NAME` | Nome da partilha errado | Confirmar com `smbclient -L` (2.1.5, Passo 2) |
 | Aluno consegue escrever | Aluno também no grupo de professores, ou *Modify* para `Everyone`/`Authenticated Users` | Rever 1.4 (Passo 6) e 1.5 |
 
 <a id="ec-b1-sssd"></a>
-### Parte B - SSSD: Domínio e SSSD (2.1.5 - 2.1.6)
+### Parte B - SSSD: Domínio e SSSD (2.1.6 - 2.1.7)
 
 | Sintoma | Causa provável | Solução |
 |---|---|---|
-| `realm discover` falha | DNS ou `krb5.conf` | Repetir 2.1.1 (Passo 12) e 2.1.3 (Passo 2) |
-| `realm join` falha com nome de máquina | Hostname com mais de 15 caracteres (ainda com o nome do template) | Repetir 2.1.5, Passo 1 |
+| `id` mostra o mesmo utilizador duas vezes, ou o login fica lento | O Winbind está ativo no PAM ou no NSS deste cliente | 2.1.1, Passos 1 a 3 (comandos de correção) |
+| `realm discover` falha | DNS ou `krb5.conf` | Repetir 2.1.2 (Passo 12) e 2.1.4 (Passo 2) |
+| `realm join` falha com nome de máquina | Hostname com mais de 15 caracteres (ainda com o nome do template) | Repetir 2.1.6, Passo 1 |
 | `no such user` no `id` | Cache do SSSD desatualizada ou SSSD ainda a sincronizar | Esperar 1 min; `sudo sss_cache -E` e `sudo systemctl restart sssd` |
-| SSSD não arranca depois de editar o `sssd.conf` | Permissões do ficheiro ou erro de sintaxe | `sudo chmod 600 /etc/sssd/sssd.conf`; `sudo sssctl config-check` (2.1.7, Passo 2) |
+| SSSD não arranca depois de editar o `sssd.conf` | Permissões do ficheiro ou erro de sintaxe | `sudo chmod 600 /etc/sssd/sssd.conf`; `sudo sssctl config-check` (2.1.8, Passo 2) |
 
 <a id="ec-b1-pam"></a>
-### Parte B - SSSD: PAM e pam_mount (2.1.7, 2.1.9)
+### Parte B - SSSD: PAM e pam_mount (2.1.8, 2.1.10)
 
 | Sintoma | Causa provável | Solução |
 |---|---|---|
-| `su: System error` no login do utilizador do AD (nos registos: `pam_sss ... Access denied ... System error`) | GPO do AD a bloquear o login | `ad_gpo_access_control = permissive` no `sssd.conf` (caixa em 2.1.7, Passo 2) |
-| Home não é criada no primeiro login | `pam_mkhomedir` não ativo | `sudo pam-auth-update --enable mkhomedir` (2.1.7, Passo 1) |
-| `cp` do `pam_mount.conf.xml`: `Ficheiro ou pasta inexistente` | O pam_mount não está instalado | 2.1.9, Passo 1 |
-| `mount \| grep SRII` não mostra nada depois do login | `pam_mount.so` ausente no PAM ou linhas `<volume>` erradas | Confirmar `pam_mount.so` (2.1.9, Passo 1) e as linhas `<volume>` (Passo 4) |
+| `su: System error` no login do utilizador do AD (nos registos: `pam_sss ... Access denied ... System error`) | GPO do AD a bloquear o login | `ad_gpo_access_control = permissive` no `sssd.conf` (caixa em 2.1.8, Passo 2) |
+| Home não é criada no primeiro login | `pam_mkhomedir` não ativo | `sudo pam-auth-update --enable mkhomedir` (2.1.8, Passo 1) |
+| `cp` do `pam_mount.conf.xml`: `Ficheiro ou pasta inexistente` | O pam_mount não está instalado: a VM não veio do template UbuntuClient | Clonar de novo a partir do template certo (Setup das VMs, Passo 3) |
+| `mount \| grep SRII` não mostra nada depois do login | `pam_mount.so` ausente no PAM ou linhas `<volume>` erradas | Confirmar `pam_mount.so` (2.1.10, Passo 1) e as linhas `<volume>` (Passo 4) |
 
 <a id="ec-b2"></a>
-### Parte B - Winbind
+### Parte B - Winbind (2.2)
 
-`[A AGUARDAR CONTEÚDO]`
+| Sintoma | Causa provável | Solução |
+|---|---|---|
+| O `su -` ou o login gráfico ficam lentos ou falham com o SSSD ainda ativo | O SSSD continua ativo no PAM ou no NSS deste cliente | 2.2.2, Passos 1 a 3 |
+| O `winbind` não arranca no arranque da VM | O serviço ficou desativado | 2.2.2, Passo 4 (`sudo systemctl enable winbind`) |
+| `testparm -s` não mostra `Server role: ROLE_DOMAIN_MEMBER` | `security = ADS` em falta ou erro de escrita na `[global]` | Rever 2.2.3, Passo 2 e repetir `sudo testparm -s` |
+| `kinit` ou `net ads join` dá `Clock skew too great` | Relógio do cliente desacertado | 2.2.1, Passo 4 (chrony) |
+| `net ads join` não encontra o domínio ou o DC | DNS do cliente não aponta para o DC, ou falta a correção do mDNS | 2.2.1, Passos 2 e 3 (2.1.2, Passos 7 a 14) |
+| `net ads join` dá erro de palavra-passe | Palavra-passe do `Administrator` do domínio errada | Repetir com a palavra-passe do `ISEC\Administrator` |
+| `net ads testjoin` não diz `Join is OK` ou `wbinfo -t` falha | O join não ficou feito, ou o Winbind está parado | `sudo systemctl restart winbind`; se continuar, repetir 2.2.4, Passo 4 |
+| `wbinfo -u` / `wbinfo -g` vazios | Winbind arrancou antes do join, ou `winbind enum users/groups` em falta | `sudo systemctl restart winbind`; rever 2.2.3, Passo 2 |
+| `wbinfo` funciona mas `getent passwd professor.teste` não devolve nada | `winbind` em falta nas linhas `passwd`/`group` do `nsswitch.conf` | 2.2.7, Passo 1 |
+| `su - professor.teste` dá `Authentication failure` | Perfil *Winbind NT/Active Directory authentication* desativado no PAM | 2.2.8, Passo 1 |
+| `su -` entra mas diz `No directory, logging in with HOME=/` | *Create home directory on login* desativado | 2.2.8, Passo 1 |
+| O utilizador só entra como `ISEC\professor.teste` | `winbind use default domain = yes` em falta | Rever 2.2.3, Passo 2; `sudo systemctl restart winbind` |
+| `smbclient ... -U` dá `NT_STATUS_LOGON_FAILURE` | Palavra-passe errada ou falta o `ISEC\` antes do nome | Usar `-U 'ISEC\professor.teste'` com a palavra-passe do AD |
+| O ecrã de login não mostra "Não está listado?" | O `dconf update` não foi corrido ou o GDM3 não foi reiniciado | 2.2.11, Passo 1 |
 
 ---
 
@@ -1120,4 +1632,7 @@ Formato: **Sintoma → Causa provável → Solução**.
 | 3 | 1.5, Passo 2 | Permissão de partilha do Grupo-Professores: *Full Control* ou *Change*. |
 | 4 | 1.5, Passo 4 | Nome do ficheiro de teste: `ficheiroteste.txt` ou `notas.txt`. |
 | 5 | 2.1 (nota inicial) | Se o enunciado exige `smb.conf` também na variante SSSD. |
-| 6 | 2.1.7, Passo 2 | Correção `ad_gpo_access_control = permissive`: se todos os alunos apanharem `su: System error`, passar a passo normal e acrescentá-la aos diapositivos. |
+| 6 | 2.1.8, Passo 2 | Correção `ad_gpo_access_control = permissive`: se todos os alunos apanharem `su: System error`, passar a passo normal e acrescentá-la aos diapositivos. |
+| 7 | 2.2.1, Passo 4 | A sincronização do relógio no cliente Winbind não aparece nos diapositivos, mas é necessária para o Kerberos: acrescentá-la aos diapositivos. |
+| 8 | 2.2.11, Passo 1 | O GDM3 só lê `/etc/dconf/db/gdm.d` se existir o perfil `/etc/dconf/profile/gdm` (no teste do colega funcionou). Confirmar no template novo. |
+| 9 | 2.2.2 e 2.2.8 | Template único: confirmar que o ADsys não interfere com o login dos utilizadores do Winbind e se aparece como perfil no `pam-auth-update`. |

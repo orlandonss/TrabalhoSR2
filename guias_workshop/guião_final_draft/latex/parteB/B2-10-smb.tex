@@ -1,0 +1,51 @@
+% 2.2.10
+% Ficheiro incluído por main.tex
+
+\subsection[Testar a partilha SMB do Windows Server]{Testar a partilha SMB do Windows Server}
+
+\esquema{2-2-10-smb}{Acesso à SRII com smbclient e palavra-passe}
+
+\passo{Passo 1 - Listar as partilhas e entrar na SRII como professor}
+
+\begin{lstlisting}[style=bashstyle]
+smbclient -L //SR2-SRV.isec.local -U 'ISEC\professor.teste'
+smbclient //SR2-SRV.isec.local/SRII -U 'ISEC\professor.teste'
+\end{lstlisting}
+
+\emph{Verificação esperada:} a lista mostra a partilha \textbf{SRII}; o segundo comando abre o prompt \texttt{smb: \textbackslash{}\textgreater{}}.
+
+\begin{simplesbox}
+Ao contrário de 2.1.5, aqui o \texttt{smbclient} autentica-se com a palavra-passe (\texttt{-U}) e não precisa de \texttt{kinit}.
+\end{simplesbox}
+
+\passo{Passo 2 - Testar a escrita (professor)}
+
+No prompt \texttt{smb: \textbackslash{}\textgreater{}}:
+
+\begin{lstlisting}[style=cfgstyle]
+ls
+mkdir teste-professor-winbind
+ls
+exit
+\end{lstlisting}
+
+\emph{Verificação esperada:} a pasta \texttt{teste-professor-winbind} aparece no segundo \texttt{ls}.
+
+\passo{Passo 3 - Entrar como aluno e testar a escrita}
+
+\begin{lstlisting}[style=bashstyle]
+smbclient //SR2-SRV.isec.local/SRII -U 'ISEC\aluno.teste'
+\end{lstlisting}
+
+No prompt \texttt{smb: \textbackslash{}\textgreater{}}:
+
+\begin{lstlisting}[style=cfgstyle]
+ls
+mkdir teste-aluno-winbind
+ls
+exit
+\end{lstlisting}
+
+\emph{Verificação esperada:} o aluno vê \texttt{teste-professor-winbind}, mas o \texttt{mkdir} dá \texttt{NT\_STATUS\_ACCESS\_DENIED making remote directory \textbackslash{}teste-aluno-winbind}: só tem leitura.
+
+\problemas{\hyperref[ec-b1-samba]{Erros Comuns - 2.1 Samba e SRII}}

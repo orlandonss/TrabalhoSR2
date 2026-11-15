@@ -1,0 +1,13 @@
+%% 2.2.9 Login com utilizador do AD (Winbind)
+sequenceDiagram
+    participant U as Utilizador (su -)
+    participant P as PAM (pam_winbind, pam_mkhomedir)
+    participant D as winbindd
+    participant DC as DC (SR2-SRV)
+    U->>P: professor.teste + palavra-passe
+    P->>D: Autenticar
+    D->>DC: Valida a palavra-passe no domínio
+    DC-->>D: OK + grupos
+    D-->>P: Autenticado
+    P->>P: pam_mkhomedir cria /home/professor.teste
+    P-->>U: Sessão aberta

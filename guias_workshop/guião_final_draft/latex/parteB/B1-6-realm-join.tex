@@ -1,0 +1,47 @@
+% 2.1.6
+% Ficheiro incluído por main.tex
+
+\subsection[Entrada no domínio: realmd e adcli]{Entrada no domínio: realmd e adcli}
+
+\esquema{2-1-6-realm-join}{Adesão ao domínio com realmd e adcli}
+
+\textbf{Objetivo:} o Ubuntu passar a ser \textbf{membro do domínio}. Até aqui só usava tickets pedidos à mão (\texttt{kinit}); o computador não existia no AD e não conhecia os utilizadores. O \texttt{realm join} cria a conta da máquina no AD (através do \texttt{adcli}) e configura o SSSD.
+
+\passo{Passo 1 - Ajustar o nome do cliente}
+
+\begin{lstlisting}[style=bashstyle]
+hostnamectl
+sudo hostnamectl set-hostname ubuclient
+hostnamectl
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{Static hostname: ubuclient}.
+
+\emph{Porquê:} o nome original do template (\texttt{user-ClientUbuntu}) tem 17 caracteres e o limite do nome NetBIOS no AD é \textbf{15}. Todos usam \texttt{ubuclient}: como cada aluno tem o seu DC na sua VLAN, o nome não colide entre colegas.
+
+\passo{Passo 2 - Descobrir o domínio}
+
+\begin{lstlisting}[style=bashstyle]
+realm discover isec.local
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{type: kerberos}, \texttt{realm-name: ISEC.LOCAL}, \texttt{server-software: active-directory}. Se falhar, repete 2.1.2 (Passo 12, DNS) e 2.1.4 (Passo 2, \texttt{krb5.conf}).
+
+\passo{Passo 3 - Fazer o join ao domínio}
+
+\begin{lstlisting}[style=bashstyle]
+sudo realm join -U Administrator isec.local
+\end{lstlisting}
+
+Pede a palavra-passe do \emph{Administrator} do domínio. \textbf{Silêncio = sucesso.} Cria o objeto da máquina no AD e gera \texttt{/\allowbreak{}etc/\allowbreak{}sssd/\allowbreak{}sssd.conf}.
+
+\passo{Passo 4 - Confirmar o join ao domínio}
+
+\begin{lstlisting}[style=bashstyle]
+realm list
+sudo systemctl status sssd --no-pager
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{realm list} mostra \texttt{configured: kerberos-member}; o \texttt{sssd} está \texttt{active (running)}.
+
+\problemas{\hyperref[ec-b1-sssd]{Erros Comuns - 2.1 Domínio e SSSD}}

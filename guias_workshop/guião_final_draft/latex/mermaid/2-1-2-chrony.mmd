@@ -1,8 +1,0 @@
-%% 2.1.2 Sincronização do relógio
-sequenceDiagram
-    participant C as Ubuntu (chrony)
-    participant W as Windows Server (W32Time)
-    Note over C,W: O Kerberos rejeita diferenças de hora superiores a 5 minutos
-    C->>W: Pedido NTP (UDP 123)
-    W-->>C: Resposta NTP com a hora do DC
-    C->>C: Ajusta o relógio local (fonte marcada com ^*)

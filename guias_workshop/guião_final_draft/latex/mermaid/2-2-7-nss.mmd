@@ -1,0 +1,17 @@
+%% 2.2.7 NSS com Winbind
+flowchart LR
+    subgraph CL["Cliente Winbind - UBU-WINBIND"]
+        ID["id / getent"]:::svc
+        NSS["NSS<br/>files systemd winbind"]:::svc
+        WBD["winbindd<br/>idmap rid<br/>UID = 10000 + RID"]:::svc
+    end
+    subgraph DC["Windows Server - SR2-SRV"]
+        AD["Active Directory<br/>utilizadores, grupos e RID"]:::svc
+    end
+    ID --> NSS --> WBD
+    WBD <-->|"RPC / LDAP"| AD
+    class CL,DC vm
+    classDef vm fill:#e8eef7,stroke:#1f497d,stroke-width:2px,color:#000
+    classDef svc fill:#ffffff,stroke:#1f497d,stroke-width:1px,color:#000
+    classDef net fill:#f3f3f3,stroke:#777,stroke-dasharray:4 3,color:#000
+    classDef ext fill:#fff4e5,stroke:#c77700,color:#000

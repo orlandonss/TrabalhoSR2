@@ -1,0 +1,13 @@
+%% 2.2.8 Perfis PAM no cliente Winbind
+\begin{tikzpicture}
+  \node[svc, text width=2.4cm] (pa) at (-5.6,0) {\texttt{pam-auth-update}};
+  \draw[caixa] (-3.60,-2.15) rectangle (2.60,2.35);
+  \node[caixatit] at (-3.48,2.27) {PAM - \texttt{/etc/pam.d/common-*}};
+  \node[svc, text width=5.4cm] (u) at (-0.5,1.35) {\textit{Unix authentication}\\\texttt{pam\_unix}};
+  \node[svc, text width=5.4cm] (w) at (-0.5,0.35) {\textit{Winbind NT/Active Directory authentication}\\\texttt{pam\_winbind}};
+  \node[svc, text width=5.4cm] (h) at (-0.5,-0.65) {\textit{Create home directory on login}\\\texttt{pam\_mkhomedir}};
+  \node[net, text width=5.4cm] (s) at (-0.5,-1.6) {\textit{SSS authentication} - desmarcado};
+  \node[svc, text width=1.9cm] (wbd) at (5.2,0.35) {\textbf{winbindd}};
+  \draw[seta] (pa.east) -- (-3.6,0.1) node[midway, above, rot] {ativa};
+  \draw[seta] (w.east) -- (wbd.west);
+\end{tikzpicture}

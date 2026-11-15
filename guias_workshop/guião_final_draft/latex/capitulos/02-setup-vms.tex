@@ -14,16 +14,21 @@ Abrir o Proxmox e selecionar a pool \textbf{\texttt{PoolStudentTemplates}}.
 
 \passo{Passo 2 - Localizar os templates do grupo}
 
-Localizar os templates do \textbf{Windows Server} e do \textbf{Ubuntu Client} do grupo.
+Localizar os templates do grupo:
+
+\begin{itemize}
+\item \textbf{Windows Server} - o Domain Controller (Parte A);
+\item \textbf{UbuntuClient} - o cliente Ubuntu, com os pacotes do SSSD e do Winbind. O mesmo template dá origem aos dois clientes: o da integração com SSSD (2.1, clonado agora) e o da integração com Winbind (2.2, clonado em 2.2.1).
+\end{itemize}
 
 \passo{Passo 3 - Clonar as duas VMs}
 
-Em cada template: \textbf{Clone} →
+No template do Windows Server e no \textbf{UbuntuClient}: \textbf{Clone} →
 
 \begin{itemize}
 \item \textbf{Mode:} \texttt{Linked Clone} (é importante selecionar \emph{Linked Clone} para não haver problemas);
 \item \textbf{Pool:} \texttt{\textless{}POOL\_GRUPO\textgreater{}} (a pool do teu grupo, ex.: \texttt{PoolTeamX});
-\item \textbf{Nome:} \texttt{WindowsServerADDS-grp\textless{}N\textgreater{}} para o Windows e \texttt{UbuntuClient-grp\textless{}N\textgreater{}} para o Ubuntu.
+\item \textbf{Nome:} \texttt{WindowsServerADDS-grp\textless{}N\textgreater{}} para o Windows e \texttt{UbuntuClient-SSSD-grp\textless{}N\textgreater{}} para o Ubuntu (o cliente da parte 2.1).
 \end{itemize}
 
 \passo{Passo 4 - Escolher a placa de rede (Windows Server)}
@@ -46,7 +51,7 @@ Repetir para a VM do Ubuntu, com a \textbf{mesma} bridge \texttt{\textless{}BRID
 
 \begin{notabox}[title={Nota}]
 \begin{itemize}
-\item Os templates já trazem os recursos (CPU/RAM/disco) e, no Ubuntu, as dependências instaladas (Kerberos, SSSD, Samba). \textbf{[VERIFICAR]} recursos mínimos, caso seja preciso criar uma VM de raiz.
+\item Os templates já trazem os recursos (CPU/RAM/disco) e \textbf{todas as dependências instaladas}: no workshop não é preciso instalar nenhum pacote. O template Ubuntu traz as duas variantes (SSSD e Winbind), mas como não podem estar ativas na mesma máquina, vem com \textbf{só o SSSD ativo} (o Winbind está desativado). O cliente SSSD confirma isso em 2.1.1; o cliente Winbind desativa o SSSD e ativa o Winbind em 2.2.2. \textbf{[VERIFICAR]} recursos mínimos, caso seja preciso criar uma VM de raiz.
 \item \textbf{[VERIFICAR]} O número da bridge corresponde à VLAN (ex.: \texttt{vmbr105} ↔ \texttt{192.168.105.0/\allowbreak{}24}). Confirmar com o docente a bridge/VLAN atribuída a cada aluno.
 \end{itemize}
 \end{notabox}

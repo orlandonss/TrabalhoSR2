@@ -1,0 +1,47 @@
+% 2.2.2
+% Ficheiro incluído por main.tex
+
+\subsection[Preparar o cliente: desativar o SSSD e ativar o Winbind]{Preparar o cliente: desativar o SSSD e ativar o Winbind}
+
+\esquema{2-2-2-trocar-variante}{Neste cliente desativa-se o SSSD e ativa-se o Winbind}
+
+\textbf{Objetivo:} este cliente foi clonado do mesmo template UbuntuClient, que vem com o SSSD ativo e o Winbind desativado. Aqui faz-se o contrário: desativa-se o SSSD e ativa-se o Winbind.
+
+\passo{Passo 1 - Parar e desativar o serviço SSSD}
+
+\begin{lstlisting}[style=bashstyle]
+sudo systemctl disable --now sssd
+systemctl is-enabled sssd
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{disabled}.
+
+\passo{Passo 2 - Retirar o SSSD do PAM}
+
+\begin{lstlisting}[style=bashstyle]
+sudo pam-auth-update --disable sss
+grep -c pam_sss /etc/pam.d/common-auth
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{0} (o \texttt{pam\_sss} já não está na pilha de autenticação).
+
+\passo{Passo 3 - Retirar o SSSD do NSS}
+
+\begin{lstlisting}[style=bashstyle]
+sudo cp -a /etc/nsswitch.conf /etc/nsswitch.conf.orig
+sudo sed -i -E '/^(passwd|group|shadow):/ s/ sss//' /etc/nsswitch.conf
+grep -E '^(passwd|group|shadow):' /etc/nsswitch.conf
+\end{lstlisting}
+
+\emph{Verificação esperada:} as linhas \texttt{passwd:}, \texttt{group:} e \texttt{shadow:} já não têm \texttt{sss}. O \texttt{winbind} é configurado no NSS em 2.2.7.
+
+\passo{Passo 4 - Ativar o serviço Winbind}
+
+\begin{lstlisting}[style=bashstyle]
+sudo systemctl enable winbind
+systemctl is-enabled winbind
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{enabled}. O serviço só arranca depois de configurado o \texttt{smb.conf} e feito o join (2.2.5, Passo 1).
+
+\problemas{\hyperref[ec-b2]{Erros Comuns - 2.2 Winbind}}

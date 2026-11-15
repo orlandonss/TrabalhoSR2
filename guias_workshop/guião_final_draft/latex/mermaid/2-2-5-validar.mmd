@@ -1,0 +1,13 @@
+%% 2.2.5 Validar a associação ao domínio
+sequenceDiagram
+    participant W as Ubuntu (wbinfo)
+    participant D as winbindd
+    participant DC as DC (SR2-SRV)
+    W->>D: wbinfo -t
+    D->>DC: Valida o segredo da máquina (RPC)
+    DC-->>D: OK
+    D-->>W: trust secret ... succeeded
+    W->>D: wbinfo -u / wbinfo -g
+    D->>DC: Pede utilizadores e grupos
+    DC-->>D: professor.teste, grupo-alunos, ...
+    D-->>W: Listas de utilizadores e grupos

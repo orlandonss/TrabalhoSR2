@@ -1,0 +1,9 @@
+%% 2.2.10 Acesso à SRII com smbclient e palavra-passe
+sequenceDiagram
+    participant S as Ubuntu (smbclient -U)
+    participant F as Servidor SMB (SR2-SRV:445)
+    S->>F: Sessão SMB com ISEC\utilizador e palavra-passe
+    F-->>S: Sessão aceite
+    S->>F: ls / mkdir na SRII
+    F->>F: Permissões de partilha + NTFS
+    F-->>S: Professor: mkdir OK<br/>Aluno: NT_STATUS_ACCESS_DENIED

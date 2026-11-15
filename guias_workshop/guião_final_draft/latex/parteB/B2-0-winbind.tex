@@ -1,0 +1,9 @@
+% 2.2 (abertura)
+% Ficheiro incluído por main.tex
+
+\clearpage
+\section[Integração com Winbind]{Integração com Winbind}
+
+\begin{notabox}[title={Nota}]
+Nesta variante o Ubuntu entra no domínio através do Samba (\texttt{net ads join}) e o serviço \textbf{Winbind} faz a ponte entre o Linux (NSS e PAM) e o Active Directory. Usa-se uma \textbf{VM nova}, clonada do mesmo template \textbf{UbuntuClient}, onde se desativa o SSSD e se ativa o Winbind (2.2.2): as duas variantes não podem estar ativas na mesma máquina. O Windows Server é o mesmo da Parte A (domínio, utilizadores, grupos e SRII já existem).
+\end{notabox}

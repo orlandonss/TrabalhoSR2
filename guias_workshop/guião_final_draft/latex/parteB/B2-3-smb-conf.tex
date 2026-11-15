@@ -1,0 +1,88 @@
+% 2.2.3
+% Ficheiro incluído por main.tex
+
+\subsection[Configuração do Samba (smb.conf)]{Configuração do Samba (\texttt{smb.conf})}
+
+\esquema{2-2-3-smb-conf}{O smb.conf define o Ubuntu como membro do domínio ISEC}
+
+\passo{Passo 1 - Guardar a configuração original}
+
+\begin{lstlisting}[style=bashstyle]
+sudo cp -a /etc/samba/smb.conf /etc/samba/smb.conf.bak
+\end{lstlisting}
+
+\passo{Passo 2 - Definir a secção \texttt{[global]}}
+
+\begin{lstlisting}[style=bashstyle]
+sudo nano /etc/samba/smb.conf
+\end{lstlisting}
+
+Substituir toda a secção \texttt{[global]} (até à linha \texttt{\#======================= Share Definitions =======================}) por:
+
+\begin{lstlisting}[style=cfgstyle]
+[global]
+    # Identificação do domínio Active Directory
+    workgroup = ISEC
+    realm = ISEC.LOCAL
+    security = ADS
+
+    # Nome NetBIOS (máximo 15 caracteres) - nome da máquina no AD
+    netbios name = UBU-WINBIND
+
+    # Mapeamento de identificadores Windows para Linux
+    idmap config * : backend = tdb
+    idmap config * : range = 3000-7999
+    idmap config ISEC : backend = rid
+    idmap config ISEC : range = 10000-999999
+
+    # Integração com Winbind
+    winbind use default domain = yes
+    winbind enum users = yes
+    winbind enum groups = yes
+    winbind refresh tickets = yes
+
+    # Ambiente dos utilizadores do domínio
+    template shell = /bin/bash
+    template homedir = /home/%U
+
+    # Integração com PAM
+    obey pam restrictions = yes
+\end{lstlisting}
+
+Guardar com \texttt{Ctrl+O}, \texttt{Enter}; sair com \texttt{Ctrl+X}.
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{0.32\linewidth}|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{Parâmetro} & \textbf{O que faz} \\
+\hline
+\texttt{workgroup}, \texttt{realm}, \texttt{security = ADS} & Domínio NetBIOS \texttt{ISEC}, realm Kerberos \texttt{ISEC.LOCAL} e modo membro de Active Directory \\
+\hline
+\texttt{netbios name = UBU-WINBIND} & Nome da máquina no AD. É diferente do cliente SSSD (\texttt{UBUCLIENT}), por isso os dois podem estar no mesmo domínio \\
+\hline
+\texttt{idmap config * : ...} (\texttt{tdb}) & UIDs/GIDs para contas fora do domínio (ex.: \texttt{BUILTIN}), entre 3000 e 7999 \\
+\hline
+\texttt{idmap config ISEC : ...} (\texttt{rid}) & UIDs/GIDs dos utilizadores do domínio calculados a partir do RID do AD (10000 + RID): são sempre os mesmos \\
+\hline
+\texttt{winbind use default domain = yes} & Os utilizadores escrevem-se sem domínio: \texttt{professor.teste} em vez de \texttt{ISEC\textbackslash{}professor.teste} \\
+\hline
+\texttt{winbind enum users/\allowbreak{}groups = yes} & Permite listar todos os utilizadores e grupos (\texttt{wbinfo -u}, \texttt{wbinfo -g}) \\
+\hline
+\texttt{winbind refresh tickets = yes} & Renova automaticamente os tickets Kerberos dos utilizadores \\
+\hline
+\texttt{template shell}, \texttt{template homedir} & Shell e pasta pessoal dos utilizadores do domínio (\texttt{/\allowbreak{}home/\allowbreak{}professor.teste}) \\
+\hline
+\texttt{obey pam restrictions = yes} & O Samba respeita as regras do PAM \\
+\hline
+\end{tabularx}
+\end{center}
+
+\passo{Passo 3 - Verificar e validar a sintaxe}
+
+\begin{lstlisting}[style=bashstyle]
+sudo testparm -s
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{Loaded services file OK.} e \textbf{\texttt{Server role: ROLE\_DOMAIN\_MEMBER}}, seguido dos parâmetros da \texttt{[global]}. O aviso \texttt{Weak crypto is allowed by GnuTLS} é normal.
+
+\problemas{\hyperref[ec-b2]{Erros Comuns - 2.2 Winbind}}

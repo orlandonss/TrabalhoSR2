@@ -1,0 +1,65 @@
+% 2.2.4
+% Ficheiro incluído por main.tex
+
+\subsection[Configuração do Kerberos e adesão ao domínio]{Configuração do Kerberos e adesão ao domínio}
+
+\esquema{2-2-4-net-ads-join}{Adesão ao domínio com net ads join}
+
+\passo{Passo 1 - Guardar a configuração original}
+
+\begin{lstlisting}[style=bashstyle]
+sudo cp -a /etc/krb5.conf /etc/krb5.conf.bak
+\end{lstlisting}
+
+\passo{Passo 2 - Escrever o \texttt{krb5.conf} (substituir todo o conteúdo)}
+
+\begin{lstlisting}[style=bashstyle]
+sudo tee /etc/krb5.conf > /dev/null << 'EOF'
+[libdefaults]
+    default_realm = ISEC.LOCAL
+    dns_lookup_realm = false
+    dns_lookup_kdc = true
+    rdns = false
+    ticket_lifetime = 24h
+    forwardable = true
+
+[realms]
+    ISEC.LOCAL = {
+        kdc = SR2-SRV.isec.local
+        admin_server = SR2-SRV.isec.local
+    }
+
+[domain_realm]
+    .isec.local = ISEC.LOCAL
+    isec.local = ISEC.LOCAL
+EOF
+cat /etc/krb5.conf
+\end{lstlisting}
+
+É o mesmo ficheiro de 2.1.4, Passo 2, com mais duas linhas: \texttt{ticket\_lifetime = 24h} (validade dos tickets) e \texttt{forwardable = true} (tickets que podem ser reencaminhados para outros serviços).
+
+\passo{Passo 3 - Testar a autenticação Kerberos}
+
+\begin{lstlisting}[style=bashstyle]
+kinit professor.teste@ISEC.LOCAL
+klist
+\end{lstlisting}
+
+\emph{Verificação esperada:} o \texttt{kinit} pede a palavra-passe e não mostra mais nada; o \texttt{klist} mostra \texttt{Default principal: professor.teste@ISEC.LOCAL} e o ticket \texttt{krbtgt/\allowbreak{}ISEC.LOCAL@ISEC.LOCAL}.
+
+\passo{Passo 4 - Juntar a máquina ao domínio (cria a conta de computador no AD)}
+
+\begin{lstlisting}[style=bashstyle]
+sudo net ads join -U Administrator
+\end{lstlisting}
+
+Pede a palavra-passe do \emph{Administrator} do domínio.
+
+\emph{Verificação esperada:}
+
+\begin{lstlisting}[style=cfgstyle]
+Using short domain name -- ISEC
+Joined 'UBU-WINBIND' to dns domain 'isec.local'
+\end{lstlisting}
+
+\problemas{\hyperref[ec-b2]{Erros Comuns - 2.2 Winbind}}

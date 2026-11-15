@@ -1,0 +1,16 @@
+%% 2.2.8 Perfis PAM no cliente Winbind
+flowchart LR
+    PA["pam-auth-update"]:::svc
+    subgraph PAM["PAM - /etc/pam.d/common-*"]
+        U["Unix authentication<br/>pam_unix"]:::svc
+        W["Winbind NT/Active Directory authentication<br/>pam_winbind"]:::svc
+        H["Create home directory on login<br/>pam_mkhomedir"]:::svc
+        S["SSS authentication - desmarcado"]:::net
+    end
+    WBD["winbindd"]:::svc
+    PA -->|"ativa"| PAM
+    W --> WBD
+    classDef vm fill:#e8eef7,stroke:#1f497d,stroke-width:2px,color:#000
+    classDef svc fill:#ffffff,stroke:#1f497d,stroke-width:1px,color:#000
+    classDef net fill:#f3f3f3,stroke:#777,stroke-dasharray:4 3,color:#000
+    classDef ext fill:#fff4e5,stroke:#c77700,color:#000

@@ -34,7 +34,7 @@ No fim do workshop, cada aluno terá:
 \item Autenticação \textbf{Kerberos} a funcionar (\texttt{kinit} / \texttt{klist}) e acesso à SRII com o ticket (\texttt{smbclient}).
 \item O Ubuntu \textbf{membro do domínio} (\texttt{realm join}), com os utilizadores do AD visíveis pelo \textbf{SSSD} e login com contas do AD via \textbf{PAM} (home criada automaticamente).
 \item \textbf{Montagem automática da SRII no login} (\texttt{pam\_mount}).
-\item A variante de integração com \textbf{Winbind} (em preparação).
+\item Um \textbf{segundo cliente Ubuntu} integrado no mesmo domínio com \textbf{Samba + Winbind} (\texttt{net ads join}), com login por terminal e gráfico (GDM3) e acesso à SRII.
 \end{enumerate}
 
 \section*{Topologia}
@@ -60,7 +60,9 @@ Cada aluno trabalha na sua VLAN \texttt{X}, com o seu DC e o seu cliente. O DC �
 \hline
 \texttt{\textless{}IP\_DC\textgreater{}} & IP do Windows Server, no formato \texttt{192.168.X.Y} (Y entre 2 e 254) & \texttt{192.168.105.2} \\
 \hline
-\texttt{\textless{}IP\_CLIENTE\textgreater{}} & IP do Ubuntu, no formato \texttt{192.168.X.Y} (Y entre 2 e 254, diferente do DC) & \texttt{192.168.105.3} \\
+\texttt{\textless{}IP\_CLIENTE\textgreater{}} & IP do cliente Ubuntu SSSD, no formato \texttt{192.168.X.Y} (Y entre 2 e 254, diferente do DC) & \texttt{192.168.105.3} \\
+\hline
+\texttt{\textless{}IP\_CLIENTE\_WB\textgreater{}} & IP do cliente Ubuntu Winbind (2.2), no formato \texttt{192.168.X.Y} (diferente dos outros dois) & \texttt{192.168.105.4} \\
 \hline
 \texttt{/\allowbreak{}24} · \texttt{255.255.255.0} & Máscara da VLAN & - \\
 \hline
@@ -86,7 +88,9 @@ Nome NetBIOS do domínio & \texttt{ISEC} \\
 \hline
 Nome do Windows Server & \texttt{SR2-SRV} → FQDN \texttt{SR2-SRV.isec.local} \\
 \hline
-Nome do cliente Ubuntu (máx. \textbf{15} caracteres) & \texttt{ubuclient} \\
+Nome do cliente SSSD (máx. \textbf{15} caracteres) & \texttt{ubuclient} (no AD: \texttt{UBUCLIENT}) \\
+\hline
+Nome do cliente Winbind no AD (\texttt{netbios name}) & \texttt{UBU-WINBIND} \\
 \hline
 Placa de rede do Ubuntu & \texttt{ens18} (confirmar com \texttt{ip -br a}) \\
 \hline

@@ -19,15 +19,27 @@ Esquemas disponíveis:
   1-4-grupos-utilizadores 1.4
   1-5-partilha-srii       1.5
   1-6-firewall            1.6
-  2-1-1-rede-dns          2.1.1
-  2-1-2-chrony            2.1.2
-  2-1-3-kerberos          2.1.3
-  2-1-4-samba             2.1.4
-  2-1-5-realm-join        2.1.5
-  2-1-6-sssd              2.1.6
-  2-1-7-pam               2.1.7
-  2-1-8-srii-dominio      2.1.8
-  2-1-9-pam-mount         2.1.9
+  2-1-1-desativar-winbind 2.1.1
+  2-1-2-rede-dns          2.1.2
+  2-1-3-chrony            2.1.3
+  2-1-4-kerberos          2.1.4
+  2-1-5-samba             2.1.5
+  2-1-6-realm-join        2.1.6
+  2-1-7-sssd              2.1.7
+  2-1-8-pam               2.1.8
+  2-1-9-srii-dominio      2.1.9
+  2-1-10-pam-mount        2.1.10
+  2-2-1-novo-cliente      2.2.1
+  2-2-2-trocar-variante   2.2.2
+  2-2-3-smb-conf          2.2.3
+  2-2-4-net-ads-join      2.2.4
+  2-2-5-validar           2.2.5
+  2-2-6-diagnostico       2.2.6
+  2-2-7-nss               2.2.7
+  2-2-8-pam               2.2.8
+  2-2-9-login             2.2.9
+  2-2-10-smb              2.2.10
+  2-2-11-gdm3             2.2.11
 
 Para gerar: colar o .mmd em https://mermaid.live e exportar PNG/SVG,
 ou com o mermaid-cli:  mmdc -i ../mermaid/00-topologia.mmd -o 00-topologia.png -s 3

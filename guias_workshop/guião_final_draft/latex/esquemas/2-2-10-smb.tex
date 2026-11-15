@@ -1,0 +1,16 @@
+%% 2.2.10 Acesso à SRII com smbclient e palavra-passe
+\begin{tikzpicture}
+  \node[vm, text width=3.20cm, font=\footnotesize] (s) at (-3.50,0) {Ubuntu\\(\texttt{smbclient -U})};
+  \node[vm, text width=3.20cm, font=\footnotesize] (f) at (3.50,0) {Servidor SMB\\(\texttt{SR2-SRV}:445)};
+  \draw[vida] (s.south) -- (-3.50,-6.20);
+  \draw[vida] (f.south) -- (3.50,-6.20);
+  \draw[seta] (-3.50,-1.60) -- (3.50,-1.60);
+  \node[rot, anchor=south] at (0.00,-1.56) {Sessão SMB com \texttt{ISEC\textbackslash{}utilizador} e palavra-passe};
+  \draw[setad] (3.50,-2.43) -- (-3.50,-2.43);
+  \node[rot, anchor=south] at (0.00,-2.39) {Sessão aceite};
+  \draw[seta] (-3.50,-3.26) -- (3.50,-3.26);
+  \node[rot, anchor=south] at (0.00,-3.22) {\texttt{ls} / \texttt{mkdir} na SRII};
+  \node[acao, text width=2.9cm] at (3.50,-4.14) {Permissões de partilha + NTFS};
+  \draw[setad] (3.50,-5.62) -- (-3.50,-5.62);
+  \node[rot, text width=6.65cm, anchor=south] at (0.00,-5.58) {Professor: \texttt{mkdir} OK\\Aluno: \texttt{NT\_STATUS\_ACCESS\_DENIED}};
+\end{tikzpicture}

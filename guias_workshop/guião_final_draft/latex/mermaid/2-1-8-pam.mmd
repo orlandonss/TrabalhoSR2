@@ -1,0 +1,15 @@
+%% 2.1.8 Login com contas do AD: PAM
+sequenceDiagram
+    participant U as Utilizador (su -)
+    participant P as PAM (pam_sss + pam_mkhomedir)
+    participant S as SSSD
+    participant K as KDC (SR2-SRV:88)
+    U->>P: aluno.teste@isec.local + palavra-passe
+    P->>S: Autenticar
+    S->>K: Valida a palavra-passe (Kerberos)
+    K-->>S: OK
+    S-->>P: Autenticado e com acesso
+    P->>P: pam_mkhomedir cria /home/aluno.teste@isec.local
+    P-->>U: Sessão aberta
+    U->>K: kinit dentro da sessão
+    K-->>U: TGT do utilizador do domínio

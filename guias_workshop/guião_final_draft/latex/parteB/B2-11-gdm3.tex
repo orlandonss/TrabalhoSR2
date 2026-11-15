@@ -1,0 +1,46 @@
+% 2.2.11
+% Ficheiro incluído por main.tex
+
+\subsection[Início de sessão gráfico com AD (GDM3)]{Início de sessão gráfico com AD (GDM3)}
+
+\esquema{2-2-11-gdm3}{Login gráfico com um utilizador do AD}
+
+\passo{Passo 1 - Configurar o GDM3 para permitir escrever o nome do utilizador}
+
+\begin{lstlisting}[style=bashstyle]
+sudo mkdir -p /etc/dconf/db/gdm.d
+sudo tee /etc/dconf/db/gdm.d/00-login-ad > /dev/null << 'EOF'
+[org/gnome/login-screen]
+disable-user-list=true
+EOF
+sudo cat /etc/dconf/db/gdm.d/00-login-ad
+sudo dconf update
+sudo systemctl restart gdm3
+\end{lstlisting}
+
+\texttt{disable-user-list=true} esconde a lista de utilizadores locais e deixa escrever qualquer nome, incluindo os do AD.
+
+\begin{simplesbox}
+O \texttt{systemctl restart gdm3} fecha a sessão gráfica: guarda o que estiveres a fazer antes de o correr.
+\end{simplesbox}
+
+\emph{Verificação esperada:} o ecrã de login mostra a opção \textbf{"Não está listado?"}.
+
+\passo{Passo 2 - Testar o início de sessão gráfico com \texttt{professor.teste} e \texttt{aluno.teste}}
+
+No ecrã de login: \textbf{Não está listado?} → escrever \texttt{professor.teste} → palavra-passe do AD. Repetir depois com \texttt{aluno.teste}.
+
+\emph{Verificação esperada:} entra no ambiente de trabalho do utilizador do domínio (no primeiro login, a pasta pessoal é criada).
+
+\passo{Passo 3 - Confirmar a autenticação e os grupos do domínio}
+
+Abrir um terminal na sessão gráfica:
+
+\begin{lstlisting}[style=bashstyle]
+whoami
+id
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{whoami} → \texttt{aluno.teste}; o \texttt{id} inclui \texttt{domain users} e \texttt{grupo-alunos}: a autenticação e os grupos vêm do domínio \texttt{isec.local}, através do Winbind.
+
+\problemas{\hyperref[ec-b2]{Erros Comuns - 2.2 Winbind}}

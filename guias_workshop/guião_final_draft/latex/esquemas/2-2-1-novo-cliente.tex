@@ -1,0 +1,13 @@
+%% 2.2.1 Novo cliente Winbind
+\begin{tikzpicture}
+  \node[svc, text width=3.4cm] (t) at (4.6,2.75) {Template\\\texttt{UbuntuClient-Winbind}};
+  \draw[caixa] (-6.80,-1.60) rectangle (6.80,1.60);
+  \node[caixatit] at (-6.68,1.52) {VLAN X - bridge \ph{BRIDGE} - domínio \texttt{isec.local}};
+  \node[vm, text width=3.3cm, fill=black!5, draw=azul!50] (cl) at (-4.6,-0.15) {Cliente SSSD\\\texttt{UBUCLIENT}\\\ph{IP\_CLIENTE}};
+  \node[vm, text width=3.3cm] (dc) at (0,-0.15) {Windows Server\\\texttt{SR2-SRV}\\\ph{IP\_DC}};
+  \node[vm, text width=3.3cm] (wb) at (4.6,-0.15) {\textbf{Cliente Winbind}\\\texttt{UBU-WINBIND}\\\ph{IP\_CLIENTE\_WB}};
+  \draw[seta] (t) -- (wb) node[midway, right, rot] {Linked Clone};
+  \draw[linha, dashed] (cl) -- (dc);
+  \draw[duplo] (wb) -- (dc);
+  \node[rot, text width=4.2cm] at (0,-1.95) {o mesmo DC e a mesma SRII da Parte A};
+\end{tikzpicture}

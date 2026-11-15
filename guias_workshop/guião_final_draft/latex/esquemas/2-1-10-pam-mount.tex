@@ -1,0 +1,23 @@
+%% 2.1.10 Montagem automática da SRII no login
+\begin{tikzpicture}
+  \node[vm, text width=3.20cm, font=\footnotesize] (u) at (-5.75,0) {Utilizador\\(\texttt{su -})};
+  \node[vm, text width=3.20cm, font=\footnotesize] (p) at (-1.92,0) {PAM\\(\texttt{pam\_sss}, \texttt{pam\_mount})};
+  \node[vm, text width=3.20cm, font=\footnotesize] (m) at (1.92,0) {\texttt{mount.cifs}};
+  \node[vm, text width=3.20cm, font=\footnotesize] (f) at (5.75,0) {Servidor SMB\\(porta 445)};
+  \draw[vida] (u.south) -- (-5.75,-8.62);
+  \draw[vida] (p.south) -- (-1.92,-8.62);
+  \draw[vida] (m.south) -- (1.92,-8.62);
+  \draw[vida] (f.south) -- (5.75,-8.62);
+  \draw[seta] (-5.75,-1.93) -- (-1.92,-1.93);
+  \node[rot, text width=3.48cm, anchor=south] at (-3.83,-1.89) {Login com utilizador e palavra-passe do AD};
+  \node[acao, text width=2.9cm] at (-1.92,-2.81) {\texttt{pam\_sss} autentica (SSSD + Kerberos)};
+  \draw[seta] (-1.92,-4.29) -- (1.92,-4.29);
+  \node[rot, text width=3.48cm, anchor=south] at (0.00,-4.25) {\texttt{pam\_mount} passa a palavra-passe};
+  \draw[seta] (1.92,-5.45) -- (5.75,-5.45);
+  \node[rot, text width=3.48cm, anchor=south] at (3.83,-5.41) {Sessão SMB (\texttt{sec=ntlmssp}, \texttt{domain=ISEC})};
+  \draw[setad] (5.75,-6.28) -- (1.92,-6.28);
+  \node[rot, anchor=south] at (3.83,-6.24) {Partilha SRII montada};
+  \draw[setad] (1.92,-7.11) -- (-5.75,-7.11);
+  \node[rot, anchor=south] at (-1.92,-7.07) {\texttt{\textasciitilde/SRII} disponível com as permissões do AD};
+  \node[nota, text width=14.30cm] at (0.00,-7.86) {No logout, o \texttt{pam\_mount} desmonta \texttt{\textasciitilde/SRII}};
+\end{tikzpicture}

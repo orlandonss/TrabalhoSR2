@@ -1,0 +1,14 @@
+%% 2.2.3 smb.conf
+flowchart LR
+    SC["/etc/samba/smb.conf<br/>secção [global]"]:::svc
+    subgraph P["Parâmetros principais"]
+        P1["Domínio: workgroup = ISEC<br/>realm = ISEC.LOCAL - security = ADS"]:::svc
+        P2["IDs: idmap tdb (*) + rid (ISEC)"]:::svc
+        P3["Winbind e PAM: winbind ...<br/>template homedir = /home/%U"]:::svc
+    end
+    TP["testparm -s<br/>ROLE_DOMAIN_MEMBER"]:::svc
+    SC --> P -->|"valida"| TP
+    classDef vm fill:#e8eef7,stroke:#1f497d,stroke-width:2px,color:#000
+    classDef svc fill:#ffffff,stroke:#1f497d,stroke-width:1px,color:#000
+    classDef net fill:#f3f3f3,stroke:#777,stroke-dasharray:4 3,color:#000
+    classDef ext fill:#fff4e5,stroke:#c77700,color:#000

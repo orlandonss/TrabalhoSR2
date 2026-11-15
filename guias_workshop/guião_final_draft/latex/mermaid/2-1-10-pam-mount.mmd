@@ -1,0 +1,13 @@
+%% 2.1.10 Montagem automática da SRII no login (pam_mount)
+sequenceDiagram
+    participant U as Utilizador (su -)
+    participant P as PAM (pam_sss + pam_mount)
+    participant M as mount.cifs
+    participant F as Servidor SMB (SR2-SRV:445)
+    U->>P: Login com utilizador e palavra-passe do AD
+    P->>P: pam_sss autentica (SSSD + Kerberos)
+    P->>M: pam_mount passa a palavra-passe do login
+    M->>F: Sessão SMB - sec=ntlmssp, domain=ISEC
+    F-->>M: Partilha SRII montada
+    M-->>U: ~/SRII disponível com as permissões do AD
+    Note over U,F: No logout o pam_mount desmonta ~/SRII

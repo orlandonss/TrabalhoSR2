@@ -1,0 +1,13 @@
+%% 2.1.3 Sincronização do relógio
+\begin{tikzpicture}
+  \node[vm, text width=3.20cm, font=\footnotesize] (c) at (-3.50,0) {Ubuntu\\(\texttt{chrony})};
+  \node[vm, text width=3.20cm, font=\footnotesize] (w) at (3.50,0) {Windows Server\\(W32Time)};
+  \draw[vida] (c.south) -- (-3.50,-5.14);
+  \draw[vida] (w.south) -- (3.50,-5.14);
+  \node[nota, text width=9.80cm] at (0.00,-1.52) {O Kerberos rejeita diferenças de hora superiores a 5 minutos};
+  \draw[seta] (-3.50,-2.53) -- (3.50,-2.53);
+  \node[rot, anchor=south] at (0.00,-2.49) {Pedido NTP (UDP 123)};
+  \draw[setad] (3.50,-3.36) -- (-3.50,-3.36);
+  \node[rot, anchor=south] at (0.00,-3.32) {Resposta NTP com a hora do DC};
+  \node[acao, text width=2.9cm] at (-3.50,-4.24) {Ajusta o relógio local};
+\end{tikzpicture}

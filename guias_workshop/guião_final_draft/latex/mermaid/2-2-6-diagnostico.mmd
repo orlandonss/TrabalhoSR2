@@ -1,0 +1,12 @@
+%% 2.2.6 Diagnosticar o Winbind
+sequenceDiagram
+    participant W as Ubuntu (wbinfo)
+    participant D as winbindd
+    participant DC as DC (SR2-SRV)
+    W->>D: wbinfo --ping-dc
+    D->>DC: NETLOGON
+    DC-->>D: Resposta do DC
+    D-->>W: dc connection ... succeeded
+    W->>D: wbinfo -i professor.teste
+    D->>D: idmap rid - UID = 10000 + RID
+    D-->>W: professor.teste:*:11103:10513:...

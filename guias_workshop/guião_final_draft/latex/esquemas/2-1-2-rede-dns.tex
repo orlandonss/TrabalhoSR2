@@ -1,0 +1,15 @@
+%% 2.1.2 Ubuntu: IP estático e DNS do Windows
+\begin{tikzpicture}
+  \draw[caixa] (-7.00,-2.00) rectangle (-0.50,1.90);
+  \node[caixatit] at (-6.88,1.82) {Ubuntu Client - \texttt{ubuclient}};
+  \draw[caixa] (1.60,-2.00) rectangle (7.00,1.90);
+  \node[caixatit] at (1.72,1.82) {Windows Server - \texttt{SR2-SRV}};
+  \node[svc, text width=5.4cm] (nm) at (-3.75,0.85) {NetworkManager - perfil \texttt{labX}\\\texttt{ens18}: \ph{IP\_CLIENTE}/24};
+  \node[svc, text width=2.4cm] (nss) at (-5.35,-0.9) {\texttt{nsswitch.conf}\\\texttt{hosts: files dns}};
+  \node[svc, text width=2.4cm] (res) at (-2.1,-0.9) {systemd-resolved\\DNS = \ph{IP\_DC}};
+  \node[svc, text width=3.6cm] (srv) at (4.3,0.85) {\texttt{SR2-SRV}\\\ph{IP\_DC}};
+  \node[svc, text width=3.6cm] (dns) at (4.3,-0.9) {DNS \texttt{isec.local}\\registos A e SRV};
+  \draw[seta] (nm.east) -- (srv.west) node[midway, above, rot] {ping (ICMP)};
+  \draw[seta] (nss.east) -- (res.west);
+  \draw[seta] (res.east) -- (dns.west) node[midway, above, rot, text width=2.6cm] {consultas DNS\\UDP/TCP 53};
+\end{tikzpicture}

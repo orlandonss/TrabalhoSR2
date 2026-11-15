@@ -1,0 +1,12 @@
+%% 2.1.1 Preparar o cliente: desativar o Winbind
+flowchart TB
+    subgraph CL["Cliente SSSD - clone do template UbuntuClient"]
+        A["SSSD - fica ativo<br/>sssd, pam_sss, NSS sss"]:::svc
+        B["Winbind - desativado no template<br/>winbind, pam_winbind, NSS winbind"]:::net
+        P["PAM e NSS do cliente"]:::svc
+    end
+    A --> P
+    B -.->|"desligado"| P
+    classDef vm fill:#e8eef7,stroke:#1f497d,stroke-width:2px,color:#000
+    classDef svc fill:#ffffff,stroke:#1f497d,stroke-width:1px,color:#000
+    classDef net fill:#f3f3f3,stroke:#777,stroke-dasharray:4 3,color:#000

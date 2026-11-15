@@ -1,0 +1,12 @@
+%% 2.2.3 smb.conf
+\begin{tikzpicture}
+  \node[svc, text width=3.2cm] (sc) at (-5.0,0) {\texttt{/etc/samba/smb.conf}\\secção \texttt{[global]}};
+  \draw[caixa] (-2.00,-1.95) rectangle (3.00,1.95);
+  \node[caixatit] at (-1.88,1.87) {Parâmetros principais};
+  \node[svc, text width=4.3cm] (p1) at (0.5,1.0) {\textbf{Domínio}: \texttt{workgroup = ISEC}\\\texttt{realm = ISEC.LOCAL} - \texttt{security = ADS}};
+  \node[svc, text width=4.3cm] (p2) at (0.5,-0.1) {\textbf{IDs}: \texttt{idmap} \texttt{tdb} (\texttt{*}) + \texttt{rid} (\texttt{ISEC})};
+  \node[svc, text width=4.3cm] (p3) at (0.5,-1.15) {\textbf{Winbind e PAM}: \texttt{winbind ...}\\\texttt{template homedir = /home/\%U}};
+  \node[svc, text width=2.6cm] (tp) at (5.3,0) {\texttt{testparm -s}\\\texttt{ROLE\_DOMAIN\_MEMBER}};
+  \draw[seta] (sc.east) -- (-2.0,0);
+  \draw[seta] (3.0,0) -- (tp.west) node[midway, above, rot] {valida};
+\end{tikzpicture}

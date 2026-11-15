@@ -1,0 +1,24 @@
+%% 2.1.6 Entrada no domínio com realmd e adcli
+\begin{tikzpicture}
+  \node[vm, text width=3.20cm, font=\footnotesize] (r) at (-5.75,0) {Ubuntu\\(\texttt{realm}, \texttt{adcli})};
+  \node[vm, text width=3.20cm, font=\footnotesize] (d) at (-1.92,0) {DNS\\(porta 53)};
+  \node[vm, text width=3.20cm, font=\footnotesize] (k) at (1.92,0) {KDC\\(porta 88)};
+  \node[vm, text width=3.20cm, font=\footnotesize] (l) at (5.75,0) {LDAP do AD\\(porta 389)};
+  \draw[vida] (r.south) -- (-5.75,-8.19);
+  \draw[vida] (d.south) -- (-1.92,-8.19);
+  \draw[vida] (k.south) -- (1.92,-8.19);
+  \draw[vida] (l.south) -- (5.75,-8.19);
+  \draw[seta] (-5.75,-1.60) -- (-1.92,-1.60);
+  \node[rot, anchor=south] at (-3.83,-1.56) {\texttt{realm discover}: SRV \texttt{\_ldap}};
+  \draw[setad] (-1.92,-2.76) -- (-5.75,-2.76);
+  \node[rot, text width=3.48cm, anchor=south] at (-3.83,-2.72) {\texttt{SR2-SRV} (active-directory)};
+  \draw[seta] (-5.75,-3.59) -- (1.92,-3.59);
+  \node[rot, anchor=south] at (-1.92,-3.55) {Autentica o Administrator};
+  \draw[setad] (1.92,-4.42) -- (-5.75,-4.42);
+  \node[rot, anchor=south] at (-1.92,-4.38) {Ticket do Administrator};
+  \draw[seta] (-5.75,-5.25) -- (5.75,-5.25);
+  \node[rot, anchor=south] at (0.00,-5.21) {Cria a conta de computador \texttt{UBUCLIENT}};
+  \draw[setad] (5.75,-6.08) -- (-5.75,-6.08);
+  \node[rot, anchor=south] at (0.00,-6.04) {Conta criada};
+  \node[acao, text width=2.9cm] at (-5.75,-7.12) {Gera a keytab e o \texttt{sssd.conf}; arranca o SSSD};
+\end{tikzpicture}

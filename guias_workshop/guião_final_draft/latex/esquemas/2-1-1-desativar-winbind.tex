@@ -1,0 +1,10 @@
+%% 2.1.1 Preparar o cliente: desativar o Winbind
+\begin{tikzpicture}
+  \draw[caixa] (-6.90,-2.20) rectangle (6.90,2.00);
+  \node[caixatit] at (-6.78,1.92) {Cliente SSSD - clone do template \texttt{UbuntuClient}};
+  \node[svc, text width=5.4cm] (a) at (-3.3,0.75) {\textbf{SSSD} - fica ativo\\\texttt{sssd}, \texttt{pam\_sss}, NSS \texttt{sss}};
+  \node[net, text width=5.4cm] (b) at (3.3,0.75) {\textbf{Winbind} - desativado no template\\\texttt{winbind}, \texttt{pam\_winbind}, NSS \texttt{winbind}};
+  \node[svc, text width=4.6cm, fill=azul!8] (p) at (0,-1.2) {PAM e NSS do cliente};
+  \draw[seta] (a.south) -- (p);
+  \draw[setad, draw=black!40] (b.south) -- (p) node[midway, rot, text=black!70] {desligado};
+\end{tikzpicture}

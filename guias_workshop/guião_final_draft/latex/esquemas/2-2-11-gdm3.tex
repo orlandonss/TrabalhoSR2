@@ -1,0 +1,24 @@
+%% 2.2.11 Login gráfico com AD (GDM3)
+\begin{tikzpicture}
+  \node[vm, text width=3.20cm, font=\footnotesize] (g) at (-5.75,0) {Ecrã de login\\(GDM3)};
+  \node[vm, text width=3.20cm, font=\footnotesize] (p) at (-1.92,0) {PAM\\(\texttt{pam\_winbind})};
+  \node[vm, text width=3.20cm, font=\footnotesize] (d) at (1.92,0) {\texttt{winbindd}};
+  \node[vm, text width=3.20cm, font=\footnotesize] (dc) at (5.75,0) {DC\\(\texttt{SR2-SRV})};
+  \draw[vida] (g.south) -- (-5.75,-8.52);
+  \draw[vida] (p.south) -- (-1.92,-8.52);
+  \draw[vida] (d.south) -- (1.92,-8.52);
+  \draw[vida] (dc.south) -- (5.75,-8.52);
+  \node[acao, text width=2.9cm] at (-5.75,-1.81) {\textit{Não está listado?}\\(\texttt{disable-user-list=true})};
+  \draw[seta] (-5.75,-3.46) -- (-1.92,-3.46);
+  \node[rot, text width=3.48cm, anchor=south] at (-3.83,-3.42) {\texttt{aluno.teste} + palavra-passe};
+  \draw[seta] (-1.92,-4.29) -- (1.92,-4.29);
+  \node[rot, anchor=south] at (0.00,-4.25) {Autenticar};
+  \draw[seta] (1.92,-5.12) -- (5.75,-5.12);
+  \node[rot, anchor=south] at (3.83,-5.08) {Valida no domínio};
+  \draw[setad] (5.75,-5.95) -- (1.92,-5.95);
+  \node[rot, anchor=south] at (3.83,-5.91) {OK + grupos};
+  \draw[setad] (1.92,-6.78) -- (-1.92,-6.78);
+  \node[rot, anchor=south] at (0.00,-6.74) {Autenticado};
+  \draw[setad] (-1.92,-7.94) -- (-5.75,-7.94);
+  \node[rot, text width=3.48cm, anchor=south] at (-3.83,-7.90) {Abre a sessão gráfica do utilizador do AD};
+\end{tikzpicture}

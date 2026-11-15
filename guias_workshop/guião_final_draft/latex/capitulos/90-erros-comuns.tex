@@ -49,23 +49,23 @@ Aluno consegue escrever na SRII & Aluno também no Grupo-Professores, ou \emph{M
 
 \phantomsection\label{ec-b1-rede}
 
-\section*{Parte B - SSSD: Rede e DNS do cliente (2.1.1)}
-\addcontentsline{toc}{section}{Parte B - SSSD: Rede e DNS do cliente (2.1.1)}
+\section*{Parte B - SSSD: Rede e DNS do cliente (2.1.2)}
+\addcontentsline{toc}{section}{Parte B - SSSD: Rede e DNS do cliente (2.1.2)}
 
 \begin{center}\small
 \begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
 \hline
 \rowcolor{azul!10}\textbf{Sintoma} & \textbf{Causa provável} & \textbf{Solução} \\
 \hline
-\texttt{Conflicting default route} no \texttt{netplan apply} & Mais de um ficheiro ou método a configurar a mesma placa & Ficar com um único método: repetir 2.1.1, Passos 2 a 5 \\
+\texttt{Conflicting default route} no \texttt{netplan apply} & Mais de um ficheiro ou método a configurar a mesma placa & Ficar com um único método: repetir 2.1.2, Passos 2 a 5 \\
 \hline
-\texttt{mv: destino '/\allowbreak{}root/\allowbreak{}netplan-bak/\allowbreak{}': Ficheiro ou pasta inexistente} & Faltou criar a pasta de backup & 2.1.1, Passo 3 e repetir o Passo 4 \\
+\texttt{mv: destino '/\allowbreak{}root/\allowbreak{}netplan-bak/\allowbreak{}': Ficheiro ou pasta inexistente} & Faltou criar a pasta de backup & 2.1.2, Passo 3 e repetir o Passo 4 \\
 \hline
-\texttt{O NetworkManager não está em execução} & Serviço parado & 2.1.1, Passo 6 e repetir o Passo 7 \\
+\texttt{O NetworkManager não está em execução} & Serviço parado & 2.1.2, Passo 6 e repetir o Passo 7 \\
 \hline
-IP \texttt{169.254.x.x} na \texttt{ens18} & O IP estático não foi aplicado & 2.1.1, Passos 7 e 8 \\
+IP \texttt{169.254.x.x} na \texttt{ens18} & O IP estático não foi aplicado & 2.1.2, Passos 7 e 8 \\
 \hline
-DNS público (\texttt{8.8.8.8}, \texttt{1.1.1.1}) em \texttt{resolvectl status} & Falta \texttt{ipv4.ignore-auto-dns yes} & 2.1.1, Passo 7 \\
+DNS público (\texttt{8.8.8.8}, \texttt{1.1.1.1}) em \texttt{resolvectl status} & Falta \texttt{ipv4.ignore-auto-dns yes} & 2.1.2, Passo 7 \\
 \hline
 Perfil antigo (ex.: \texttt{Ligação com fios 1}) sem placa & Restos da configuração anterior & \texttt{sudo nmcli connection delete 'NOME'} \\
 \hline
@@ -73,28 +73,28 @@ Perfil antigo (ex.: \texttt{Ligação com fios 1}) sem placa & Restos da configu
 \hline
 Ping ao DC falha, mas o MAC aparece no \texttt{ip neigh} & Firewall do Windows & Ver \hyperref[ec-a]{Parte A} (1.6) \\
 \hline
-\texttt{dig} funciona mas \texttt{ping isec.local} falha & \texttt{mdns4\_minimal} no \texttt{nsswitch.conf} & 2.1.1, Passo 13 \\
+\texttt{dig} funciona mas \texttt{ping isec.local} falha & \texttt{mdns4\_minimal} no \texttt{nsswitch.conf} & 2.1.2, Passo 13 \\
 \hline
 \end{tabularx}
 \end{center}
 
 \phantomsection\label{ec-b1-kerberos}
 
-\section*{Parte B - SSSD: Relógio e Kerberos (2.1.2 - 2.1.3)}
-\addcontentsline{toc}{section}{Parte B - SSSD: Relógio e Kerberos (2.1.2 - 2.1.3)}
+\section*{Parte B - SSSD: Relógio e Kerberos (2.1.3 - 2.1.4)}
+\addcontentsline{toc}{section}{Parte B - SSSD: Relógio e Kerberos (2.1.3 - 2.1.4)}
 
 \begin{center}\small
 \begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
 \hline
 \rowcolor{azul!10}\textbf{Sintoma} & \textbf{Causa provável} & \textbf{Solução} \\
 \hline
-\texttt{Clock skew too great} & Diferença de hora \textgreater{} 5 min entre cliente e DC & Repetir 2.1.2 (chrony) \\
+\texttt{Clock skew too great} & Diferença de hora \textgreater{} 5 min entre cliente e DC & Repetir 2.1.3 (chrony) \\
 \hline
 \texttt{chrony} não existe como serviço & Nome do serviço diferente & Usar \texttt{chronyd} \\
 \hline
-\texttt{Cannot find KDC for realm} & DNS não devolve os registos SRV do domínio & Repetir 2.1.1, Passo 12 (DNS) \\
+\texttt{Cannot find KDC for realm} & DNS não devolve os registos SRV do domínio & Repetir 2.1.2, Passo 12 (DNS) \\
 \hline
-\texttt{Cannot resolve network address for KDC} & Nome do DC errado no \texttt{krb5.conf} ou não resolve no DNS & Repetir 2.1.1, Passo 12 e 2.1.3, Passo 2; confirmar \texttt{SR2-SRV.isec.local} no \texttt{krb5.conf} \\
+\texttt{Cannot resolve network address for KDC} & Nome do DC errado no \texttt{krb5.conf} ou não resolve no DNS & Repetir 2.1.2, Passo 12 e 2.1.4, Passo 2; confirmar \texttt{SR2-SRV.isec.local} no \texttt{krb5.conf} \\
 \hline
 \texttt{Client not found in Kerberos database} & O login não existe & No Windows: \texttt{Get-ADUser -Filter * \textbar{} Select SamAccountName} \\
 \hline
@@ -105,8 +105,8 @@ Ping ao DC falha, mas o MAC aparece no \texttt{ip neigh} & Firewall do Windows &
 
 \phantomsection\label{ec-b1-samba}
 
-\section*{Parte B - SSSD: Samba e SRII (2.1.4, 2.1.8)}
-\addcontentsline{toc}{section}{Parte B - SSSD: Samba e SRII (2.1.4, 2.1.8)}
+\section*{Parte B - SSSD: Samba e SRII (2.1.5, 2.1.9)}
+\addcontentsline{toc}{section}{Parte B - SSSD: Samba e SRII (2.1.5, 2.1.9)}
 
 \begin{center}\small
 \begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
@@ -119,11 +119,11 @@ Terminal fica em \texttt{\textgreater{}} depois de colar \texttt{smbclient ... -
 \hline
 \texttt{NT\_STATUS\_NO\_LOGON\_SERVERS} / \texttt{NT\_STATUS\_LOGON\_FAILURE} com \texttt{--use-kerberos=required} & Ticket em falta ou expirado & \texttt{klist}; se vazio: \texttt{kinit utilizador@ISEC.LOCAL} e repetir \\
 \hline
-\texttt{NT\_STATUS\_NO\_LOGON\_SERVERS} com \texttt{creating NEG\_TOKEN\_INIT ... failed} & Falta o \texttt{kinit} dentro da sessão do utilizador do domínio (depois de \texttt{su -}) & 2.1.7, Passo 3 \\
+\texttt{NT\_STATUS\_NO\_LOGON\_SERVERS} com \texttt{creating NEG\_TOKEN\_INIT ... failed} & Falta o \texttt{kinit} dentro da sessão do utilizador do domínio (depois de \texttt{su -}) & 2.1.8, Passo 3 \\
 \hline
 \texttt{NT\_STATUS\_ACCESS\_DENIED} no \texttt{ls} de ambos & Grupos ou permissões NTFS mal definidos & Rever 1.5 (Passos 2 e 3) \\
 \hline
-\texttt{NT\_STATUS\_BAD\_NETWORK\_NAME} & Nome da partilha errado & Confirmar com \texttt{smbclient -L} (2.1.4, Passo 2) \\
+\texttt{NT\_STATUS\_BAD\_NETWORK\_NAME} & Nome da partilha errado & Confirmar com \texttt{smbclient -L} (2.1.5, Passo 2) \\
 \hline
 Aluno consegue escrever & Aluno também no grupo de professores, ou \emph{Modify} para \texttt{Everyone}/\texttt{Authenticated Users} & Rever 1.4 (Passo 6) e 1.5 \\
 \hline
@@ -132,49 +132,85 @@ Aluno consegue escrever & Aluno também no grupo de professores, ou \emph{Modify
 
 \phantomsection\label{ec-b1-sssd}
 
-\section*{Parte B - SSSD: Domínio e SSSD (2.1.5 - 2.1.6)}
-\addcontentsline{toc}{section}{Parte B - SSSD: Domínio e SSSD (2.1.5 - 2.1.6)}
+\section*{Parte B - SSSD: Domínio e SSSD (2.1.6 - 2.1.7)}
+\addcontentsline{toc}{section}{Parte B - SSSD: Domínio e SSSD (2.1.6 - 2.1.7)}
 
 \begin{center}\small
 \begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
 \hline
 \rowcolor{azul!10}\textbf{Sintoma} & \textbf{Causa provável} & \textbf{Solução} \\
 \hline
-\texttt{realm discover} falha & DNS ou \texttt{krb5.conf} & Repetir 2.1.1 (Passo 12) e 2.1.3 (Passo 2) \\
+\texttt{id} mostra o mesmo utilizador duas vezes, ou o login fica lento & O Winbind está ativo no PAM ou no NSS deste cliente & 2.1.1, Passos 1 a 3 (comandos de correção) \\
 \hline
-\texttt{realm join} falha com nome de máquina & Hostname com mais de 15 caracteres (ainda com o nome do template) & Repetir 2.1.5, Passo 1 \\
+\texttt{realm discover} falha & DNS ou \texttt{krb5.conf} & Repetir 2.1.2 (Passo 12) e 2.1.4 (Passo 2) \\
+\hline
+\texttt{realm join} falha com nome de máquina & Hostname com mais de 15 caracteres (ainda com o nome do template) & Repetir 2.1.6, Passo 1 \\
 \hline
 \texttt{no such user} no \texttt{id} & Cache do SSSD desatualizada ou SSSD ainda a sincronizar & Esperar 1 min; \texttt{sudo sss\_cache -E} e \texttt{sudo systemctl restart sssd} \\
 \hline
-SSSD não arranca depois de editar o \texttt{sssd.conf} & Permissões do ficheiro ou erro de sintaxe & \texttt{sudo chmod 600 /\allowbreak{}etc/\allowbreak{}sssd/\allowbreak{}sssd.conf}; \texttt{sudo sssctl config-check} (2.1.7, Passo 2) \\
+SSSD não arranca depois de editar o \texttt{sssd.conf} & Permissões do ficheiro ou erro de sintaxe & \texttt{sudo chmod 600 /\allowbreak{}etc/\allowbreak{}sssd/\allowbreak{}sssd.conf}; \texttt{sudo sssctl config-check} (2.1.8, Passo 2) \\
 \hline
 \end{tabularx}
 \end{center}
 
 \phantomsection\label{ec-b1-pam}
 
-\section*{Parte B - SSSD: PAM e pam\_mount (2.1.7, 2.1.9)}
-\addcontentsline{toc}{section}{Parte B - SSSD: PAM e pam\_mount (2.1.7, 2.1.9)}
+\section*{Parte B - SSSD: PAM e pam\_mount (2.1.8, 2.1.10)}
+\addcontentsline{toc}{section}{Parte B - SSSD: PAM e pam\_mount (2.1.8, 2.1.10)}
 
 \begin{center}\small
 \begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
 \hline
 \rowcolor{azul!10}\textbf{Sintoma} & \textbf{Causa provável} & \textbf{Solução} \\
 \hline
-\texttt{su: System error} no login do utilizador do AD (nos registos: \texttt{pam\_sss ... Access denied ... System error}) & GPO do AD a bloquear o login & \texttt{ad\_gpo\_access\_control = permissive} no \texttt{sssd.conf} (caixa em 2.1.7, Passo 2) \\
+\texttt{su: System error} no login do utilizador do AD (nos registos: \texttt{pam\_sss ... Access denied ... System error}) & GPO do AD a bloquear o login & \texttt{ad\_gpo\_access\_control = permissive} no \texttt{sssd.conf} (caixa em 2.1.8, Passo 2) \\
 \hline
-Home não é criada no primeiro login & \texttt{pam\_mkhomedir} não ativo & \texttt{sudo pam-auth-update --enable mkhomedir} (2.1.7, Passo 1) \\
+Home não é criada no primeiro login & \texttt{pam\_mkhomedir} não ativo & \texttt{sudo pam-auth-update --enable mkhomedir} (2.1.8, Passo 1) \\
 \hline
-\texttt{cp} do \texttt{pam\_mount.conf.xml}: \texttt{Ficheiro ou pasta inexistente} & O pam\_mount não está instalado & 2.1.9, Passo 1 \\
+\texttt{cp} do \texttt{pam\_mount.conf.xml}: \texttt{Ficheiro ou pasta inexistente} & O pam\_mount não está instalado: a VM não veio do template UbuntuClient & Clonar de novo a partir do template certo (Setup das VMs, Passo 3) \\
 \hline
-\texttt{mount \textbar{} grep SRII} não mostra nada depois do login & \texttt{pam\_mount.so} ausente no PAM ou linhas \texttt{\textless{}volume\textgreater{}} erradas & Confirmar \texttt{pam\_mount.so} (2.1.9, Passo 1) e as linhas \texttt{\textless{}volume\textgreater{}} (Passo 4) \\
+\texttt{mount \textbar{} grep SRII} não mostra nada depois do login & \texttt{pam\_mount.so} ausente no PAM ou linhas \texttt{\textless{}volume\textgreater{}} erradas & Confirmar \texttt{pam\_mount.so} (2.1.10, Passo 1) e as linhas \texttt{\textless{}volume\textgreater{}} (Passo 4) \\
 \hline
 \end{tabularx}
 \end{center}
 
 \phantomsection\label{ec-b2}
 
-\section*{Parte B - Winbind}
-\addcontentsline{toc}{section}{Parte B - Winbind}
+\section*{Parte B - Winbind (2.2)}
+\addcontentsline{toc}{section}{Parte B - Winbind (2.2)}
 
-\texttt{[A AGUARDAR CONTEÚDO]}
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{Sintoma} & \textbf{Causa provável} & \textbf{Solução} \\
+\hline
+O \texttt{su -} ou o login gráfico ficam lentos ou falham com o SSSD ainda ativo & O SSSD continua ativo no PAM ou no NSS deste cliente & 2.2.2, Passos 1 a 3 \\
+\hline
+O \texttt{winbind} não arranca no arranque da VM & O serviço ficou desativado & 2.2.2, Passo 4 (\texttt{sudo systemctl enable winbind}) \\
+\hline
+\texttt{testparm -s} não mostra \texttt{Server role: ROLE\_DOMAIN\_MEMBER} & \texttt{security = ADS} em falta ou erro de escrita na \texttt{[global]} & Rever 2.2.3, Passo 2 e repetir \texttt{sudo testparm -s} \\
+\hline
+\texttt{kinit} ou \texttt{net ads join} dá \texttt{Clock skew too great} & Relógio do cliente desacertado & 2.2.1, Passo 4 (chrony) \\
+\hline
+\texttt{net ads join} não encontra o domínio ou o DC & DNS do cliente não aponta para o DC, ou falta a correção do mDNS & 2.2.1, Passos 2 e 3 (2.1.2, Passos 7 a 14) \\
+\hline
+\texttt{net ads join} dá erro de palavra-passe & Palavra-passe do \texttt{Administrator} do domínio errada & Repetir com a palavra-passe do \texttt{ISEC\textbackslash{}Administrator} \\
+\hline
+\texttt{net ads testjoin} não diz \texttt{Join is OK} ou \texttt{wbinfo -t} falha & O join não ficou feito, ou o Winbind está parado & \texttt{sudo systemctl restart winbind}; se continuar, repetir 2.2.4, Passo 4 \\
+\hline
+\texttt{wbinfo -u} / \texttt{wbinfo -g} vazios & Winbind arrancou antes do join, ou \texttt{winbind enum users/\allowbreak{}groups} em falta & \texttt{sudo systemctl restart winbind}; rever 2.2.3, Passo 2 \\
+\hline
+\texttt{wbinfo} funciona mas \texttt{getent passwd professor.teste} não devolve nada & \texttt{winbind} em falta nas linhas \texttt{passwd}/\texttt{group} do \texttt{nsswitch.conf} & 2.2.7, Passo 1 \\
+\hline
+\texttt{su - professor.teste} dá \texttt{Authentication failure} & Perfil \emph{Winbind NT/Active Directory authentication} desativado no PAM & 2.2.8, Passo 1 \\
+\hline
+\texttt{su -} entra mas diz \texttt{No directory,\allowbreak{} logging in with HOME=/\allowbreak{}} & \emph{Create home directory on login} desativado & 2.2.8, Passo 1 \\
+\hline
+O utilizador só entra como \texttt{ISEC\textbackslash{}professor.teste} & \texttt{winbind use default domain = yes} em falta & Rever 2.2.3, Passo 2; \texttt{sudo systemctl restart winbind} \\
+\hline
+\texttt{smbclient ... -U} dá \texttt{NT\_STATUS\_LOGON\_FAILURE} & Palavra-passe errada ou falta o \texttt{ISEC\textbackslash{}} antes do nome & Usar \texttt{-U 'ISEC\textbackslash{}professor.teste'} com a palavra-passe do AD \\
+\hline
+O ecrã de login não mostra "Não está listado?" & O \texttt{dconf update} não foi corrido ou o GDM3 não foi reiniciado & 2.2.11, Passo 1 \\
+\hline
+\end{tabularx}
+\end{center}

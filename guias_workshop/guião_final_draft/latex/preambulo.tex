@@ -30,7 +30,7 @@
 \DeclareUnicodeCharacter{2194}{\ensuremath{\leftrightarrow}}
 
 % ---------- Cores ----------
-\definecolor{azul}{RGB}{31,73,125}
+\definecolor{azul}{RGB}{0,0,0}
 \definecolor{cinza}{RGB}{90,90,90}
 
 \hypersetup{colorlinks=true,linkcolor=azul,urlcolor=azul,pdftitle={Guião-Workshop SR2}}
@@ -65,9 +65,9 @@
   svc/.style={draw=azul!70, fill=white, rounded corners=2pt, align=center, font=\footnotesize, inner sep=4pt},
   grupo/.style={draw=azul!70, fill=azul!12, rounded corners=2pt, align=center, font=\footnotesize, inner sep=4pt},
   net/.style={draw=black!50, dashed, fill=black!4, rounded corners=2pt, align=center, font=\footnotesize, inner sep=4pt},
-  ext/.style={draw=orange!70!black, fill=orange!10, ellipse, align=center, font=\footnotesize, inner sep=3pt},
+  ext/.style={draw=black, fill=white, ellipse, align=center, font=\footnotesize, inner sep=3pt},
   caixa/.style={draw=azul, thick, rounded corners=4pt, fill=azul!3},
-  caixatit/.style={font=\footnotesize\bfseries, text=azul, anchor=north west},
+  caixatit/.style={font=\footnotesize\bfseries, text=azul, anchor=north west, fill=white, inner sep=2pt},
   seta/.style={-{Stealth[length=2.2mm]}, thick, draw=black!70},
   setad/.style={seta, dashed},
   duplo/.style={{Stealth[length=2.2mm]}-{Stealth[length=2.2mm]}, thick, draw=black!70},
@@ -75,12 +75,13 @@
   rot/.style={font=\scriptsize, fill=white, inner sep=1.5pt, align=center},
   vida/.style={draw=black!35, dashed},
   acao/.style={draw=azul!60, fill=azul!5, rounded corners=2pt, align=center, font=\scriptsize, inner sep=3pt},
-  nota/.style={draw=orange!60!black, fill=yellow!12, align=center, font=\scriptsize, inner sep=3pt},
+  nota/.style={draw=black, fill=black!8, align=center, font=\scriptsize, inner sep=3pt},
 }
 \newcommand{\esquema}[2]{%
+  \Needspace{.50\textheight}%
   \begin{figure}[H]
     \centering
-    \adjustbox{max width=\linewidth}{\input{\esquemadir#1}}
+    \adjustbox{max width=\linewidth,max totalheight=.44\textheight,center}{\input{\esquemadir#1}}
     \caption{#2}
   \end{figure}}
 
@@ -140,15 +141,15 @@
     {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1 {Ç}{{\c C}}1
     {→}{{$\rightarrow$}}1
 }
-\lstdefinestyle{bashstyle}{style=base,language=bash,commentstyle=\color{green!40!black}\itshape}
-\lstdefinestyle{psstyle}{style=base,commentstyle=\color{green!40!black}\itshape,morecomment=[l]{\#}}
+\lstdefinestyle{bashstyle}{style=base,language=bash,commentstyle=\color{black!60}\itshape}
+\lstdefinestyle{psstyle}{style=base,commentstyle=\color{black!60}\itshape,morecomment=[l]{\#}}
 \lstdefinestyle{cfgstyle}{style=base}
 \lstdefinestyle{diagstyle}{style=base,frame=none,backgroundcolor=,basicstyle=\ttfamily\footnotesize}
 
 % ---------- Caixas ----------
 \tcbset{enhanced,breakable,fonttitle=\bfseries,boxrule=0.6pt,arc=2pt,left=6pt,right=6pt,top=4pt,bottom=4pt,before skip=0.8em,after skip=0.8em}
-\newtcolorbox{avisobox}[1][]{colback=red!3,colframe=red!55!black,#1}
-\newtcolorbox{notabox}[1][]{colback=azul!4,colframe=azul,#1}
-\newtcolorbox{importantebox}[1][]{colback=orange!5,colframe=orange!70!black,#1}
-\newtcolorbox{dicabox}[1][]{colback=green!4,colframe=green!40!black,#1}
+\newtcolorbox{avisobox}[1][]{colback=black!5,colframe=black!55,#1}
+\newtcolorbox{notabox}[1][]{colback=black!5,colframe=black!55,#1}
+\newtcolorbox{importantebox}[1][]{colback=black!5,colframe=black!55,#1}
+\newtcolorbox{dicabox}[1][]{colback=black!5,colframe=black!55,#1}
 \newtcolorbox{simplesbox}{colback=black!3,frame hidden,borderline west={2pt}{0pt}{black!35},sharp corners}

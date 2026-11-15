@@ -1,0 +1,13 @@
+%% 2.2.11 Login gráfico com AD (GDM3)
+sequenceDiagram
+    participant G as Ecrã de login (GDM3)
+    participant P as PAM (pam_winbind)
+    participant D as winbindd
+    participant DC as DC (SR2-SRV)
+    Note over G: Não está listado? (disable-user-list=true)
+    G->>P: aluno.teste + palavra-passe
+    P->>D: Autenticar
+    D->>DC: Valida no domínio
+    DC-->>D: OK + grupos
+    D-->>P: Autenticado
+    P-->>G: Abre a sessão gráfica do utilizador do AD

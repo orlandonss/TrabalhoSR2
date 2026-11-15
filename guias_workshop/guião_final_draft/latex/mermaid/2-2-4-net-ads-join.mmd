@@ -1,0 +1,12 @@
+%% 2.2.4 Kerberos e net ads join
+sequenceDiagram
+    participant U as Ubuntu (kinit, net ads)
+    participant K as KDC (porta 88)
+    participant L as DC LDAP / SMB (389 / 445)
+    U->>K: kinit professor.teste@ISEC.LOCAL
+    K-->>U: TGT do professor (teste do Kerberos)
+    U->>K: net ads join - autentica o Administrator
+    K-->>U: Ticket do Administrator
+    U->>L: Cria a conta de computador UBU-WINBIND
+    L-->>U: Conta criada no domínio isec.local
+    U->>U: Guarda a palavra-passe da máquina (secrets.tdb)

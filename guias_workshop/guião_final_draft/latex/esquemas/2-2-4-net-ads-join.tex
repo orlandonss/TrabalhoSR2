@@ -1,0 +1,22 @@
+%% 2.2.4 Kerberos e net ads join
+\begin{tikzpicture}
+  \node[vm, text width=3.20cm, font=\footnotesize] (u) at (-5.75,0) {Ubuntu\\(\texttt{kinit}, \texttt{net ads})};
+  \node[vm, text width=3.20cm, font=\footnotesize] (k) at (0.00,0) {KDC\\(porta 88)};
+  \node[vm, text width=3.20cm, font=\footnotesize] (l) at (5.75,0) {DC: LDAP / SMB\\(389 / 445)};
+  \draw[vida] (u.south) -- (-5.75,-7.86);
+  \draw[vida] (k.south) -- (0.00,-7.86);
+  \draw[vida] (l.south) -- (5.75,-7.86);
+  \draw[seta] (-5.75,-1.60) -- (0.00,-1.60);
+  \node[rot, anchor=south] at (-2.88,-1.56) {\texttt{kinit professor.teste@ISEC.LOCAL}};
+  \draw[setad] (0.00,-2.43) -- (-5.75,-2.43);
+  \node[rot, anchor=south] at (-2.88,-2.39) {TGT do professor (teste do Kerberos)};
+  \draw[seta] (-5.75,-3.26) -- (0.00,-3.26);
+  \node[rot, anchor=south] at (-2.88,-3.22) {\texttt{net ads join}: autentica o Administrator};
+  \draw[setad] (0.00,-4.09) -- (-5.75,-4.09);
+  \node[rot, anchor=south] at (-2.88,-4.05) {Ticket do Administrator};
+  \draw[seta] (-5.75,-4.92) -- (5.75,-4.92);
+  \node[rot, anchor=south] at (0.00,-4.88) {Cria a conta de computador \texttt{UBU-WINBIND}};
+  \draw[setad] (5.75,-5.75) -- (-5.75,-5.75);
+  \node[rot, anchor=south] at (0.00,-5.71) {Conta criada no domínio \texttt{isec.local}};
+  \node[acao, text width=2.9cm] at (-5.75,-6.79) {Guarda a palavra-passe da máquina (\texttt{secrets.tdb})};
+\end{tikzpicture}

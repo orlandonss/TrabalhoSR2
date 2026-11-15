@@ -1,0 +1,15 @@
+%% 2.2.1 Novo cliente Winbind
+flowchart LR
+    T["Template<br/>UbuntuClient-Winbind"]:::svc
+    subgraph VLAN["VLAN X - bridge #lt;BRIDGE#gt; - domínio isec.local"]
+        CL["Cliente SSSD<br/>UBUCLIENT<br/>#lt;IP_CLIENTE#gt;"]:::vm
+        DC["Windows Server<br/>SR2-SRV<br/>#lt;IP_DC#gt;"]:::vm
+        WB["Cliente Winbind (novo)<br/>UBU-WINBIND<br/>#lt;IP_CLIENTE_WB#gt;"]:::vm
+    end
+    T -->|"Linked Clone"| WB
+    CL -.- DC
+    WB <--> DC
+    classDef vm fill:#e8eef7,stroke:#1f497d,stroke-width:2px,color:#000
+    classDef svc fill:#ffffff,stroke:#1f497d,stroke-width:1px,color:#000
+    classDef net fill:#f3f3f3,stroke:#777,stroke-dasharray:4 3,color:#000
+    classDef ext fill:#fff4e5,stroke:#c77700,color:#000

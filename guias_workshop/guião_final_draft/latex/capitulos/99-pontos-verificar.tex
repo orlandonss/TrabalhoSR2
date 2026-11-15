@@ -20,7 +20,13 @@
 \hline
 5 & 2.1 (nota inicial) & Se o enunciado exige \texttt{smb.conf} também na variante SSSD. \\
 \hline
-6 & 2.1.7, Passo 2 & Correção \texttt{ad\_gpo\_access\_control = permissive}: se todos os alunos apanharem \texttt{su: System error}, passar a passo normal e acrescentá-la aos diapositivos. \\
+6 & 2.1.8, Passo 2 & Correção \texttt{ad\_gpo\_access\_control = permissive}: se todos os alunos apanharem \texttt{su: System error}, passar a passo normal e acrescentá-la aos diapositivos. \\
+\hline
+7 & 2.2.1, Passo 4 & A sincronização do relógio no cliente Winbind não aparece nos diapositivos, mas é necessária para o Kerberos: acrescentá-la aos diapositivos. \\
+\hline
+8 & 2.2.11, Passo 1 & O GDM3 só lê \texttt{/\allowbreak{}etc/\allowbreak{}dconf/\allowbreak{}db/\allowbreak{}gdm.d} se existir o perfil \texttt{/\allowbreak{}etc/\allowbreak{}dconf/\allowbreak{}profile/\allowbreak{}gdm} (no teste do colega funcionou). Confirmar no template novo. \\
+\hline
+9 & 2.2.2 e 2.2.8 & Template único: confirmar que o ADsys não interfere com o login dos utilizadores do Winbind e se aparece como perfil no \texttt{pam-auth-update}. \\
 \hline
 \end{tabularx}
 \end{center}

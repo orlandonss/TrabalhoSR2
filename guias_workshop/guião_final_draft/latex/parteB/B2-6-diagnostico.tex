@@ -1,0 +1,33 @@
+% 2.2.6
+% Ficheiro incluído por main.tex
+
+\subsection[Diagnosticar o Winbind]{Diagnosticar o Winbind}
+
+\esquema{2-2-6-diagnostico}{Diagnóstico do Winbind: contacto com o DC e resolução de identidades}
+
+\passo{Passo 1 - Verificar se o Winbind contacta o controlador de domínio}
+
+\begin{lstlisting}[style=bashstyle]
+wbinfo --ping-dc
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{checking the NETLOGON for domain[ISEC] dc connection to "SR2-SRV.isec.local" succeeded}.
+
+\passo{Passo 2 - Verificar se o domínio está online para o Winbind}
+
+\begin{lstlisting}[style=bashstyle]
+wbinfo --online-status
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{BUILTIN}, \texttt{UBU-WINBIND} e \texttt{ISEC} com \texttt{active connection}.
+
+\passo{Passo 3 - Verificar a resolução de identidades}
+
+\begin{lstlisting}[style=bashstyle]
+wbinfo -i professor.teste
+wbinfo -i aluno.teste
+\end{lstlisting}
+
+\emph{Verificação esperada:} uma linha por utilizador no formato do \texttt{/\allowbreak{}etc/\allowbreak{}passwd}, por exemplo \texttt{professor.teste:*:11103:10513:Professor Teste:/\allowbreak{}home/\allowbreak{}professor.teste:/\allowbreak{}bin/\allowbreak{}bash}. O UID (\texttt{11103}) é 10000 + RID do utilizador no AD, por isso os números podem ser diferentes de aluno para aluno.
+
+\problemas{\hyperref[ec-b2]{Erros Comuns - 2.2 Winbind}}

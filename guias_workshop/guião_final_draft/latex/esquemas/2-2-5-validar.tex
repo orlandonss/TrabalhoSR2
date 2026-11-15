@@ -1,0 +1,25 @@
+%% 2.2.5 Validar a associação ao domínio
+\begin{tikzpicture}
+  \node[vm, text width=3.20cm, font=\footnotesize] (w) at (-5.75,0) {Ubuntu\\(\texttt{wbinfo})};
+  \node[vm, text width=3.20cm, font=\footnotesize] (d) at (0.00,0) {\texttt{winbindd}};
+  \node[vm, text width=3.20cm, font=\footnotesize] (dc) at (5.75,0) {DC\\(\texttt{SR2-SRV})};
+  \draw[vida] (w.south) -- (-5.75,-7.99);
+  \draw[vida] (d.south) -- (0.00,-7.99);
+  \draw[vida] (dc.south) -- (5.75,-7.99);
+  \draw[seta] (-5.75,-1.60) -- (0.00,-1.60);
+  \node[rot, anchor=south] at (-2.88,-1.56) {\texttt{wbinfo -t}};
+  \draw[seta] (0.00,-2.43) -- (5.75,-2.43);
+  \node[rot, anchor=south] at (2.88,-2.39) {Valida o segredo da máquina (RPC)};
+  \draw[setad] (5.75,-3.26) -- (0.00,-3.26);
+  \node[rot, anchor=south] at (2.88,-3.22) {OK};
+  \draw[setad] (0.00,-4.09) -- (-5.75,-4.09);
+  \node[rot, anchor=south] at (-2.88,-4.05) {\texttt{trust secret ... succeeded}};
+  \draw[seta] (-5.75,-4.92) -- (0.00,-4.92);
+  \node[rot, anchor=south] at (-2.88,-4.88) {\texttt{wbinfo -u} / \texttt{wbinfo -g}};
+  \draw[seta] (0.00,-5.75) -- (5.75,-5.75);
+  \node[rot, anchor=south] at (2.88,-5.71) {Pede utilizadores e grupos};
+  \draw[setad] (5.75,-6.58) -- (0.00,-6.58);
+  \node[rot, anchor=south] at (2.88,-6.54) {\texttt{professor.teste}, \texttt{grupo-alunos}, ...};
+  \draw[setad] (0.00,-7.41) -- (-5.75,-7.41);
+  \node[rot, anchor=south] at (-2.88,-7.37) {Listas de utilizadores e grupos};
+\end{tikzpicture}

@@ -5,21 +5,18 @@
 
 \esquema{1-1-nome-rede-ip}{Windows Server: IP estático, gateway e DNS}
 
-\passo{Passo 1 - Primeiro arranque e nome do computador}
+\passo{Passo 1 - Primeiro arranque}
 
-\emph{Objetivo:} concluir o assistente inicial e dar ao servidor o nome standard.
+\emph{Objetivo:} concluir o assistente inicial. O nome do computador (\textbf{\texttt{SR2-SRV}}) já vem definido no template.
 
-\begin{enumerate}
-\item Iniciar a VM e completar o assistente com os valores aconselhados:
+Iniciar a VM e completar o assistente com os valores aconselhados:
+
 \begin{itemize}
 \item Região: \textbf{Portugal}; teclado: \textbf{Português}; idioma: \textbf{Inglês};
 \item Palavra-passe do Administrator: \textbf{\texttt{\textless{}PASSWORD\_LAB\textgreater{}}} (a mesma em todo o laboratório).
 \end{itemize}
-\item Mudar o nome do computador para \textbf{\texttt{SR2-SRV}}: barra de pesquisa do Windows → \textbf{About this computer} → \textbf{Rename this PC}.
-\item Reiniciar o servidor.
-\end{enumerate}
 
-\emph{Verificação esperada:} após o reinício, \emph{About this computer} mostra o nome \texttt{SR2-SRV}.
+\emph{Verificação esperada:} barra de pesquisa do Windows → \textbf{About this computer} mostra o nome \texttt{SR2-SRV}.
 
 \passo{Passo 2 - Abrir as definições do adaptador de rede}
 

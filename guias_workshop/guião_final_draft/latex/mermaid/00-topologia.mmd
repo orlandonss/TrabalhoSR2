@@ -1,16 +1,15 @@
-%% Topologia geral do laboratório (uma VLAN por aluno)
+%% Topologia geral do laboratório (DC + cliente SSSD + cliente Winbind)
 flowchart TB
     INT(("Internet")):::ext
     GW["Default gateway da VLAN X<br/>192.168.X.1"]:::net
     subgraph VLAN["VLAN X - 192.168.X.0/24 (bridge #lt;BRIDGE#gt; no Proxmox)"]
-        direction LR
-        DC["Windows Server - SR2-SRV.isec.local<br/>IP: #lt;IP_DC#gt;<br/>AD DS - DNS - KDC Kerberos - Partilha SMB SRII"]:::vm
-        CL["Ubuntu Client - ubuclient<br/>IP: #lt;IP_CLIENTE#gt;<br/>Kerberos - Samba - SSSD - PAM"]:::vm
+        DC["Windows Server - SR2-SRV.isec.local<br/>#lt;IP_DC#gt;<br/>AD DS - DNS - KDC - Partilha SRII"]:::vm
+        CL["Cliente SSSD (2.1) - ubuclient<br/>#lt;IP_CLIENTE#gt;<br/>Kerberos - SSSD - PAM - pam_mount"]:::vm
+        WB["Cliente Winbind (2.2) - UBU-WINBIND<br/>#lt;IP_CLIENTE_WB#gt;<br/>Kerberos - Samba - Winbind - PAM"]:::vm
     end
-    INT --- GW
-    GW --- DC
-    GW --- CL
+    INT --- GW --- VLAN
     CL <-->|"DNS 53 - Kerberos 88 - LDAP 389 - SMB 445 - NTP 123"| DC
+    WB <-->|"DNS 53 - Kerberos 88 - RPC - SMB 445 - NTP 123"| DC
     classDef vm fill:#e8eef7,stroke:#1f497d,stroke-width:2px,color:#000
     classDef svc fill:#ffffff,stroke:#1f497d,stroke-width:1px,color:#000
     classDef net fill:#f3f3f3,stroke:#777,stroke-dasharray:4 3,color:#000

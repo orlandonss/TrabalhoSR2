@@ -1,0 +1,43 @@
+% 2.2.1
+% Ficheiro incluído por main.tex
+
+\subsection[Configuração de um novo cliente (clone, IP estático, DNS)]{Configuração de um novo cliente (clone, IP estático, DNS)}
+
+\esquema{2-2-1-novo-cliente}{Novo cliente Winbind na mesma VLAN e no mesmo domínio}
+
+\passo{Passo 1 - Clonar o template UbuntuClient}
+
+No Proxmox, tal como em \emph{Setup das VMs} (Passos 3 a 6), clonar o template \textbf{UbuntuClient} com \emph{Linked Clone} para a pool do grupo, com o nome \texttt{UbuntuClient-Winbind-grp\textless{}N\textgreater{}}, e ligá-lo à \textbf{mesma} bridge \texttt{\textless{}BRIDGE\textgreater{}}. Iniciar a VM.
+
+\passo{Passo 2 - Atribuir um IP estático disponível na rede}
+
+Repetir 2.1.2, Passos 1 a 10, nesta VM, com o IP \textbf{\texttt{\textless{}IP\_CLIENTE\_WB\textgreater{}}} (formato \texttt{192.168.X.Y}, diferente do DC e do cliente SSSD):
+
+\begin{lstlisting}[style=bashstyle]
+sudo nmcli connection add type ethernet ifname ens18 con-name labX \
+     ipv4.method manual \
+     ipv4.addresses <IP_CLIENTE_WB>/24 \
+     ipv4.gateway 192.168.X.1 \
+     ipv4.dns <IP_DC> \
+     ipv4.dns-search isec.local \
+     ipv4.ignore-auto-dns yes
+sudo nmcli connection up labX
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{ip -br a} mostra \texttt{ens18} com \texttt{\textless{}IP\_CLIENTE\_WB\textgreater{}/\allowbreak{}24} e \texttt{resolvectl status ens18} mostra só o DNS \texttt{\textless{}IP\_DC\textgreater{}}.
+
+No Windows Server, acrescentar \texttt{\textless{}IP\_CLIENTE\_WB\textgreater{}} à regra \textbf{SR2 Allow Ping Ubuntu} (1.6): \emph{Properties} → \emph{Scope} → \emph{Remote IP address} → \textbf{Add...}
+
+\passo{Passo 3 - Configurar o DNS e confirmar o domínio}
+
+Repetir 2.1.2, Passos 11 a 14: \texttt{ping} ao DC, \texttt{dig} aos registos SRV, correção do mDNS no \texttt{nsswitch.conf} e \texttt{ping isec.local}.
+
+\emph{Verificação esperada:} \texttt{getent hosts isec.local} devolve \texttt{\textless{}IP\_DC\textgreater{}} e \texttt{ping -c 3 isec.local} responde.
+
+\passo{Passo 4 - Sincronizar o relógio}
+
+Repetir 2.1.3 (Passos 1 e 2) nesta VM. Sem relógio certo, o \texttt{kinit} e o \texttt{net ads join} falham com \texttt{Clock skew too great}.
+
+\emph{Verificação esperada:} \texttt{chronyc sources -v} mostra \texttt{\textless{}IP\_DC\textgreater{}} com \texttt{\textasciicircum{}*} ou \texttt{\textasciicircum{}+}.
+
+\problemas{\hyperref[ec-b1-rede]{Erros Comuns - 2.1 Rede e DNS do cliente}}

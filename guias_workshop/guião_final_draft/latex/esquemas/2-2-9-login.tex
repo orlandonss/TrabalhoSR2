@@ -1,0 +1,24 @@
+%% 2.2.9 Login com utilizador do AD (Winbind)
+\begin{tikzpicture}
+  \node[vm, text width=3.20cm, font=\footnotesize] (u) at (-5.75,0) {Utilizador\\(\texttt{su -})};
+  \node[vm, text width=3.20cm, font=\footnotesize] (p) at (-1.92,0) {PAM\\(\texttt{pam\_winbind}, \texttt{pam\_mkhomedir})};
+  \node[vm, text width=3.20cm, font=\footnotesize] (d) at (1.92,0) {\texttt{winbindd}};
+  \node[vm, text width=3.20cm, font=\footnotesize] (dc) at (5.75,0) {DC\\(\texttt{SR2-SRV})};
+  \draw[vida] (u.south) -- (-5.75,-8.19);
+  \draw[vida] (p.south) -- (-1.92,-8.19);
+  \draw[vida] (d.south) -- (1.92,-8.19);
+  \draw[vida] (dc.south) -- (5.75,-8.19);
+  \draw[seta] (-5.75,-1.93) -- (-1.92,-1.93);
+  \node[rot, text width=3.48cm, anchor=south] at (-3.83,-1.89) {\texttt{professor.teste} + palavra-passe};
+  \draw[seta] (-1.92,-2.76) -- (1.92,-2.76);
+  \node[rot, anchor=south] at (0.00,-2.72) {Autenticar};
+  \draw[seta] (1.92,-3.92) -- (5.75,-3.92);
+  \node[rot, text width=3.48cm, anchor=south] at (3.83,-3.88) {Valida a palavra-passe no domínio};
+  \draw[setad] (5.75,-4.75) -- (1.92,-4.75);
+  \node[rot, anchor=south] at (3.83,-4.71) {OK + grupos};
+  \draw[setad] (1.92,-5.58) -- (-1.92,-5.58);
+  \node[rot, anchor=south] at (0.00,-5.54) {Autenticado};
+  \node[acao, text width=2.9cm] at (-1.92,-6.46) {\texttt{pam\_mkhomedir} cria \texttt{/home/professor.teste}};
+  \draw[setad] (-1.92,-7.61) -- (-5.75,-7.61);
+  \node[rot, anchor=south] at (-3.83,-7.57) {Sessão aberta};
+\end{tikzpicture}
