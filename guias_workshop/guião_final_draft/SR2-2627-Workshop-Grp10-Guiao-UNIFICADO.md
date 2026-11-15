@@ -143,13 +143,22 @@ Repetir para a VM do Ubuntu, com a **mesma** bridge `<BRIDGE>` (aconselhado: uma
 
 **Passo 1 - Primeiro arranque**
 
-*Objetivo:* concluir o assistente inicial. O nome do computador (**`SR2-SRV`**) já vem definido no template.
+*Objetivo:* concluir o assistente inicial e dar o nome correto ao servidor.
 
 Iniciar a VM e completar o assistente com os valores aconselhados:
 - Região: **Portugal**; teclado: **Português**; idioma: **Inglês**;
 - Palavra-passe do Administrator: **`<PASSWORD_LAB>`** (a mesma em todo o laboratório).
 
-*Verificação esperada:* barra de pesquisa do Windows → **About this computer** mostra o nome `SR2-SRV`.
+**Passo 2 - Mudar o nome do computador para `SR2-SRV`**
+
+Abrir o **Server Manager** → **Local Server** → clicar no nome atual do computador → **Change...** → escrever `SR2-SRV` → **OK** → **Restart Now**.
+
+Em alternativa, pelo PowerShell (como Administrator):
+```powershell
+Rename-Computer -NewName "SR2-SRV" -Restart
+```
+
+*Verificação esperada:* após o reinício, barra de pesquisa do Windows → **About this computer** mostra o nome `SR2-SRV`.
 
 **Passo 2 - Abrir as definições do adaptador de rede**
 

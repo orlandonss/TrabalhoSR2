@@ -7,7 +7,7 @@
 
 \passo{Passo 1 - Primeiro arranque}
 
-\emph{Objetivo:} concluir o assistente inicial. O nome do computador (\textbf{\texttt{SR2-SRV}}) já vem definido no template.
+\emph{Objetivo:} concluir o assistente inicial e dar o nome correto ao servidor.
 
 Iniciar a VM e completar o assistente com os valores aconselhados:
 
@@ -16,13 +16,23 @@ Iniciar a VM e completar o assistente com os valores aconselhados:
 \item Palavra-passe do Administrator: \textbf{\texttt{\textless{}PASSWORD\_LAB\textgreater{}}} (a mesma em todo o laboratório).
 \end{itemize}
 
-\emph{Verificação esperada:} barra de pesquisa do Windows → \textbf{About this computer} mostra o nome \texttt{SR2-SRV}.
+\passo{Passo 2 - Mudar o nome do computador para \texttt{SR2-SRV}}
 
-\passo{Passo 2 - Abrir as definições do adaptador de rede}
+\textbf{Server Manager} → \textbf{Local Server} → clicar no nome atual do computador → \textbf{Change\ldots} → escrever \texttt{SR2-SRV} → \textbf{OK} → \textbf{Restart Now}.
+
+Em alternativa, pelo PowerShell (como Administrator):
+
+\begin{lstlisting}[style=psstyle]
+Rename-Computer -NewName "SR2-SRV" -Restart
+\end{lstlisting}
+
+\emph{Verificação esperada:} após o reinício, barra de pesquisa do Windows → \textbf{About this computer} mostra o nome \texttt{SR2-SRV}.
+
+\passo{Passo 3 - Abrir as definições do adaptador de rede}
 
 \emph{Control Panel → Network and Internet → Network and Sharing Center → Change adapter settings} → botão direito no adaptador → \textbf{Properties} → \textbf{Internet Protocol Version 4 (TCP/IPv4)} → \textbf{Properties}.
 
-\passo{Passo 3 - Atribuir o IP estático e testar a conectividade}
+\passo{Passo 4 - Atribuir o IP estático e testar a conectividade}
 
 \emph{Objetivo:} dar ao DC um IP fixo e apontar o DNS para ele próprio.
 
@@ -51,7 +61,7 @@ ping 192.168.X.1
 
 \emph{Verificação esperada:} \texttt{ipconfig} mostra \texttt{\textless{}IP\_DC\textgreater{}}, gateway \texttt{192.168.X.1} e DNS \texttt{\textless{}IP\_DC\textgreater{}}; o gateway responde ao ping.
 
-\passo{Passo 4 - Aguardar o arranque dos serviços}
+\passo{Passo 5 - Aguardar o arranque dos serviços}
 
 Aguardar que os serviços do servidor iniciem (o Server Manager abre sozinho) antes de começar a configuração.
 
