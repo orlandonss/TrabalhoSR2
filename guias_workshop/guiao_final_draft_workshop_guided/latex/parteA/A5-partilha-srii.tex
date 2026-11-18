@@ -1,0 +1,37 @@
+% 1.5
+% Ficheiro incluído por main.tex
+
+\section[Partilha SRII: SMB e permissões NTFS]{Partilha SRII: SMB e permissões NTFS}
+
+\passo{Passo 1 - Criar a pasta e partilhá-la}
+
+\begin{enumerate}
+\item Criar uma pasta no \textbf{Ambiente de Trabalho (Desktop)} com o nome \textbf{\texttt{SRII}}.
+\item Botão direito → \textbf{Properties} → separador \textbf{Sharing} → \textbf{Advanced Sharing...}
+\item Marcar \textbf{Share this folder} → \textbf{Permissions}.
+\end{enumerate}
+
+\passo{Passo 2 - Permissões de partilha (grupos)}
+
+\begin{enumerate}
+\item \textbf{Remover} o grupo \texttt{Everyone} (por segurança).
+\item \textbf{Add...} → \texttt{Grupo-Professores} → OK → coluna \emph{Allow}: \textbf{Full Control}.
+\item \textbf{Add...} → \texttt{Grupo-Alunos} → OK → coluna \emph{Allow}: \textbf{apenas Read}.
+\item \textbf{OK} duas vezes para voltar às propriedades.
+\end{enumerate}
+
+\passo{Passo 3 - Permissões de segurança (NTFS)}
+
+\begin{enumerate}
+\item Separador \textbf{Security} → \textbf{Edit...} → \textbf{Add...} → adicionar \texttt{Grupo-Alunos} e \texttt{Grupo-Professores}.
+\item Selecionar \texttt{Grupo-Alunos} e verificar que estão marcadas \textbf{Read \& execute}, \textbf{List folder contents} e \textbf{Read}.
+\item Selecionar \texttt{Grupo-Professores} e marcar \textbf{Modify} na coluna \emph{Allow}.
+\item \textbf{OK} para aplicar e fechar as propriedades.
+\end{enumerate}
+
+\passo{Passo 4 - Ficheiro de teste}
+
+Criar dentro da SRII um ficheiro de texto \textbf{\texttt{ficheiroteste.txt}} (com qualquer conteúdo), para os testes de leitura no Ubuntu.
+
+\emph{Verificação esperada:} a pasta mostra o ícone de partilha e contém \texttt{ficheiroteste.txt}.
+

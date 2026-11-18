@@ -1,0 +1,144 @@
+% 2.1.2
+% Ficheiro incluído por main.tex
+
+\subsection[Ubuntu: IP estático e DNS do Windows]{Ubuntu: IP estático e DNS do Windows}
+
+\passo{Passo 1 - Iniciar a VM e abrir o terminal}
+
+Trabalhar \textbf{na consola da VM} (não por SSH).
+
+\passo{Passo 2 - Ver a configuração de rede existente}
+
+\begin{lstlisting}[style=bashstyle]
+ls /etc/netplan
+nmcli -f NAME,DEVICE,TYPE connection show
+\end{lstlisting}
+
+\begin{itemize}
+\item \texttt{ls /\allowbreak{}etc/\allowbreak{}netplan} lista os ficheiros do Netplan.
+\item \texttt{nmcli ... connection show} lista as ligações geridas pelo NetworkManager.
+\end{itemize}
+
+\passo{Passo 3 - Criar uma pasta de backup}
+
+\begin{lstlisting}[style=bashstyle]
+sudo mkdir -p /root/netplan-bak
+\end{lstlisting}
+
+\passo{Passo 4 - Remover os ficheiros em conflito}
+
+\begin{lstlisting}[style=bashstyle]
+cd /etc/netplan
+sudo mv 00-installer-config.yaml 01-netcfg.yaml 90-NM-*.yaml /root/netplan-bak/
+ls /etc/netplan
+cd ~
+\end{lstlisting}
+
+\emph{Verificação esperada:} o \texttt{ls} mostra \textbf{só} \texttt{01-network-manager-all.yaml}.
+
+\passo{Passo 5 - Aplicar a limpeza}
+
+\begin{lstlisting}[style=bashstyle]
+sudo netplan apply
+\end{lstlisting}
+
+\passo{Passo 6 - Garantir que o NetworkManager está a correr}
+
+\begin{lstlisting}[style=bashstyle]
+sudo systemctl start NetworkManager
+systemctl is-active NetworkManager
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{active}.
+
+\passo{Passo 7 - Criar a ligação com IP estático e DNS do Windows Server}
+
+\begin{lstlisting}[style=bashstyle]
+sudo nmcli connection add type ethernet ifname ens18 con-name labX \
+     ipv4.method manual \
+     ipv4.addresses <IP_CLIENTE>/24 \
+     ipv4.gateway 192.168.X.1 \
+     ipv4.dns <IP_DC> \
+     ipv4.dns-search isec.local \
+     ipv4.ignore-auto-dns yes
+\end{lstlisting}
+
+\emph{Verificação esperada:} o comando termina sem erros.
+
+\passo{Passo 8 - Ativar a ligação e confirmar}
+
+\begin{lstlisting}[style=bashstyle]
+sudo nmcli connection up labX
+nmcli -f NAME,DEVICE,TYPE connection show
+\end{lstlisting}
+
+\emph{Verificação esperada:} o perfil \texttt{labX} aparece associado à placa \texttt{ens18}.
+
+\begin{lstlisting}[style=bashstyle]
+sudo nmcli connection delete 'NOME'
+\end{lstlisting}
+
+\passo{Passo 9 - Confirmar o IP e a rota}
+
+\begin{lstlisting}[style=bashstyle]
+ip -br a
+ip route
+\end{lstlisting}
+
+\emph{Verificação esperada:}
+
+\begin{itemize}
+\item \texttt{ens18} aparece \textbf{UP} com \texttt{\textless{}IP\_CLIENTE\textgreater{}/\allowbreak{}24} - e \textbf{não} com um endereço \texttt{169.254.x.x};
+\item existe \textbf{uma única} linha \texttt{default via 192.168.X.1} (o conflito do início desapareceu).
+\end{itemize}
+
+\passo{Passo 10 - Confirmar que o DNS é o do Windows}
+
+\begin{lstlisting}[style=bashstyle]
+resolvectl status ens18
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{Current DNS Server: \textless{}IP\_DC\textgreater{}}, \texttt{DNS Servers: \textless{}IP\_DC\textgreater{}} (sem \texttt{8.8.8.8} nem \texttt{1.1.1.1}), \texttt{DNS Domain: isec.local}.
+
+\passo{Passo 11 - Testar a ligação ao servidor}
+
+\begin{lstlisting}[style=bashstyle]
+ping -c 3 <IP_DC>
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{0\% packet loss}.
+
+\passo{Passo 12 - Testar o DNS do domínio}
+
+\begin{lstlisting}[style=bashstyle]
+dig @<IP_DC> isec.local +short
+dig @<IP_DC> _ldap._tcp.dc._msdcs.isec.local SRV +short
+\end{lstlisting}
+
+\emph{Verificação esperada:}
+
+\begin{itemize}
+\item o 1.º devolve \texttt{\textless{}IP\_DC\textgreater{}};
+\item o 2.º devolve algo como \texttt{0 100 389 sr2-srv.isec.local.}
+\end{itemize}
+
+\passo{Passo 13 - Corrigir o ping a \texttt{isec.local} (desativar o mDNS para \texttt{.local})}
+
+\begin{lstlisting}[style=bashstyle]
+sudo cp /etc/nsswitch.conf /etc/nsswitch.conf.bak
+grep ^hosts /etc/nsswitch.conf
+sudo sed -i 's/mdns4_minimal \[NOTFOUND=return\] //' /etc/nsswitch.conf
+grep ^hosts /etc/nsswitch.conf
+\end{lstlisting}
+
+\emph{Verificação esperada:} a linha passa de \texttt{hosts: files mdns4\_minimal [NOTFOUND=return] dns} para \texttt{hosts: files dns}.
+
+\passo{Passo 14 - Testar o \texttt{isec.local}}
+
+\begin{lstlisting}[style=bashstyle]
+getent hosts isec.local
+ping -c 3 isec.local
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{getent} devolve \texttt{\textless{}IP\_DC\textgreater{} isec.local} e o ping responde com \texttt{0\% packet loss}.
+

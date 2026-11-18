@@ -1,0 +1,29 @@
+% 2.1.1
+% Ficheiro incluído por main.tex
+
+\subsection[Preparar o cliente: confirmar que o Winbind está desativado]{Preparar o cliente: confirmar que o Winbind está desativado}
+
+\passo{Passo 1 - Confirmar que o serviço Winbind está desativado}
+
+\begin{lstlisting}[style=bashstyle]
+systemctl is-enabled winbind
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{disabled}. Se aparecer \texttt{enabled}: \texttt{sudo systemctl disable --now winbind}.
+
+\passo{Passo 2 - Confirmar que o Winbind não está no PAM}
+
+\begin{lstlisting}[style=bashstyle]
+grep -c pam_winbind /etc/pam.d/common-auth
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{0}. Se der outro número: \texttt{sudo pam-auth-update --disable winbind}.
+
+\passo{Passo 3 - Confirmar que o Winbind não está no NSS}
+
+\begin{lstlisting}[style=bashstyle]
+grep -E '^(passwd|group):' /etc/nsswitch.conf
+\end{lstlisting}
+
+\emph{Verificação esperada:} as linhas \texttt{passwd:} e \texttt{group:} não têm \texttt{winbind} (ex.: \texttt{passwd: files systemd sss}). Se tiverem: \texttt{sudo sed -i -E '/\allowbreak{}\textasciicircum{}(passwd\textbar{}group):/\allowbreak{} s/\allowbreak{} winbind/\allowbreak{}/\allowbreak{}' /\allowbreak{}etc/\allowbreak{}nsswitch.conf}.
+

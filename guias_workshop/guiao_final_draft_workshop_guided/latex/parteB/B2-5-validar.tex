@@ -1,0 +1,32 @@
+% 2.2.5
+% Ficheiro incluído por main.tex
+
+\subsection[Validar a associação ao domínio]{Validar a associação ao domínio}
+
+\passo{Passo 1 - Verificar se o Ubuntu está associado ao domínio}
+
+\begin{lstlisting}[style=bashstyle]
+sudo systemctl restart winbind
+sudo systemctl status winbind --no-pager
+sudo net ads testjoin
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{winbind.service} com \texttt{active (running)} e \texttt{Status: "winbindd: ready to serve connections..."}; o \texttt{testjoin} responde \textbf{\texttt{Join is OK}}.
+
+\passo{Passo 2 - Verificar a relação de confiança}
+
+\begin{lstlisting}[style=bashstyle]
+sudo wbinfo -t
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{checking the trust secret for domain ISEC via RPC calls succeeded}.
+
+\passo{Passo 3 - Verificar se o Winbind identifica os utilizadores e grupos do AD}
+
+\begin{lstlisting}[style=bashstyle]
+sudo wbinfo -u
+sudo wbinfo -g
+\end{lstlisting}
+
+\emph{Verificação esperada:} o \texttt{-u} lista, entre outros, \texttt{professor.teste} e \texttt{aluno.teste}; o \texttt{-g} lista, entre outros, \texttt{grupo-professores} e \texttt{grupo-alunos} (em minúsculas).
+

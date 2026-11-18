@@ -1,0 +1,42 @@
+% 2.2.9
+% Ficheiro incluído por main.tex
+
+\subsection[Testar o início de sessão com um utilizador AD]{Testar o início de sessão com um utilizador AD}
+
+\passo{Passo 1 - Verificar se a pasta pessoal já existe}
+
+\begin{lstlisting}[style=bashstyle]
+ls -ld /home/professor.teste
+\end{lstlisting}
+
+\emph{Verificação esperada:} na primeira vez, \texttt{No such file or directory} (a pasta ainda não existe; é criada no login).
+
+\passo{Passo 2 - Autenticar o utilizador}
+
+\begin{lstlisting}[style=bashstyle]
+su - professor.teste
+\end{lstlisting}
+
+Pede a palavra-passe do utilizador no AD (escrever só \texttt{professor.teste}, sem \texttt{@isec.local}).
+
+\passo{Passo 3 - Validar a sessão}
+
+\begin{lstlisting}[style=bashstyle]
+whoami
+id
+pwd
+echo "$HOME"
+touch teste-winbind.txt
+ls -l teste-winbind.txt
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{whoami} → \texttt{professor.teste}; o \texttt{id} inclui \texttt{grupo-professores}; \texttt{pwd} e \texttt{\$HOME} → \texttt{/\allowbreak{}home/\allowbreak{}professor.teste}; o ficheiro criado pertence a \texttt{professor.teste} e ao grupo \texttt{domain users}.
+
+\passo{Passo 4 - Regressar à conta local}
+
+\begin{lstlisting}[style=bashstyle]
+exit
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{logout} e o prompt volta a ser o do utilizador local.
+

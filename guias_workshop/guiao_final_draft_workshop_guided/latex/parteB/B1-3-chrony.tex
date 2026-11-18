@@ -1,0 +1,23 @@
+% 2.1.3
+% Ficheiro incluído por main.tex
+
+\subsection[Sincronização do relógio (chrony)]{Sincronização do relógio (chrony)}
+
+\passo{Passo 1 - Direcionar o chrony ao Windows Server}
+
+\begin{lstlisting}[style=bashstyle]
+grep -q "^server <IP_DC>" /etc/chrony/chrony.conf || \
+  echo "server <IP_DC> iburst" | sudo tee -a /etc/chrony/chrony.conf
+grep "^server <IP_DC>" /etc/chrony/chrony.conf
+\end{lstlisting}
+
+\passo{Passo 2 - Reiniciar o chrony e confirmar}
+
+\begin{lstlisting}[style=bashstyle]
+sudo systemctl restart chrony
+systemctl status chrony --no-pager
+chronyc sources -v
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{active (running)} (se o serviço não existir, tenta \texttt{chronyd}) e, no \texttt{chronyc sources -v}, a linha de \texttt{\textless{}IP\_DC\textgreater{}} com \texttt{\textasciicircum{}*} ou \texttt{\textasciicircum{}+}. Se \texttt{\textless{}IP\_DC\textgreater{}} aparecer com \texttt{\textasciicircum{}?}, espera uns segundos e repete o comando.
+

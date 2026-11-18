@@ -1,0 +1,34 @@
+% 2.1.8
+% Ficheiro incluído por main.tex
+
+\subsection[Login com contas do AD: PAM]{Login com contas do AD: PAM}
+
+\passo{Passo 1 - Ativar a criação automática da home no primeiro login}
+
+\begin{lstlisting}[style=bashstyle]
+sudo pam-auth-update --enable mkhomedir
+grep mkhomedir /etc/pam.d/common-session
+\end{lstlisting}
+
+\emph{Verificação esperada:} o \texttt{grep} mostra \texttt{pam\_mkhomedir.so}. Não há MFA configurado: o login pede só utilizador e palavra-passe.
+
+\passo{Passo 2 - Login com uma conta do AD}
+
+\begin{lstlisting}[style=bashstyle]
+su - aluno.teste@isec.local
+whoami
+id
+pwd
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{whoami} mostra \texttt{aluno.teste@isec.local}; a home é criada na primeira vez (\texttt{pwd} → \texttt{/\allowbreak{}home/\allowbreak{}aluno.teste@isec.local}).
+
+\passo{Passo 3 - Obter o ticket Kerberos na sessão}
+
+\begin{lstlisting}[style=bashstyle]
+kinit aluno.teste@ISEC.LOCAL
+klist
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{klist} mostra \texttt{krbtgt/\allowbreak{}ISEC.LOCAL@ISEC.LOCAL}.
+

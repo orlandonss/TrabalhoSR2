@@ -1,0 +1,75 @@
+% 2.1.5
+% Ficheiro incluído por main.tex
+
+\subsection[Samba: acesso à partilha SRII com Kerberos]{Samba: acesso à partilha SRII com Kerberos}
+
+\passo{Passo 1 - Limpar a cache do Kerberos}
+
+\begin{lstlisting}[style=bashstyle]
+kdestroy
+klist
+\end{lstlisting}
+
+\passo{Passo 2 - Listar as pastas partilhadas do servidor}
+
+\begin{lstlisting}[style=bashstyle]
+kinit aluno.teste@ISEC.LOCAL
+smbclient -L //SR2-SRV.isec.local --use-kerberos=required
+\end{lstlisting}
+
+\emph{Verificação esperada:} aparece a partilha \textbf{SRII}.
+
+\passo{Passo 3 - Preparar um ficheiro de testes}
+
+\begin{lstlisting}[style=bashstyle]
+echo "Escrito a partir do Ubuntu" > /tmp/teste-escrita.txt
+chmod 644 /tmp/teste-escrita.txt
+kdestroy
+klist
+\end{lstlisting}
+
+\passo{Passo 4 - Testar o aluno}
+
+\begin{lstlisting}[style=bashstyle]
+kinit aluno.teste@ISEC.LOCAL
+smbclient //SR2-SRV.isec.local/SRII --use-kerberos=required -c 'ls'
+smbclient //SR2-SRV.isec.local/SRII --use-kerberos=required -c 'put /tmp/teste-escrita.txt aluno-escrita.txt'
+kdestroy
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{ls} funciona; \texttt{put} falha com \texttt{NT\_STATUS\_ACCESS\_DENIED}.
+
+\passo{Passo 5 - Testar o professor}
+
+\begin{lstlisting}[style=bashstyle]
+kinit professor.teste@ISEC.LOCAL
+smbclient //SR2-SRV.isec.local/SRII --use-kerberos=required -c 'ls'
+smbclient //SR2-SRV.isec.local/SRII --use-kerberos=required -c 'put /tmp/teste-escrita.txt professor-escrita.txt'
+smbclient //SR2-SRV.isec.local/SRII --use-kerberos=required -c 'ls'
+kdestroy
+klist
+\end{lstlisting}
+
+\emph{Verificação esperada:} o professor lista e escreve; \texttt{professor-escrita.txt} aparece no segundo \texttt{ls}.
+
+\passo{Passo 6 - Analisar resultados e discutir}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{Utilizador} & \textbf{Listar (\texttt{ls})} & \textbf{Escrever (\texttt{put})} \\
+\hline
+\texttt{aluno.teste} & Permitido & \texttt{NT\_STATUS\_ACCESS\_DENIED} \\
+\hline
+\texttt{professor.teste} & Permitido & Permitido \\
+\hline
+\end{tabularx}
+\end{center}
+
+Confirmar também no Windows Server:
+
+\begin{lstlisting}[style=psstyle]
+Get-ChildItem "$env:USERPROFILE\Desktop\SRII"
+\end{lstlisting}
+
+\emph{Verificação esperada:} existe \texttt{professor-escrita.txt} e \textbf{não} existe \texttt{aluno-escrita.txt}.

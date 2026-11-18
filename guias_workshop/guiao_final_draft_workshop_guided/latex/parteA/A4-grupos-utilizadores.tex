@@ -1,0 +1,52 @@
+% 1.4
+% Ficheiro incluído por main.tex
+
+\section[Grupos e utilizadores no Active Directory]{Grupos e utilizadores no Active Directory}
+
+\passo{Passo 1 - Abrir o Active Directory Users and Computers}
+
+\textbf{Server Manager} → menu \textbf{Tools} (canto superior direito) → \textbf{Active Directory Users and Computers}.
+
+\passo{Passo 2 - Pasta Users}
+
+Expandir o domínio \textbf{\texttt{isec.local}} e clicar na pasta \textbf{Users}.
+
+\passo{Passo 3 - Criar os grupos}
+
+Ícone \textbf{Create a new group}:
+
+\begin{enumerate}
+\item \textbf{Grupo-Alunos} - \emph{Group scope:} \textbf{Global}, \emph{Group type:} \textbf{Security} → OK.
+\item \textbf{Grupo-Professores} - mesmas opções → OK.
+\end{enumerate}
+
+\passo{Passo 4 - Criar os utilizadores}
+
+Ícone \textbf{Create a new user}:
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{azul!10}\textbf{First name} & \textbf{Last name} & \textbf{User logon name} & \textbf{Grupo} \\
+\hline
+Professor & Teste & \texttt{professor.teste} & Grupo-Professores \\
+\hline
+Aluno & Teste & \texttt{aluno.teste} & Grupo-Alunos \\
+\hline
+\end{tabularx}
+\end{center}
+
+\passo{Passo 5 - Palavra-passe dos utilizadores}
+
+Atribuir a palavra-passe \texttt{\textless{}PASSWORD\_LAB\textgreater{}}, \textbf{desmarcar} \emph{"User must change password at next logon"} e manter \emph{"Password never expires"} \textbf{desmarcada}.
+
+\passo{Passo 6 - Atribuir os grupos aos utilizadores}
+
+\begin{enumerate}
+\item Na pasta \emph{Users}, localizar os utilizadores criados: \textbf{Professor Teste} e \textbf{Aluno Teste}.
+\item Duplo clique em \textbf{Professor Teste} → separador \textbf{Member Of} → \textbf{Add...} → \texttt{Grupo-Professores} → OK.
+\item Duplo clique em \textbf{Aluno Teste} → \textbf{Member Of} → \textbf{Add...} → \texttt{Grupo-Alunos} → OK.
+\end{enumerate}
+
+\emph{Verificação esperada:} em \emph{Member Of}, cada utilizador mostra \texttt{Domain Users} e o seu grupo.
+

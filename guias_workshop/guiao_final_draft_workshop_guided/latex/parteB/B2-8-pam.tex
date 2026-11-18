@@ -1,0 +1,27 @@
+% 2.2.8
+% Ficheiro incluído por main.tex
+
+\subsection[Configurar a autenticação PAM]{Configurar a autenticação PAM}
+
+\passo{Passo 1 - Ativar os perfis PAM do Winbind}
+
+\begin{lstlisting}[style=bashstyle]
+sudo pam-auth-update
+\end{lstlisting}
+
+No menu (espaço para marcar, \texttt{Tab} para ir ao \textbf{OK}):
+
+\begin{itemize}
+\item \textbf{marcar:} \emph{Unix authentication}, \emph{Winbind NT/Active Directory authentication} e \emph{Create home directory on login};
+\item \textbf{desmarcar}, se aparecerem: \emph{SSS authentication}, as opções \emph{SSS ... smart card} e qualquer perfil do \emph{ADsys};
+\item as restantes opções ficam como estão.
+\end{itemize}
+
+\emph{Verificação esperada:}
+
+\begin{lstlisting}[style=bashstyle]
+grep -E "pam_winbind|pam_mkhomedir" /etc/pam.d/common-auth /etc/pam.d/common-session
+\end{lstlisting}
+
+mostra \texttt{pam\_winbind.so} no \texttt{common-auth} e \texttt{pam\_mkhomedir.so} no \texttt{common-session}.
+

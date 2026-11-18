@@ -1,0 +1,46 @@
+% 2.1.4
+% Ficheiro incluído por main.tex
+
+\subsection[Kerberos: configurar o realm e obter o ticket]{Kerberos: configurar o realm e obter o ticket}
+
+\passo{Passo 1 - Guardar uma cópia do ficheiro original}
+
+\begin{lstlisting}[style=bashstyle]
+sudo cp /etc/krb5.conf /etc/krb5.conf.original 2>/dev/null
+\end{lstlisting}
+
+\passo{Passo 2 - Escrever o novo \texttt{krb5.conf}}
+
+\begin{lstlisting}[style=bashstyle]
+sudo tee /etc/krb5.conf > /dev/null << 'EOF'
+[libdefaults]
+    default_realm = ISEC.LOCAL
+    dns_lookup_realm = false
+    dns_lookup_kdc = true
+    rdns = false
+
+[realms]
+    ISEC.LOCAL = {
+        kdc = SR2-SRV.isec.local
+        admin_server = SR2-SRV.isec.local
+    }
+
+[domain_realm]
+    .isec.local = ISEC.LOCAL
+    isec.local = ISEC.LOCAL
+EOF
+cat /etc/krb5.conf
+\end{lstlisting}
+
+\emph{Verificação esperada:} o \texttt{cat} mostra o ficheiro exatamente como acima.
+
+\passo{Passo 3 - Obter o ticket}
+
+\begin{lstlisting}[style=bashstyle]
+kinit aluno.teste@ISEC.LOCAL
+klist
+kdestroy
+\end{lstlisting}
+
+\emph{Verificação esperada:} o \texttt{kinit} pede a palavra-passe e não mostra mais nada; o \texttt{klist} mostra o utilizador e o ticket \texttt{krbtgt/\allowbreak{}ISEC.LOCAL@ISEC.LOCAL}.
+

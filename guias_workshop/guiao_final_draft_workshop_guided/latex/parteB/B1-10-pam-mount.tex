@@ -1,0 +1,88 @@
+% 2.1.10
+% Ficheiro incluído por main.tex
+
+\subsection[Montagem automática da SRII no login: pam\_mount]{Montagem automática da SRII no login: pam\_mount}
+
+\passo{Passo 1 - Confirmar que o pam\_mount está ativo no PAM} (terminal do utilizador local)
+
+\begin{lstlisting}[style=bashstyle]
+grep pam_mount /etc/pam.d/common-auth /etc/pam.d/common-session
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{pam\_mount.so} aparece nos dois ficheiros. Se não aparecer: \texttt{sudo pam-auth-update --enable libpam-mount}.
+
+\passo{Passo 2 - Cópia de segurança e abrir a configuração}
+
+\begin{lstlisting}[style=bashstyle]
+sudo cp /etc/security/pam_mount.conf.xml /etc/security/pam_mount.conf.xml.bak
+sudo nano /etc/security/pam_mount.conf.xml
+\end{lstlisting}
+
+\passo{Passo 3 - Colar as linhas \texttt{\textless{}volume\textgreater{}} (uma por utilizador)}
+
+Logo abaixo da linha \texttt{\textless{}!-- Volume definitions --\textgreater{}}, colar:
+
+\begin{lstlisting}[style=cfgstyle]
+<!-- [Linux Client] /etc/security/pam_mount.conf.xml - igual para todos -->
+<volume user="aluno.teste@isec.local" fstype="cifs"
+        server="SR2-SRV.isec.local" path="SRII" mountpoint="~/SRII"
+        options="sec=ntlmssp,vers=3.0,domain=ISEC,username=aluno.teste,uid=%(USERUID),gid=%(USERGID)" />
+
+<volume user="professor.teste@isec.local" fstype="cifs"
+        server="SR2-SRV.isec.local" path="SRII" mountpoint="~/SRII"
+        options="sec=ntlmssp,vers=3.0,domain=ISEC,username=professor.teste,uid=%(USERUID),gid=%(USERGID)" />
+\end{lstlisting}
+
+\passo{Passo 4 - Guardar e confirmar as duas linhas}
+
+Guardar com \texttt{Ctrl+O}, \texttt{Enter}; sair com \texttt{Ctrl+X}. Depois:
+
+\begin{lstlisting}[style=bashstyle]
+grep -n -A2 "<volume user" /etc/security/pam_mount.conf.xml
+\end{lstlisting}
+
+\emph{Verificação esperada:} aparecem as duas entradas (aluno e professor), logo abaixo de \emph{Volume definitions}.
+
+\passo{Passo 5 - Entrar como professor: a SRII é montada sozinha}
+
+\begin{lstlisting}[style=bashstyle]
+su - professor.teste@isec.local
+mount | grep SRII
+exit
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{/\allowbreak{}/\allowbreak{}SR2-SRV.isec.local/\allowbreak{}SRII on /\allowbreak{}home/\allowbreak{}professor.teste@isec.local/\allowbreak{}SRII type cifs (rw,\allowbreak{}...,\allowbreak{}sec=ntlmssp,\allowbreak{}...)}.
+
+\passo{Passo 6 - Entrar como aluno: a SRII também é montada}
+
+\begin{lstlisting}[style=bashstyle]
+su - aluno.teste@isec.local
+mount | grep SRII
+exit
+\end{lstlisting}
+
+\emph{Verificação esperada:} a mesma linha \texttt{type cifs}, agora em \texttt{/\allowbreak{}home/\allowbreak{}aluno.teste@isec.local/\allowbreak{}SRII}.
+
+\passo{Passo 7 - Aluno lê, mas não escreve}
+
+\begin{lstlisting}[style=bashstyle]
+su - aluno.teste@isec.local
+cat ~/SRII/ficheiroteste.txt
+echo "teste" > ~/SRII/aluno-tenta.txt
+exit
+\end{lstlisting}
+
+\emph{Verificação esperada:} o aluno lê o ficheiro, mas o \texttt{echo} dá \texttt{Permissão recusada} (só tem leitura).
+
+\passo{Passo 8 - Professor lê e escreve}
+
+\begin{lstlisting}[style=bashstyle]
+su - professor.teste@isec.local
+cat ~/SRII/ficheiroteste.txt
+echo "Criado no Ubuntu pelo professor" > ~/SRII/criado-no-ubuntu.txt
+ls -l ~/SRII
+exit
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{criado-no-ubuntu.txt} aparece no \texttt{ls -l}. No Windows Server, na pasta SRII, está \texttt{criado-no-ubuntu.txt} e \textbf{não} \texttt{aluno-tenta.txt}.
+

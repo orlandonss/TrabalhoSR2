@@ -1,0 +1,46 @@
+% Introdução - Setup das Máquinas Virtuais
+% Ficheiro incluído por main.tex
+
+\section*{Setup das Máquinas Virtuais (Proxmox)}
+\addcontentsline{toc}{section}{Setup das Máquinas Virtuais (Proxmox)}
+
+\passo{Passo 1 - Abrir a pool dos templates}
+
+Abrir o Proxmox e selecionar a pool \textbf{\texttt{PoolStudentTemplates}}.
+
+\passo{Passo 2 - Localizar os templates do grupo}
+
+Localizar os templates do grupo:
+
+\begin{itemize}
+\item \textbf{Windows Server} - o Domain Controller (Parte A);
+\item \textbf{UbuntuClient} - o cliente Ubuntu, com os pacotes do SSSD e do Winbind. O mesmo template dá origem aos dois clientes: o da integração com SSSD (2.1, clonado agora) e o da integração com Winbind (2.2, clonado em 2.2.1).
+\end{itemize}
+
+\passo{Passo 3 - Clonar as duas VMs}
+
+No template do Windows Server e no \textbf{UbuntuClient}: \textbf{Clone} →
+
+\begin{itemize}
+\item \textbf{Mode:} \texttt{Linked Clone};
+\item \textbf{Pool:} \texttt{\textless{}POOL\_GRUPO\textgreater{}} (a pool do teu grupo, ex.: \texttt{PoolTeamX});
+\item \textbf{Nome:} \texttt{WindowsServerADDS-grp\textless{}N\textgreater{}} para o Windows e \texttt{UbuntuClient-SSSD-grp\textless{}N\textgreater{}} para o Ubuntu (o cliente da parte 2.1).
+\end{itemize}
+
+\passo{Passo 4 - Escolher a placa de rede (Windows Server)}
+
+Na VM do Windows: \textbf{Hardware → Network Device} → escolher a bridge \textbf{\texttt{\textless{}BRIDGE\textgreater{}}} que pertence à pool de endereços do teu grupo.
+
+\passo{Passo 5 - Escolher a placa de rede (Ubuntu)}
+
+Repetir para a VM do Ubuntu, com a \textbf{mesma} bridge \texttt{\textless{}BRIDGE\textgreater{}} (aconselhado: uma bridge por aluno, para não haver conflitos). Em ambas as VMs confirmar:
+
+\begin{itemize}
+\item \textbf{Bridge = \texttt{\textless{}BRIDGE\textgreater{}}};
+\item \textbf{Disconnect} desmarcado;
+\item \textbf{Firewall} desmarcado.
+\end{itemize}
+
+\passo{Passo 6 - Iniciar as duas VMs}
+
+\textbf{Verificação esperada:} as duas VMs aparecem dentro de \texttt{\textless{}POOL\_GRUPO\textgreater{}}, ambas com a bridge \texttt{\textless{}BRIDGE\textgreater{}}, e arrancam.

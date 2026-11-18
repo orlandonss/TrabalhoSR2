@@ -1,0 +1,20 @@
+% 2.1.7
+% Ficheiro incluído por main.tex
+
+\subsection[Utilizadores do AD no Linux: SSSD]{Utilizadores do AD no Linux: SSSD}
+
+\passo{Passo 1 - Confirmar que o Linux localiza os utilizadores do AD e ver a configuração do SSSD}
+
+\begin{lstlisting}[style=bashstyle]
+id aluno.teste@isec.local
+id professor.teste@isec.local
+sudo cat /etc/sssd/sssd.conf
+\end{lstlisting}
+
+\emph{Verificação esperada:}
+
+\begin{itemize}
+\item \texttt{id} mostra o UID e os grupos, ex.: \texttt{groups=...(domain users@isec.local),\allowbreak{}...(grupo-alunos@isec.local)} - os grupos aparecem em \textbf{minúsculas};
+\item o \texttt{sssd.conf} (gerado pelo \texttt{realm join}) contém:
+\end{itemize}
+

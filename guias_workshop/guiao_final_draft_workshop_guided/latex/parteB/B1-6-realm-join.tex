@@ -1,0 +1,40 @@
+% 2.1.6
+% Ficheiro incluído por main.tex
+
+\subsection[Entrada no domínio: realmd e adcli]{Entrada no domínio: realmd e adcli}
+
+\passo{Passo 1 - Ajustar o nome do cliente}
+
+\begin{lstlisting}[style=bashstyle]
+hostnamectl
+sudo hostnamectl set-hostname ubuclient
+hostnamectl
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{Static hostname: ubuclient}.
+
+\passo{Passo 2 - Descobrir o domínio}
+
+\begin{lstlisting}[style=bashstyle]
+realm discover isec.local
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{type: kerberos}, \texttt{realm-name: ISEC.LOCAL}, \texttt{server-software: active-directory}.
+
+\passo{Passo 3 - Fazer o join ao domínio}
+
+\begin{lstlisting}[style=bashstyle]
+sudo realm join -U Administrator isec.local
+\end{lstlisting}
+
+Pede a palavra-passe do \emph{Administrator} do domínio.
+
+\passo{Passo 4 - Confirmar o join ao domínio}
+
+\begin{lstlisting}[style=bashstyle]
+realm list
+sudo systemctl status sssd --no-pager
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{realm list} mostra \texttt{configured: kerberos-member}; o \texttt{sssd} está \texttt{active (running)}.
+

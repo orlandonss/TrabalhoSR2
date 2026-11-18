@@ -1,0 +1,62 @@
+% 2.1.9
+% Ficheiro incluído por main.tex
+
+\subsection[Acesso à SRII como utilizador do domínio]{Acesso à SRII como utilizador do domínio}
+
+\subsubsection[Aluno]{Aluno}
+
+\passo{Passo 1 - Obter o ticket na sessão do aluno}
+
+Continuando na sessão do aluno (2.1.8):
+
+\begin{lstlisting}[style=bashstyle]
+kinit aluno.teste@ISEC.LOCAL
+klist
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{klist} mostra \texttt{krbtgt/\allowbreak{}ISEC.LOCAL@ISEC.LOCAL}.
+
+\passo{Passo 2 - Listar a SRII com o ticket}
+
+\begin{lstlisting}[style=bashstyle]
+smbclient //SR2-SRV.isec.local/SRII --use-kerberos=required -c 'ls'
+\end{lstlisting}
+
+\emph{Verificação esperada:} a listagem da SRII aparece.
+
+\passo{Passo 3 - Testar a escrita}
+
+\begin{lstlisting}[style=bashstyle]
+smbclient //SR2-SRV.isec.local/SRII --use-kerberos=required -c 'put /tmp/teste-escrita.txt aluno-escrita2.txt'
+klist
+exit
+\end{lstlisting}
+
+\emph{Verificação esperada:} o \texttt{put} falha com \texttt{NT\_STATUS\_ACCESS\_DENIED}; o \texttt{klist} mostra dois tickets: \texttt{krbtgt/\allowbreak{}ISEC.LOCAL} e \texttt{cifs/\allowbreak{}SR2-SRV.isec.local}.
+
+\subsubsection[Professor]{Professor}
+
+\passo{Passo 1 - Entrar como professor}
+
+\begin{lstlisting}[style=bashstyle]
+su - professor.teste@isec.local
+\end{lstlisting}
+
+\passo{Passo 2 - Obter o ticket na sessão}
+
+\begin{lstlisting}[style=bashstyle]
+kinit professor.teste@ISEC.LOCAL
+\end{lstlisting}
+
+\passo{Passo 3 - Ler e escrever na SRII}
+
+\begin{lstlisting}[style=bashstyle]
+smbclient //SR2-SRV.isec.local/SRII --use-kerberos=required -c 'ls'
+smbclient //SR2-SRV.isec.local/SRII --use-kerberos=required -c 'put /tmp/teste-escrita.txt professor-escrita2.txt'
+smbclient //SR2-SRV.isec.local/SRII --use-kerberos=required -c 'ls'
+klist
+exit
+\end{lstlisting}
+
+\emph{Verificação esperada:} o professor lista e escreve; \texttt{professor-escrita2.txt} aparece na segunda listagem.
+

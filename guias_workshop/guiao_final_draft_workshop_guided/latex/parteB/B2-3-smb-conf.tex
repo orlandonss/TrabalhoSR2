@@ -1,0 +1,59 @@
+% 2.2.3
+% Ficheiro incluído por main.tex
+
+\subsection[Configuração do Samba (smb.conf)]{Configuração do Samba (\texttt{smb.conf})}
+
+\passo{Passo 1 - Guardar a configuração original}
+
+\begin{lstlisting}[style=bashstyle]
+sudo cp -a /etc/samba/smb.conf /etc/samba/smb.conf.bak
+\end{lstlisting}
+
+\passo{Passo 2 - Definir a secção \texttt{[global]}}
+
+\begin{lstlisting}[style=bashstyle]
+sudo nano /etc/samba/smb.conf
+\end{lstlisting}
+
+Substituir toda a secção \texttt{[global]} (até à linha \texttt{\#======================= Share Definitions =======================}) por:
+
+\begin{lstlisting}[style=cfgstyle]
+[global]
+    # Identificação do domínio Active Directory
+    workgroup = ISEC
+    realm = ISEC.LOCAL
+    security = ADS
+
+    # Nome NetBIOS (máximo 15 caracteres) - nome da máquina no AD
+    netbios name = UBU-WINBIND
+
+    # Mapeamento de identificadores Windows para Linux
+    idmap config * : backend = tdb
+    idmap config * : range = 3000-7999
+    idmap config ISEC : backend = rid
+    idmap config ISEC : range = 10000-999999
+
+    # Integração com Winbind
+    winbind use default domain = yes
+    winbind enum users = yes
+    winbind enum groups = yes
+    winbind refresh tickets = yes
+
+    # Ambiente dos utilizadores do domínio
+    template shell = /bin/bash
+    template homedir = /home/%U
+
+    # Integração com PAM
+    obey pam restrictions = yes
+\end{lstlisting}
+
+Guardar com \texttt{Ctrl+O}, \texttt{Enter}; sair com \texttt{Ctrl+X}.
+
+\passo{Passo 3 - Verificar e validar a sintaxe}
+
+\begin{lstlisting}[style=bashstyle]
+sudo testparm -s
+\end{lstlisting}
+
+\emph{Verificação esperada:} \texttt{Loaded services file OK.} e \textbf{\texttt{Server role: ROLE\_DOMAIN\_MEMBER}}, seguido dos parâmetros da \texttt{[global]}.
+

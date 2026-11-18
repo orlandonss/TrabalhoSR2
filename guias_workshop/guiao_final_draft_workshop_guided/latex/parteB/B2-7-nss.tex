@@ -1,0 +1,41 @@
+% 2.2.7
+% Ficheiro incluído por main.tex
+
+\subsection[Integração do Winbind com NSS]{Integração do Winbind com NSS}
+
+\passo{Passo 1 - Editar a configuração NSS}
+
+\begin{lstlisting}[style=bashstyle]
+sudo cp -a /etc/nsswitch.conf /etc/nsswitch.conf.bak
+sudo nano /etc/nsswitch.conf
+\end{lstlisting}
+
+Deixar as linhas \texttt{passwd} e \texttt{group} assim (a linha \texttt{shadow} fica como está):
+
+\begin{lstlisting}[style=cfgstyle]
+passwd:         files systemd winbind
+group:          files systemd winbind
+shadow:         files systemd
+\end{lstlisting}
+
+Se aparecer \texttt{sss} nestas linhas, retirar.
+
+\passo{Passo 2 - Validar a integração}
+
+\begin{lstlisting}[style=bashstyle]
+getent passwd professor.teste
+getent passwd aluno.teste
+id professor.teste
+id aluno.teste
+getent group grupo-professores
+getent group grupo-alunos
+\end{lstlisting}
+
+\emph{Verificação esperada:}
+
+\begin{itemize}
+\item \texttt{getent passwd} devolve a mesma linha do \texttt{wbinfo -i} (2.2.6, Passo 3);
+\item \texttt{id professor.teste} inclui \texttt{grupo-professores} e \texttt{id aluno.teste} inclui \texttt{grupo-alunos}, além de \texttt{domain users};
+\item \texttt{getent group} devolve cada grupo com o seu GID (ex.: \texttt{grupo-professores:x:11101:}).
+\end{itemize}
+
