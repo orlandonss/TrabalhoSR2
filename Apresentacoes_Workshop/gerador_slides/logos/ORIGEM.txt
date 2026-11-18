@@ -1,0 +1,7 @@
+Logótipos obtidos na Wikimedia Commons (marcas registadas dos respetivos titulares; uso académico):
+- samba.png                <- File:Logo Samba Software.svg
+- ubuntu.png               <- File:UbuntuCoF.svg
+- linux.png                <- File:Tux.svg
+- windows-server.png       <- File:Windows logo - 2021.svg
+- google-authenticator.png <- File:Google Authenticator (April 2023).svg
+Normalizados para PNG quadrado com fundo transparente (600x600).
