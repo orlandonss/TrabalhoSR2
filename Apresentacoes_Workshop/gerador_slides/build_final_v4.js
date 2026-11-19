@@ -211,7 +211,7 @@ Antes de passarmos à parte prática, vamos explicar os conceitos base: porque �
     ["03", "Ligar o Linux ao servidor", "Normas, cenários, System Security Services Daemon (SSSD) e Winbind"],
     ["04", "Os mecanismos", "Pluggable Authentication Modules (PAM), Kerberos, Chrony, Samba e adsys"],
     ["05", "Do conceito ao laboratório", "Arquitetura, login passo a passo, permissões e testes"],
-    ["06", "Melhorias futuras", "Autenticação multifator (MFA), authd, Entra ID e FreeIPA"],
+    ["06", "Melhorias futuras", "Componentes avançadas: authd, Entra ID e FreeIPA"],
     ["07", "Conclusão e hands-on", "Síntese e passagem à prática"],
   ];
   const w = 4.35, h = 0.9, gx = 0.3, gy = 0.13, y0 = 1.15;
@@ -227,7 +227,7 @@ Antes de passarmos à parte prática, vamos explicar os conceitos base: porque �
   s.addNotes(`[Apresenta: ${A1}]
 Este é o percurso da apresentação. Eu começo pelo problema da gestão máquina a máquina e pelo que o AD DS mudou, e mostro como o AD DS se organiza por dentro, com um exemplo do próprio ISEC.
 O Pedro mostra como o Linux se liga ao servidor: as normas, os cenários e os dois "tradutores", o SSSD, System Security Services Daemon, e o Winbind. Depois apresenta os mecanismos do lado Linux: o PAM, Pluggable Authentication Modules, o Kerberos, que é a peça central da autenticação, e o Chrony.
-O Renalto apresenta o Samba, o adsys e a autenticação de dois fatores, leva tudo para o laboratório com um login passo a passo, e faz a conclusão antes de passarmos à prática.`);
+O Renalto apresenta o Samba e o adsys, leva tudo para o laboratório com um login passo a passo, e faz a conclusão antes de passarmos à prática.`);
 }
 
 // =====================================================================
@@ -425,12 +425,12 @@ Se a Ana estiver inscrita em Serviços de Rede II e em Bases de Dados, basta pô
     ["windows-server", null, "AD DS", "diretório central"], [null, "DNS", "DNS", "encontrar o servidor"], [null, "KRB", "Kerberos", "autenticação"],
     [null, "NTP", "Chrony", "relógios certos"], ["samba", null, "Samba", "falar com o Windows"],
     [null, "SSSD", "SSSD", "tradutor moderno"], [null, "WB", "Winbind", "tradutor clássico"], ["linux", null, "PAM", "a porta do login"],
-    ["ubuntu", null, "adsys", "políticas no Ubuntu"], [null, "MFA", "MFA", "melhoria futura"],
+    ["ubuntu", null, "adsys", "políticas no Ubuntu"],
   ];
   const w = 1.68, h = 1.5, g = 0.15;
   techs.forEach(([k, ab, n, d], i) => {
     const col = i % 5, row = Math.floor(i / 5);
-    const x = 0.5 + col * (w + g), y = 1.35 + row * (h + 0.25);
+    const x = 0.5 + col * (w + g) + (row === 1 ? (w + g) / 2 : 0), y = 1.35 + row * (h + 0.25);
     card(s, x, y, w, h, WHITE);
     if (k) logo(s, x + (w - 0.6) / 2, y + 0.15, 0.6, k); else badge(s, x + (w - 0.6) / 2, y + 0.15, 0.6, ab, i < 3 ? NAVY : ORANGE, WHITE, ab.length > 3 ? 11 : 13);
     s.addText([{ text: n, options: { bold: true, color: NAVY, fontSize: 13, breakLine: true } }, { text: d, options: { color: GREY, fontSize: 10.5 } }],
@@ -438,7 +438,7 @@ Se a Ana estiver inscrita em Serviços de Rede II e em Bases de Dados, basta pô
   });
   s.addNotes(`[Apresenta: ${A1}]
 Este é o mapa geral das tecnologias. O Windows Server com o AD DS é o diretório central. O DNS permite encontrar o servidor. O Kerberos é o protocolo de autenticação do AD e depende do Chrony, que sincroniza os relógios pelo NTP, o Network Time Protocol. O Samba permite ao Linux falar a linguagem do Windows.
-Do lado Linux há dois tradutores: o SSSD, System Security Services Daemon, e o Winbind, que faz parte do Samba. Ambos se ligam ao PAM, Pluggable Authentication Modules, a porta do login. O adsys aplica as políticas do AD ao Ubuntu e o 2FA, autenticação de dois fatores, acrescenta um segundo fator ao login.`);
+Do lado Linux há dois tradutores: o SSSD, System Security Services Daemon, e o Winbind, que faz parte do Samba. Ambos se ligam ao PAM, Pluggable Authentication Modules, a porta do login. O adsys aplica as políticas do AD ao Ubuntu.`);
 }
 
 // =====================================================================
@@ -456,7 +456,6 @@ Do lado Linux há dois tradutores: o SSSD, System Security Services Daemon, e o 
     ["NTP", "Chrony", "o relógio: um passe fora de horas não abre"],
     ["SMB", "Samba", "o intérprete entre o Linux e o Windows"],
     ["GPO", "adsys", "as regras afixadas em todas as portas"],
-    ["MFA", "MFA", "no futuro: senha + código do telemóvel"],
   ];
   items.forEach(([ab, n, d], i) => {
     const col = i % 2, row = Math.floor(i / 2);
@@ -470,7 +469,7 @@ Do lado Linux há dois tradutores: o SSSD, System Security Services Daemon, e o 
 Antes de entrar no detalhe técnico, uma analogia para quem não é da área: fazer login é como bater a uma porta.
 Quando escrevemos o nome e a password, estamos a bater à porta e a dizer quem somos. A porta é o PAM: decide que perguntas faz antes de abrir. Quem atende é o SSSD ou o Winbind: não sabe as senhas de cor, por isso vai confirmar à central.
 A central é o AD DS, que conhece todos os utilizadores e as suas senhas. Para lá chegar é preciso saber a morada, e é isso que o DNS dá. Quando a senha está certa, a central entrega um passe temporário, o bilhete Kerberos, que abre as outras portas sem voltar a pedir a senha. Esse passe tem hora de validade, por isso os relógios têm de estar acertados, que é o trabalho do Chrony.
-O Samba é o intérprete entre o Linux e o Windows. O adsys afixa as regras da central em todas as portas. E o 2FA pede a senha e ainda um código do telemóvel.
+O Samba é o intérprete entre o Linux e o Windows. O adsys afixa as regras da central em todas as portas.
 Vamos voltar a esta porta ao longo da apresentação.`);
 }
 
@@ -862,13 +861,13 @@ No nosso projeto é usado nos dois clientes: com o SSSD, para aceder à partilha
   flowRow(s, 0.5, 1.7, 9.0, 1.5, [
     ["1. Pedido no Linux", "abrir um ficheiro da pasta SRII"],
     ["2. Samba traduz", "para um pedido SMB"],
-    ["3. Envia ao SR2-SRV", "com o bilhete Kerberos"],
+    ["3. Envia ao SR2-SRV", "com as credenciais do utilizador"],
     ["4. Servidor responde", "depois de verificar as permissões"],
   ], { gap: 0.4, fs: 15 });
-  strip(s, "", "a password não volta a ser pedida: o bilhete Kerberos chega.", 3.8);
+  strip(s, "", "a pasta liga-se no login com a password já escrita, sem a pedir outra vez.", 3.8);
   s.addNotes(`[Apresenta: ${A3}]
 O papel do Samba é de tradutor. Vejamos o pedido passo a passo. Um utilizador no Linux abre um ficheiro na pasta SRII. O Linux não sabe falar com o Windows, por isso o Samba traduz esse pedido para SMB, a linguagem de partilha de ficheiros do Windows.
-Envia-o ao SR2-SRV juntando o bilhete Kerberos que obtivemos antes, por isso não é preciso voltar a escrever a password. O servidor verifica as permissões da partilha e do NTFS, as mesmas do exemplo do ISEC, e responde: se o utilizador for do Grupo-Alunos, pode ler mas não escrever.`);
+Envia-o ao SR2-SRV com as credenciais do utilizador: na montagem automática do login usa a password já escrita (autenticação NTLM, NT LAN Manager), por isso não é preciso voltá-la a escrever. No teste manual com o smbclient usámos o bilhete Kerberos. O servidor verifica as permissões da partilha e do NTFS, as mesmas do exemplo do ISEC, e responde: se o utilizador for do Grupo-Alunos, pode ler mas não escrever.`);
 }
 {
   const s = newSlide("Samba com o SSSD: teste na partilha SRII");
@@ -876,7 +875,7 @@ Envia-o ao SR2-SRV juntando o bilhete Kerberos que obtivemos antes, por isso nã
     ["aluno.teste", "sim", "não (acesso negado)"],
     ["professor.teste", "sim", "sim"],
   ], { x: 1.5, y: 1.5, w: 7.0, colW: [2.4, 2.0, 2.6], rowH: 0.7, fs: 15 });
-  s.addText("O aluno entra sem voltar a escrever a password: o Samba usa o bilhete Kerberos.", { x: 0.5, y: 3.65, w: 9.0, h: 0.4, fontSize: 14, color: TXT, align: "center", margin: 0 });
+  s.addText("No teste com o smbclient, o aluno acede sem voltar a escrever a password: o Samba usa o bilhete Kerberos.", { x: 0.5, y: 3.65, w: 9.0, h: 0.4, fontSize: 14, color: TXT, align: "center", margin: 0 });
   strip(s, "", "o cliente SSSD usa o Samba para as partilhas; as permissões vêm do AD.", 4.5, 0.5);
 }
 
@@ -964,13 +963,13 @@ Depois faz o pedido de autenticação Kerberos. Se o KDC devolver um TGT, a pass
     [5, 2, "8. resposta", 1],
     [2, 1, "9. sucesso", 1],
     [1, 1, "10. cria a pasta pessoal"],
-    [1, 6, "11. liga a pasta SRII (com o bilhete)"],
+    [1, 6, "11. liga a pasta SRII (password do login)"],
     [6, 1, "12. partilha montada", 1],
     [1, 0, "13. sessão iniciada", 1],
   ]);
   s.addNotes(`[Apresenta: ${A3}]
 Na segunda parte, a abertura da sessão. Com a ligação autenticada por Kerberos, o SSSD procura no LDAP os dados e os grupos do utilizador e traduz o SID do Windows em UID e GID do Linux.
-O SSSD devolve sucesso ao PAM e guarda as credenciais em cache. O PAM cria a pasta pessoal com o pam_mkhomedir. Depois, o pam_mount monta a partilha SRII por SMB, usando o bilhete Kerberos, sem voltar a pedir a password.
+O SSSD devolve sucesso ao PAM e guarda as credenciais em cache. O PAM cria a pasta pessoal com o pam_mkhomedir. Depois, o pam_mount monta a partilha SRII por SMB, reutilizando a password escrita no login (autenticação NTLM), sem a voltar a pedir.
 A sessão é iniciada: o utilizador está no Linux com a conta do Windows e já tem os seus ficheiros da rede. É exatamente este fluxo que vamos montar na parte prática.`);
 }
 
@@ -1056,31 +1055,10 @@ A teoria que apresentámos funciona na prática, e é isto que vamos repetir pas
 
 
 // =====================================================================
-// MELHORIAS FUTURAS: AUTENTICAÇÃO MULTIFATOR
-// =====================================================================
-{
-  const s = newSlide("Melhoria futura: autenticação multifator (MFA)");
-  const f = [
-    ["Algo que se sabe", "password do AD", NAVY, WHITE, ACCENT2],
-    ["Algo que se tem", "código temporário no telemóvel", WHITE, NAVY, ACCENT],
-    ["Acesso mais seguro", "uma password roubada já não chega", ACCENT, WHITE, WHITE],
-  ];
-  const w = 2.55, y = 1.4, h = 1.9;
-  f.forEach(([t, d, fill, tc, sc], i) => {
-    const x = 0.5 + i * (w + 0.67);
-    card(s, x, y, w, h, fill);
-    s.addText([{ text: t, options: { bold: true, fontSize: 16, color: tc, breakLine: true } }, { text: d, options: { fontSize: 12.5, color: sc } }],
-      { x: x + 0.15, y, w: w - 0.3, h, align: "center", valign: "middle", margin: 0 });
-    if (i < 2) s.addText(i === 0 ? "+" : "=", { x: x + w, y, w: 0.67, h, fontSize: 36, bold: true, color: GREY, align: "center", valign: "middle", margin: 0 });
-  });
-  s.addText("Pode ser acrescentada ao PAM (ex.: códigos Time-based One-Time Password, TOTP) sem mudar o resto da infraestrutura", { x: 0.5, y: 3.55, w: 9.0, h: 0.5, fontSize: 13, color: TXT, align: "center", valign: "middle", margin: 0 });
-  strip(s, "", "começar pelos acessos mais sensíveis: administradores e SSH aos servidores.", 4.5, 0.5);
-}
-// =====================================================================
 // MELHORIAS FUTURAS: OUTRAS COMPONENTES
 // =====================================================================
 {
-  const s = newSlide("Outras melhorias a explorar");
+  const s = newSlide("Melhorias futuras a explorar");
   const it = [
     ["ubuntu", null, "authd", "Login no Ubuntu com fornecedores de identidade na cloud, da Canonical"],
     [null, "ID", "Microsoft Entra ID", "O \"AD na cloud\": identidades híbridas e acesso a serviços online"],
